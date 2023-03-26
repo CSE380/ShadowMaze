@@ -8,8 +8,8 @@
     ],
     "rewrites": [
       {
-        "source": "**",
-        "destination": "/index.html"
+        "source": "/benchmark1",
+        "destination": "/benchmark1.html"
       }
     ]
   },
