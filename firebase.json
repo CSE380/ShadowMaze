@@ -5,6 +5,32 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "redirects": [
+      {
+        "source": "/benchmark1",
+        "destination": "/benchmark1.html",
+        "type":301
+      },
+      {
+        "source": "/benchmark2",
+        "destination": "/benchmark2.html",
+        "type":301
+      },
+      {
+        "source": "/benchmark3",
+        "destination": "/benchmark3.html",
+        "type":301
+      }
     ]
+  },
+  "emulators": {
+    "hosting": {
+      "port": 1478
+    },
+    "ui": {
+      "enabled": true
+    },
+    "singleProjectMode": true
   }
 }
