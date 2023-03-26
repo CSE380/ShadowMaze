@@ -11,13 +11,6 @@
         "source": "**",
         "destination": "/index.html"
       }
-    ],
-    "redirects": [
-      {
-        "source": "/benchmark1",
-        "destination": "/",
-        "type": 301
-      }
     ]
   },
   "emulators": {
