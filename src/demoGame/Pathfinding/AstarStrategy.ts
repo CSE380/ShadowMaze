@@ -32,7 +32,7 @@ export default class AstarStrategy extends NavPathStrat {
         let width = 64;
 
         const node = {  //create an object to represent a node
-            index: null,
+            index: -1,
             g_value: -1,
             h_value: -1,
             total: -1,
