@@ -189,7 +189,7 @@ export default class GuardDemoScene extends HW4Scene {
         player.addPhysics(new AABB(Vec2.ZERO, new Vec2(8, 8)));
         let healthbar = new HealthbarHUD(this, player, "primary", {size: player.size.clone().scaled(2, 1/2), offset: player.size.clone().scaled(0, -1/2)});
         this.healthbars.set(player.id, healthbar);
-
+        player.collisionShape.halfSize.scaleTo(0.25);
         player.addAI(PlayerAI);
         player.animation.play("IDLE");
         this.player = player
@@ -318,7 +318,8 @@ export default class GuardDemoScene extends HW4Scene {
         navmesh.registerStrategy("direct", new DirectStrategy(navmesh));
         navmesh.registerStrategy("astar", new AstarStrategy(navmesh));
         // Select A* as our navigation strategy
-        navmesh.setStrategy("astar");
+        var strategy="astar"
+        navmesh.setStrategy(strategy);
 
         // Add this navmesh to the navigation manager
         this.navManager.addNavigableEntity("navmesh", navmesh);

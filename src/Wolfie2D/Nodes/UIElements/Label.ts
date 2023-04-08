@@ -75,7 +75,9 @@ export default class Label extends UIElement{
 	setVAlign(align: string): void {
 		this.vAlign = align;
 	}
-
+	setFontsize(size:number):void{
+		this.fontSize = size;
+	}
 	/**
 	 * Calculate the offset of the text - this is used for rendering text with different alignments
 	 * @param ctx The rendering context

@@ -7,7 +7,7 @@ import Timer from "../../../Wolfie2D/Timing/Timer";
 import NPCActor from "../../Actors/NPCActor";
 import { ItemEvent } from "../../Events";
 import NPCAction from "./NPCActions/NPCAction";
-
+import { HudEvent } from "../../Events";
 
 /**
  * An abstract implementation of behavior for an NPC. Each concrete implementation of the
@@ -20,6 +20,7 @@ export default abstract class NPCBehavior extends StateMachineGoapAI<NPCAction> 
     public initializeAI(owner: NPCActor, options: Record<string, any>): void {
         this.owner = owner;
         this.receiver.subscribe(ItemEvent.LASERGUN_FIRED);
+        
     }
 
     public activate(options: Record<string, any>): void {}

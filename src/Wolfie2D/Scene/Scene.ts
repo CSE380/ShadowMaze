@@ -274,7 +274,7 @@ export default class Scene implements Updateable {
 
         return layer;
     }
-
+    
     /**
      * Adds a new parallax layer to this scene and returns it
      * @param name The name of the parallax layer

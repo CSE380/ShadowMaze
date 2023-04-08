@@ -7,8 +7,8 @@ import Finder from "../../../GameSystems/Searching/Finder";
 import { TargetableEntity } from "../../../GameSystems/Targeting/TargetableEntity";
 import BasicFinder from "../../../GameSystems/Searching/BasicFinder";
 import NavigationPath from "../../../../Wolfie2D/Pathfinding/NavigationPath";
-import Vec2 from "../../../../Wolfie2D/DataTypes/Vec2";
-
+import { ItemEvent } from "../../../Events";
+import { HudEvent } from "../../../Events";
 /**
  * An abstract GoapAction for an NPC. All NPC actions consist of doing three things:
  * 
@@ -34,49 +34,47 @@ export default abstract class NPCAction extends GoapAction {
     // The path from the NPC to the target
     protected _path: NavigationPath | null;
 
-
     public constructor(parent: NPCBehavior, actor: NPCActor) {
         super(parent, actor);
         this.targetFinder = new BasicFinder();
         this.targets = [];
         this.target = null;
         this.path = null;
+    //    this.receiver.subscribe("use-hpack");
+
     }
-    
-    
 
     public onEnter(options: Record<string, any>): void {
         // Select the target location where the NPC should perform the action
-        // console.log(this.actor.inventory);
         this.target = this.targetFinder.find(this.targets);
+
         // If we found a target, set the NPCs target to the target and find a path to the target
-        // console.log(this.target);
         if (this.target !== null) {
             // Set the actors current target to be the target for this action
-
             this.actor.setTarget(this.target);
             // Construct a path from the actor to the target
             this.path = this.actor.getPath(this.actor.position, this.target.position);
-            // console.log(this.target);
         }
     }
 
     public update(deltaT: number): void {
-        if (this.path == null) {
-            this.onEnter(null);
-            return;
+        // TODO get the NPCs to move on their paths
+        if(this.target == null){
+            this.target = this.targetFinder.find(this.targets);
         }
-        if (this.path.isDone()) {
-            this.performAction(this.target);
-            return;
-        }
-        else {
-            this.actor.moveOnPath(1, this.path);
-            return;
+        if (this.target != null && this.path != null) {
+            if (!this.path.isDone()) {
+                this.actor.moveOnPath(1, this.path);
+            }
+            if (this.path.isDone() && this.actor.atTarget()) {
+                this.performAction(this.target);
+                this.finished()
+                // this.onEnter()
+            }
         }
     }
 
-    public abstract performAction(target: TargetableEntity): void ;
+    public abstract performAction(target: TargetableEntity): void;
 
     public onExit(): Record<string, any> {
         // Clear the actor's current target
@@ -86,14 +84,13 @@ export default abstract class NPCAction extends GoapAction {
         this.path = null;
         return {};
     }
-    public safeExit() {
-        this.actor.clearTarget();
-        this.target = null;
-        this.path = null;
-    }
 
     public handleInput(event: GameEvent): void {
         switch (event.type) {
+            case HudEvent.USE_HPACK:{
+                console.log("heal");
+                console.log(event)
+            }
             default: {
                 throw new Error(`Unhandled event caught in NPCAction! Event type: ${event.type}`);
             }

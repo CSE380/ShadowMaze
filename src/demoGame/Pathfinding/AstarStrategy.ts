@@ -2,7 +2,10 @@ import Stack from "../../Wolfie2D/DataTypes/Collections/Stack";
 import Vec2 from "../../Wolfie2D/DataTypes/Vec2";
 import NavigationPath from "../../Wolfie2D/Pathfinding/NavigationPath";
 import NavPathStrat from "../../Wolfie2D/Pathfinding/Strategies/NavigationStrategy";
-
+import GraphUtils from "../../Wolfie2D/Utils/GraphUtils";
+import Graph from "../../Wolfie2D/DataTypes/Graphs/Graph";
+import EdgeNode from "../../Wolfie2D//DataTypes/Graphs/EdgeNode";
+import PositionGraph from "../../Wolfie2D/DataTypes/Graphs/PositionGraph";
 // TODO Construct a NavigationPath object using A*
 
 /**
@@ -13,197 +16,113 @@ import NavPathStrat from "../../Wolfie2D/Pathfinding/Strategies/NavigationStrate
  * 
  * - Peter
  */
+class Node {
+    public fCost: number;
+    public gCost: number;
+    public hCost: number;
+    static startIndex: number;
+    public isEnd: boolean;
+    static g: PositionGraph;
+    static endIndex: number;
+    public currIndex: number;
+    constructor(index: number, startIndex?: number, endIndex?: number, g?: PositionGraph,gCost?:number) {
+
+        if (endIndex && startIndex) {
+            Node.endIndex = endIndex;
+            Node.startIndex = startIndex;
+            Node.g = g;
+            this.gCost = 0;
+        }
+        this.currIndex = index;
+        // this.gCost = this.manhattanDistance(index, Node.startIndex);
+        this.hCost = this.manhattanDistance(index, Node.endIndex);
+        this.fCost = this.gCost + this.hCost;
+        // this.isEnd = Math.abs(this.currIndex - Node.endIndex) <=1
+        this.isEnd = this.hCost == 0;
+    }
+    public manhattanDistance(a: number, b: number): number {
+        return Math.abs(this.convertIndexToCoord(a).x - this.convertIndexToCoord(b).x)
+           + Math.abs( this.convertIndexToCoord(a).y - this.convertIndexToCoord(b).y);
+    }
+    public convertIndexToCoord(a: number) {
+        const len = 64;
+        return {
+            x: Math.floor(a / len),
+            y: Math.floor(a % len),
+        }
+    }
+}
 export default class AstarStrategy extends NavPathStrat {
 
     /**
      * @see NavPathStrat.buildPath()
      */
     public buildPath(to: Vec2, from: Vec2): NavigationPath {
-
-		let path = new Stack<Vec2>(this.mesh.graph.numVertices);    //a stack of type Vec2 that takes the number of verticies in the graph
-
-        let start = this.mesh.graph.snap(from); //return a vertex closest to the start in the graph
-		let end = this.mesh.graph.snap(to); //return a vertex closest to the end in the graph
-        
-        // console.log(start);
-        // console.log(end);
-
-        let height = 64;
-        let width = 64;
-
-        const node = {  //create an object to represent a node
-            index: -1,
-            g_value: -1,
-            h_value: -1,
-            total: -1,
-            seen: false,
-            origin: -1,
-            walkable: true
+        let start = this.mesh.graph.snap(from);
+        let end = this.mesh.graph.snap(to);
+        let pathStack = new Stack<Vec2>(this.mesh.graph.numVertices);
+        pathStack.push(to.clone());
+        pathStack.push(this.mesh.graph.positions[end]);
+        let parent = this.Astart(this.mesh.graph, start, end)
+        for (let index of parent) {
+            pathStack.push(this.mesh.graph.positions[index]);
         }
-        let arrayOfNodes: Array<typeof node> = new Array(this.mesh.graph.numVertices);  //declare an array of nodes 
-        for (let i = 0; i < arrayOfNodes.length; i++) { //initialize an array of nodes to repsent every node in the grpah
-            const shallowClone = {...node};
-            arrayOfNodes[i] = shallowClone;
-            arrayOfNodes[i].index = i;
-        }
-        let points : Array<number> = new Array(8)   //declare an array to represent the 8 nodes that will be surrounding the current node
-        let cheapest_total = this.mesh.graph.numVertices;   //represent the cheapest total of the entire grpah
-        let cheapest_h_value = this.mesh.graph.numVertices;
-        let cheapest_node = {...node};  //create a temp node for the node with the cheapest total
-        let current = start;    //set the current to the starting position
-        
-        for (let i = 0; i < 4096; i++) {
-            if (this.mesh.graph.edges[i] == undefined || this.mesh.graph.edges[i].next == null || this.mesh.graph.edges[i].next.next == null) {
-                arrayOfNodes[i].walkable = false;
-            }
-        }
-
-        //BEGING CONTRUCTING THE PATH FROM START TO END
-        //========================================================================================================
-        if (start == end) {
-            return new NavigationPath(path);
-        }
-        while (arrayOfNodes[current] != undefined && arrayOfNodes[current].h_value != 0) {    //keep on going until current node h value is 0, which means we are on top of the END
-
-            // console.log(arrayOfNodes[current]);
-            // console.log("while loop");
-            cheapest_h_value = this.mesh.graph.numVertices;
-            cheapest_total = this.mesh.graph.numVertices;
-            arrayOfNodes[current].seen = true;  //the current node we are at has been seen, dont go to it again
-            arrayOfNodes[start].g_value = 0;
-            arrayOfNodes[start].h_value = 0;
-            arrayOfNodes[start].total = 0;
-            let top_left = current - height - 1;
-            let top = current - height;
-            let top_right = current - height + 1;
-            let left = current - 1;
-            let right = current + 1;
-            let bottom_left = current + height - 1;
-            let bottom = current + height;
-            let bottom_right = current + height + 1;
-            points[0] = top_left;
-            points[1] = top;
-            points[2] = top_right;
-            points[3] = left;
-            points[4] = right;
-            points[5] = bottom_left;
-            points[6] = bottom;
-            points[7] = bottom_right;
-            
-            for (let i = 0; i < 8; i++) {   //for every node surrounding the current node, get the values of it
-                if (arrayOfNodes[points[i]].walkable == false) {
-                    // console.log(arrayOfNodes[points[i]]);
-                    if (arrayOfNodes[points[i]].index == end) {
-                        path.push(this.mesh.graph.positions[i]);
-                        return new NavigationPath(path);
-                    }
-                    continue;
-                }
-                let h_value = this.findDistance(arrayOfNodes[points[i]].index, end);    //find the h value, the value from the node to the end
-                let g_value = this.findDistance(arrayOfNodes[points[i]].index, current) + arrayOfNodes[current].g_value;    //find the g value
-                if (arrayOfNodes[points[i]].total != -1 && arrayOfNodes[points[i]].total <= h_value + g_value) {    //if the prev node total is less than or equal to the new node total, dont change it
-                    // console.log(arrayOfNodes[points[i]]);
-                    continue;
-                }   //past this, it implies that the prev node total is greater than the new one, so we have to replace it with the new one since the new one is shorter
-                arrayOfNodes[points[i]].h_value = h_value
-                arrayOfNodes[points[i]].g_value = g_value;
-                arrayOfNodes[points[i]].total = g_value + h_value;
-                arrayOfNodes[points[i]].origin = current;
-                // console.log(arrayOfNodes[points[i]]);
-
-            }
-            for (let i = 0; i < arrayOfNodes.length; i++) { //go to every node in the graph and find the node with the smallest total
-                if (arrayOfNodes[i].total != -1 && arrayOfNodes[i].total <= cheapest_total && arrayOfNodes[i].seen == false) {  //if the node has been initialized, if the node total is smaller than the previous total, and it has not been seen, this node is the new cheapest one
-                    //if the total is just straight up less, just set it to the cheaper one
-                    if (arrayOfNodes[i].total < cheapest_total) {
-                        cheapest_h_value = arrayOfNodes[i].h_value;
-                        cheapest_node = arrayOfNodes[i];
-                        cheapest_total = arrayOfNodes[i].total;
-                    }
-                    if (arrayOfNodes[i].total == cheapest_total && arrayOfNodes[i].h_value < cheapest_h_value) {   //need to check if the h value is smaller incase the total is the same
-                        cheapest_h_value = arrayOfNodes[i].h_value;    //we want the node with the smallest total and the smallest h value since h represents how close it is to the end node
-                        cheapest_node = arrayOfNodes[i];    //set the cheapest node to this smaller total
-                        cheapest_total = arrayOfNodes[i].total; //set the new cheapest total, and compare it with the others after
-                    }
-                }
-            }
-            //give two totals that are the, if the h cost of the first one is less, then the first one is cheaper
-            current = cheapest_node.index;  //aftesr finding the cheapest unseen initialized node, this is ur new current and check the ones surrounding this current one
-        }
-        //===================================================================================================================================================
-        //AFTER WE HAVE FOUND A PATH TO THE END FROM THE START, WE NEED TO PUSH THE NODES THAT WE WANT TO GO TO TO THE STACK
-        //START READING FROM END TO START
-        //===================================================================================================================================================
-        let current_index = end
-        while (arrayOfNodes[current_index] != null && current_index != start) {
-            path.push(this.mesh.graph.positions[current_index]);
-            current_index = arrayOfNodes[current_index].origin;
-        }
-
-        //every block is 8 spaces away from each other
-        return new NavigationPath(path);
+        return new NavigationPath(pathStack);
     }
 
-    public findDistance(currentNode: number, end: number) {
-        let diagonalDistance = 0;
-        //if the end area is top right of the player
-        while (this.mesh.graph.positions[currentNode].x != this.mesh.graph.positions[end].x && this.mesh.graph.positions[currentNode].y != this.mesh.graph.positions[end].y) {
-            if (this.mesh.graph.positions[end].x > this.mesh.graph.positions[currentNode].x) {
-                if (this.mesh.graph.positions[end].y < this.mesh.graph.positions[currentNode].y) {
-                    currentNode -= 64;
-                    currentNode += 1;
-                    diagonalDistance += 1;
-                }
-                if (this.mesh.graph.positions[end].y > this.mesh.graph.positions[currentNode].y) {
-                    currentNode += 64;
-                    currentNode += 1;
-                    diagonalDistance += 1;
-                }
+    public getMinNode(nodeSet: Set<Node>) {
+        let minNode = null;
+        for (let currNode of nodeSet) {
+            if (minNode == null) {
+                minNode = currNode
             }
-            if (this.mesh.graph.positions[end].x < this.mesh.graph.positions[currentNode].x) {
-                if (this.mesh.graph.positions[end].y < this.mesh.graph.positions[currentNode].y) {
-                    currentNode -= 64;
-                    currentNode -= 1;
-                    diagonalDistance += 1;
-                }
-                if (this.mesh.graph.positions[end].y > this.mesh.graph.positions[currentNode].y) {
-                    currentNode += 64;
-                    currentNode -= 1;
-                    diagonalDistance += 1;
+            else {
+                if (currNode.fCost < minNode.fCost || (currNode.fCost == minNode.fCost && currNode.hCost < minNode.hCost)) {
+                    minNode = currNode;
                 }
             }
         }
-        diagonalDistance *= 14;
-
-        let straightDistance = 0;
-        if (this.mesh.graph.positions[currentNode].y == this.mesh.graph.positions[end].y && this.mesh.graph.positions[currentNode].x != this.mesh.graph.positions[end].x) {
-            while (this.mesh.graph.positions[currentNode].y == this.mesh.graph.positions[end].y && this.mesh.graph.positions[currentNode].x != this.mesh.graph.positions[end].x) {
-                if (this.mesh.graph.positions[end].x > this.mesh.graph.positions[currentNode].x) {
-                    currentNode += 1;
-                    straightDistance += 1;
-                }
-                if (this.mesh.graph.positions[end].x < this.mesh.graph.positions[currentNode].x) {
-                    currentNode -= 1;
-                    straightDistance += 1;
-                }
-            }
-        }
-        if (this.mesh.graph.positions[currentNode].x == this.mesh.graph.positions[end].x && this.mesh.graph.positions[currentNode].y != this.mesh.graph.positions[end].y) {
-            while (this.mesh.graph.positions[currentNode].x == this.mesh.graph.positions[end].x && this.mesh.graph.positions[currentNode].y != this.mesh.graph.positions[end].y) {
-                if (this.mesh.graph.positions[end].y > this.mesh.graph.positions[currentNode].y) {
-                    currentNode += 64;
-                    straightDistance += 1;
-                }
-                if (this.mesh.graph.positions[end].y < this.mesh.graph.positions[currentNode].y) {
-                    currentNode -= 64;
-                    straightDistance += 1;
-                }
-            }
-        }
-        straightDistance *= 10;
-
-        return diagonalDistance + straightDistance;
+        nodeSet.delete(minNode);
+        return minNode;
     }
-
+    public Astart(g: PositionGraph, start: number, end: number): Array<number> {
+        let parent: Array<number> = new Array(g.numVertices).fill(0);
+        let openNodeSet = new Set<Node>();
+        let closeIndexArr : Array<boolean> = new Array(g.numVertices)
+        let firstNode = new Node(start, start, end, g);
+        openNodeSet.add(firstNode)
+        let move = [1, -1, 64, -64]
+        let currNode: Node;
+        while (true) {
+            currNode = this.getMinNode(openNodeSet);
+            let currIndex = currNode.currIndex;
+            if (currNode.isEnd) break;
+            closeIndexArr[currIndex]=true;
+            for (let moveIndex of move) {
+                let nextIndex = currIndex + moveIndex
+                if (g.edges[nextIndex]== null) {
+                    // console.log("against the wall");
+                }
+                if (g.edges[nextIndex] == null || closeIndexArr[nextIndex]) {
+                    continue;
+                }
+                let nextNode = new Node(nextIndex)
+                nextNode.gCost = currNode.gCost + 8;
+                nextNode.fCost = nextNode.gCost + nextNode.hCost ;
+                parent[nextNode.currIndex] = currNode.currIndex;
+                openNodeSet.add(nextNode);
+                closeIndexArr[nextIndex] = true;
+                nextNode.gCost = currNode.gCost+8
+            }
+        }
+        let index = currNode.currIndex;
+        let result = [];
+        while (index != firstNode.currIndex) {
+            result.push(index);
+            index = parent[index]
+        }
+        // console.log(result)
+        return result;
+    }
 
 }

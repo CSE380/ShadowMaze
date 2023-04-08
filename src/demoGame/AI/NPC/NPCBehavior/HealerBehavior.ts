@@ -5,8 +5,8 @@ import GameEvent from "../../../../Wolfie2D/Events/GameEvent";
 import Idle from "../NPCActions/GotoAction";
 import { TargetExists } from "../NPCStatuses/TargetExists";
 import BasicFinder from "../../../GameSystems/Searching/BasicFinder";
-import { ClosestPositioned, LowestHealthBattler } from "../../../GameSystems/Searching/HW4Reducers";
-import { AllyFilter, BattlerActiveFilter, BattlerGroupFilter, BattlerHealthFilter, EnemyFilter, ItemFilter, RangeFilter, VisibleItemFilter } from "../../../GameSystems/Searching/HW4Filters";
+import { ClosestPositioned } from "../../../GameSystems/Searching/HW4Reducers";
+import { BattlerActiveFilter, BattlerGroupFilter, BattlerHealthFilter, ItemFilter, RangeFilter, VisibleItemFilter } from "../../../GameSystems/Searching/HW4Filters";
 import PickupItem from "../NPCActions/PickupItem";
 import UseHealthpack from "../NPCActions/UseHealthpack";
 import Healthpack from "../../../GameSystems/ItemSystem/Items/Healthpack";
@@ -14,8 +14,7 @@ import Item from "../../../GameSystems/ItemSystem/Item";
 import { HasItem } from "../NPCStatuses/HasItem";
 import FalseStatus from "../NPCStatuses/FalseStatus";
 import Battler from "../../../GameSystems/BattleSystem/Battler";
-import LaserGun from "../../../GameSystems/ItemSystem/Items/LaserGun";
-
+import { AllyFilter } from "../../../GameSystems/Searching/HW4Filters";
 
 /**
  * When an NPC is acting as a healer, their goal is to try and heal it's teammates by running around, picking up healthpacks, 
@@ -25,13 +24,12 @@ export default class HealerBehavior extends NPCBehavior  {
 
     /** The GameNode that owns this NPCGoapAI */
     protected override owner: NPCActor;
-    
+    protected range: number;
     /** Initialize the NPC AI */
-    public initializeAI(owner: NPCActor, opts: Record<string, any>): void {
-        super.initializeAI(owner, opts);
+    public initializeAI(owner: NPCActor, options: Record<string, any>): void {
+        super.initializeAI(owner, options);
 
         let scene = owner.getScene();
-
         /* ######### Add all healer statuses ######## */
 
         this.addStatus(HealerStatuses.GOAL, new FalseStatus());
@@ -49,23 +47,24 @@ export default class HealerBehavior extends NPCBehavior  {
         /* ######### Add all healer actions ######## */
 
         // TODO configure the rest of the healer actions
-        let pickupKit = new PickupItem(this, this.owner);
-        pickupKit.targets = scene.getHealthpacks();
-        pickupKit.targetFinder = new BasicFinder<Item>(ClosestPositioned(this.owner), VisibleItemFilter(), ItemFilter(Healthpack));
-        pickupKit.addPrecondition(HealerStatuses.HPACK_EXISTS);
-        pickupKit.addEffect(HealerStatuses.HAS_HPACK);
-        pickupKit.cost = 10;
-        this.addState(HealerActions.PICKUP_HPACK, pickupKit);
-
-        let heal = new UseHealthpack(this, this.owner);
-        heal.targets = scene.getBattlers();
-        heal.targetFinder = new BasicFinder<Battler>(ClosestPositioned(this.owner), BattlerActiveFilter(), BattlerGroupFilter([owner.battleGroup]), BattlerHealthFilter(0,4));
-        heal.addPrecondition(HealerStatuses.ALLY_EXISTS);
-        heal.addPrecondition(HealerStatuses.HAS_HPACK);
-        heal.addEffect(HealerStatuses.GOAL);
-        heal.cost = 1;
-        this.addState(HealerActions.USE_HPACK, heal);
-
+        // Pickup Health pack
+        let pickupHealthPack = new PickupItem(this,this.owner)
+        pickupHealthPack.targets = scene.getHealthpacks()
+        pickupHealthPack.targetFinder = new BasicFinder<Item>(ClosestPositioned(this.owner), VisibleItemFilter(), ItemFilter(Healthpack));
+        pickupHealthPack.addPrecondition(HealerStatuses.HPACK_EXISTS)
+        pickupHealthPack.addEffect(HealerStatuses.HAS_HPACK)
+        pickupHealthPack.cost = 5;
+        this.addState(HealerActions.PICKUP_HPACK,pickupHealthPack);
+        //
+        let healAlly = new UseHealthpack(this, this.owner);
+        healAlly.targets = scene.getBattlers();
+        healAlly.targetFinder = new BasicFinder<Battler>(ClosestPositioned(this.owner), BattlerActiveFilter(),BattlerGroupFilter([owner.battleGroup]), BattlerHealthFilter(0,this.owner.maxHealth/2));
+        // healAlly.targetFinder = new BasicFinder<Battler>(ClosestPositioned(this.owner));
+        healAlly.addPrecondition(HealerStatuses.ALLY_EXISTS);
+        healAlly.addPrecondition(HealerStatuses.HAS_HPACK);
+        healAlly.addEffect(HealerStatuses.GOAL);
+        healAlly.cost = 1;
+        this.addState(HealerActions.USE_HPACK, healAlly);
         // Idle action
         let idle = new Idle(this, this.owner);
         idle.addEffect(HealerStatuses.GOAL);
@@ -76,7 +75,6 @@ export default class HealerBehavior extends NPCBehavior  {
 
         this.goal = HealerStatuses.GOAL;
         this.initialize();
-
     }
 
     public override handleEvent(event: GameEvent): void {

@@ -18,9 +18,11 @@ export enum ItemEvent {
 }
 
 export enum HudEvent {
-    HEALTH_CHANGE = "HEALTH_CHANGE"
+    HEALTH_CHANGE = "HEALTH_CHANGE",
+    USE_HPACK="USE_HPACK"
 }
 
 export enum PlayerEvent {
     PLAYER_KILLED = "PLAYER_KILLED"
+    
 }

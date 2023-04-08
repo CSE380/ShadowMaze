@@ -14,7 +14,7 @@ import UILayer from "../Scene/Layers/UILayer";
  */
 export default class Viewport {
     /** The AABB that contains the position and size of the viewport view */
-    private view: AABB;
+    public view: AABB;
     /** The boundary for the viewport. This represents the limits to where the viewport can go */
     private boundary: AABB;
     /** The GameNode the Viewport is following */
@@ -23,7 +23,7 @@ export default class Viewport {
     private focus: Vec2;
 
     /** A queue of previous positions of what this viewport is following. Used for smoothing viewport movement */
-    private lastPositions: Queue<Vec2>;
+    public lastPositions: Queue<Vec2>;
 
     /** The number of previous positions this viewport tracks */
     private smoothingFactor: number;
@@ -38,7 +38,8 @@ export default class Viewport {
     private canvasSize: Vec2;
 
     constructor(canvasSize: Vec2, zoomLevel: number){
-        this.view = new AABB(Vec2.ZERO, Vec2.ZERO);
+        let postion = new Vec2(25,450)
+        this.view = new AABB(postion);
         this.boundary = new AABB(Vec2.ZERO, Vec2.ZERO);
         this.lastPositions = new Queue();
         this.smoothingFactor = 10;

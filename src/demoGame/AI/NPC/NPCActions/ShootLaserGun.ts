@@ -45,7 +45,7 @@ export default class ShootLaserGun extends NPCAction {
             this.timer.start();
         }
         // Finish the action
-        this.finished();
+        // this.finished();
     }
 
     public onEnter(options: Record<string, any>): void {
