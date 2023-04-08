@@ -4,7 +4,7 @@ import Region from "../DataTypes/Interfaces/Region";
 import AABB from "../DataTypes/Shapes/AABB";
 import Debug from "../Debug/Debug";
 import Color from "../Utils/Color";
-
+import Circle from "../DataTypes/Shapes/Circle";
 /**
  * The representation of an object in the game world that can be drawn to the screen
  */
@@ -27,7 +27,6 @@ export default abstract class CanvasNode extends GameNode implements Region {
 		this._scale.setOnChange(() => this.scaleChanged());
 		this._boundary = new AABB();
 		this.updateBoundary();
-
 		this._hasCustomShader = false;
 	}
 
@@ -49,7 +48,7 @@ export default abstract class CanvasNode extends GameNode implements Region {
 		this._size.setOnChange(() => this.sizeChanged());
 		this.sizeChanged();
 	}
-
+	
 	get scale(): Vec2 {
 		return this._scale;
 	}
@@ -99,7 +98,7 @@ export default abstract class CanvasNode extends GameNode implements Region {
 		this._boundary.center.set(this.position.x, this.position.y);
 		this._boundary.halfSize.set(this.size.x*this.scale.x/2, this.size.y*this.scale.y/2);
 	}
-
+	
 	get boundary(): AABB {
 		return this._boundary;
 	}

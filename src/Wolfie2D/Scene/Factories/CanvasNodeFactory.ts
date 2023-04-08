@@ -16,7 +16,7 @@ import ResourceManager from "../../ResourceManager/ResourceManager";
 import Line from "../../Nodes/Graphics/Line";
 import Particle from "../../Nodes/Graphics/Particle";
 import Spritesheet from "../../DataTypes/Spritesheet";
-
+import CircleGraph from "../../Nodes/Graphics/Circle";
 // @ignorePage
 
 /**
@@ -147,11 +147,14 @@ export default class CanvasNodeFactory {
 				break;
 			case GraphicType.PARTICLE:
 				instance = this.buildParticle(options);
-				break;				
+				break;		
+			case GraphicType.CIRCLE:
+				instance = this.buildCircle(options);	
+				break;
 			default:
 				throw `GraphicType '${type}' does not exist, or is registered incorrectly.`
 		}
-
+		console.log(instance)
 		// Add instance to scene
 		instance.setScene(this.scene);
 		instance.id = this.scene.generateId();
@@ -171,7 +174,6 @@ export default class CanvasNodeFactory {
 	buildButton(options?: Record<string, any>): Button {
 		this.checkIfPropExists("Button", options, "position", Vec2, "Vec2");
 		this.checkIfPropExists("Button", options, "text", "string");
-
 		return new Button(options.position, options.text);
 	}
 
@@ -217,7 +219,6 @@ export default class CanvasNodeFactory {
 	buildLine(options?: Record<string, any>): Point {
 		this.checkIfPropExists("Line", options, "start", Vec2, "Vec2");
 		this.checkIfPropExists("Line", options, "end", Vec2, "Vec2");
-
 		return new Line(options.start, options.end);
 	}
 
@@ -227,7 +228,12 @@ export default class CanvasNodeFactory {
 
 		return new Rect(options.position, options.size);
 	}
-
+	buildCircle(options?: Record<string, any>): Rect {
+		// this.checkIfPropExists("Rect", options, "position", Vec2, "Vec2");
+		// this.checkIfPropExists("Rect", options, "size", Vec2, "Vec2");
+		
+		return new CircleGraph(options.center, options.r);
+	}
 	/* ---------- ERROR HANDLING ---------- */
 
 	checkIfPropExists<T>(objectName: string, options: Record<string, any>, prop: string, type: (new (...args: any) => T) | string, typeName?: string){

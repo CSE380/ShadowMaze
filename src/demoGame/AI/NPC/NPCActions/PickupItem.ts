@@ -20,15 +20,10 @@ export default class PickupTargetedItem extends NPCAction {
     }
 
     public performAction(target: Item): void {
-        if (target != null && target.inventory === null) {
+        if (target.inventory === null) {
             this.actor.inventory.add(target)
-            this.finished()
         }
-        else {
-            this.safeExit();
-            this.onEnter(null);
-
-        }
+        this.finished();
     }
 
     public handleInput(event: GameEvent): void {
