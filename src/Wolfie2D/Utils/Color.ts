@@ -107,7 +107,9 @@ export default class Color {
 	static get ORANGE(): Color {
 		return new Color(255, 100, 0, 1);
 	}
-
+	static get PURPLE(): Color{
+		return new Color(112, 90, 248, 1);
+	}
 	/**
 	 * Sets the color to the values provided
 	 * @param r Red

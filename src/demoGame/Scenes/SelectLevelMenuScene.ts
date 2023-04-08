@@ -43,12 +43,12 @@ export default class MainMenu extends Scene {
             position:new Vec2(x,y),
             text:SelectMenuButtonEvent[buttonName],
         }
-        const play = this.add.uiElement(UIElementType.BUTTON, this.mainMenuLayerName, options);
-        play.size.set(300, 50);
-        play.borderWidth = 2;
-        play.borderColor = Color.WHITE;
-        play.backgroundColor = Color.BLACK;
-        play.onClickEventId = buttonName;
+        const newButton = this.add.uiElement(UIElementType.BUTTON, this.mainMenuLayerName, options);
+        newButton.size.set(300, 50);
+        newButton.borderWidth = 2;
+        newButton.borderColor = Color.WHITE;
+        newButton.backgroundColor = Color.BLACK;
+        newButton.onClickEventId = buttonName;
         this.receiver.subscribe(buttonName);
     }
     public updateScene(){

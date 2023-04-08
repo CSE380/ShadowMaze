@@ -1,5 +1,5 @@
 import Game from "./Wolfie2D/Loop/Game";
-import MainMenu from "./demoGame/Scenes/MainMenu";
+import MainMenu from "./demoGame/Scenes/MainMenuScene";
 import { PlayerInput } from "./demoGame/AI/Player/PlayerController";
 import default_scene from "./default_scene";
 import AStarDemoScene from "./demoGame/Scenes/AstarDemoScene";
@@ -36,8 +36,7 @@ import HelpScene from "./demoGame/Scenes/HelpScene";
     // Create a game with the options specified
     const game = new Game(options);
     // Start our game
-    game.start(StartScene, {});
-
+    game.start(MainMenu, {});
 })();
 
 function runTests(){};

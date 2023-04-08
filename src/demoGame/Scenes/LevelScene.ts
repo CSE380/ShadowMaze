@@ -29,14 +29,15 @@ import Inventory from "../GameSystems/ItemSystem/Inventory";
 import Item from "../GameSystems/ItemSystem/Item";
 import Healthpack from "../GameSystems/ItemSystem/Items/Healthpack";
 import LaserGun from "../GameSystems/ItemSystem/Items/LaserGun";
-import { ClosestPositioned } from "../GameSystems/Searching/HW4Reducers";
-import BasicTargetable from "../GameSystems/Targeting/BasicTargetable";
-import Position from "../GameSystems/Targeting/Position";
-import AstarStrategy from "../Pathfinding/AstarStrategy";
+import SelectLevelMenuScene from "./SelectLevelMenuScene";
+import HelpScene from "./HelpScene";
+import StartScene from "./StartScene";
 import HW4Scene from "./HW4Scene";
+import ControlScene from "./ControlScene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import { UIElementType } from "../../Wolfie2D/Nodes/UIElements/UIElementTypes";
-import { PauseButtonEvent } from "../CustomizedButton";
+import {MainMenuButtonEvent } from "../CustomizedButton";
+import Input from "../../Wolfie2D/Input/Input";
 export default class LevelScene extends HW4Scene {
 
     /** GameSystems in the HW4 Scene */
@@ -53,27 +54,30 @@ export default class LevelScene extends HW4Scene {
     private wallSize; number;
     private mainMenuLayerName: "gameMenu";
     private buttonLayerName: "buttonLayer";
+    private pauseMenuLayerName: "pauseMenu";
     private bases: BattlerBase[];
     protected player: PlayerActor;
     private healthpacks: Array<Healthpack>;
     private laserguns: Array<LaserGun>;
-    private ButtonSelection: typeof PauseButtonEvent;
+    private ButtonSelection;
     // The wall layer of the tilemap
     private walls: OrthogonalTilemap;
-
+    private center:Vec2;
     // The position graph for the navmesh
     private graph: PositionGraph;
-
+    private restartButton:string;
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, options);
 
         this.battlers = new Array<Battler & Actor>();
         this.healthbars = new Map<number, HealthbarHUD>();
-        this.labelSize = 32;
+        this.labelSize = 64;
         this.laserguns = new Array<LaserGun>();
         this.healthpacks = new Array<Healthpack>();
-        this.ButtonSelection = PauseButtonEvent;
-
+        this.ButtonSelection = MainMenuButtonEvent;
+        this.buttonLayerName= "buttonLayer";
+        this.restartButton = "restart";
+        this.pauseMenuLayerName = "pauseMenu";
     }
 
     /**
@@ -94,11 +98,10 @@ export default class LevelScene extends HW4Scene {
     public override startScene() {
         // Add in the tilemap
         let tilemapLayers = this.add.tilemap("level");
-
+        console.log(tilemapLayers)
         // Get the wall layer
         this.walls = <OrthogonalTilemap>tilemapLayers[1].getItems()[0];
         this.wallSize = this.walls.size.x;
-        
         // Set the viewport bounds to the tilemap
         let tilemapSize: Vec2 = this.walls.size;
 
@@ -108,64 +111,122 @@ export default class LevelScene extends HW4Scene {
         this.initLayers();
         // create screen first 
         this.buildBlackScreen();
-        // Create the player
+        this.center = this.viewport.getHalfSize();
+        
+        // this.addBlackLabel(0, 100);
         this.initializePlayer();
-        let center = this.viewport.getCenter();
+        this.addPauseMenu();
+        
+       
+    }
+    public addPauseMenu(){
         const pauseSign = "\u23F8";
         let buttonOption = {
-            position: new Vec2(center.x + 470, center.y - 470),
+            position: new Vec2(475, 10),
             text: pauseSign,
+            layerName:this.buttonLayerName,
         }
-        console.log(this.sceneGraph)
         this.addButtons(this.ButtonSelection.PAUSE, buttonOption);
+        
+        let emptyMenuOption = {
+            position: new Vec2(this.center.x, this.center.y),
+            text: "",
+            size:new Vec2(300, 450),
+            layerName:this.buttonLayerName,
+        }
+        this.addText(emptyMenuOption);
+        let pauseTextOption = {
+            position: new Vec2(this.center.x, this.center.y-100),
+            text: "Paused",
+            size:new Vec2(100, 30),
+            layerName:this.pauseMenuLayerName,
+        }
+        this.addText(pauseTextOption);
+        let positionY=this.center.y - 60;
+        for(const buttonName in this.ButtonSelection){
+            let buttonOption1= {
+                position: new Vec2(this.center.x, positionY),
+                text: MainMenuButtonEvent[buttonName],
+                layerName :this.pauseMenuLayerName,
+            }
+            this.addButtons(buttonName, buttonOption1);
+            positionY = positionY + 40;
+        }
     }
     /**
      * @see Scene.updateScene
      */
     public addText(option: Record<string, any>) {
-        const name = <Label>this.add.uiElement(UIElementType.LABEL, this.mainMenuLayerName, option);
-        name.size.set(300, 100);
+        const name = <Label>this.add.uiElement(UIElementType.LABEL, option.layerName, option);
+        name.size.set(option.size.x,option.size.y);
         name.borderWidth = 2;
-        name.setTextColor(Color.WHITE)
-        name.setFontsize(28);
-        if (option.align)
-            name.setHAlign("left")
+        name.backgroundColor=Color.WHITE;
     }
     public addButtons(buttonName: string, option: Record<string, any>) {
-        const play = <Label>this.add.uiElement(UIElementType.BUTTON, this.mainMenuLayerName, option);
-        play.size.set(50, 50);
-        play.borderWidth = 0;
-        play.borderColor = Color.TRANSPARENT;
-        play.backgroundColor = Color.BLACK;
-        play.onClickEventId = buttonName;
-        play.setFontsize(50);
+        const newButton = <Label>this.add.uiElement(UIElementType.LABEL,  option.layerName, option);
+        newButton.size.set(200, 50);
+        newButton.borderWidth = 2;
+        newButton.borderColor = Color.TRANSPARENT;
+        // newButton.backgroundColor = Color.BLACK;
+        newButton.setTextColor(Color.PURPLE);
+        newButton.onClickEventId = buttonName;
         this.receiver.subscribe(buttonName);
+        console.log(newButton)
     }
 
     public handleEvent(event: GameEvent): void {
-        
+        console.log(event.type)
         switch (event.type) {
             case this.ButtonSelection.PAUSE: {
                 // this.sceneManager.changeToScene(MainMenu);
+                console.log("pause")
                 break;
             }
-
+            case this.restartButton: {
+                // this.sceneManager.changeToScene(MainMenu);
+                console.log("restart")
+                break;
+            }
+            case MainMenuButtonEvent.Select_levels: {
+                console.log("?")
+                this.sceneManager.changeToScene(SelectLevelMenuScene);
+                break;
+            }
+            case MainMenuButtonEvent.Controls: {
+                this.sceneManager.changeToScene(ControlScene);
+                break;
+            }
+            case MainMenuButtonEvent.Help: {
+                this.sceneManager.changeToScene(HelpScene);
+                break;
+            }
+            case MainMenuButtonEvent.Exit:{
+                this.sceneManager.changeToScene(StartScene);
+            }
         }
     }
     public override updateScene(deltaT: number): void {
         while (this.receiver.hasNextEvent()) {
             this.handleEvent(this.receiver.getNextEvent());
         }
-        this.updateLabel();
+       
+        if(Input.isKeyJustPressed("escape")){
+            this.emitter.fireEvent(this.ButtonSelection.PAUSE)
+        }
+        this.updateLabel()
     }
    
     /** Initializes the layers in the scene */
     protected initLayers(): void {
         // this.addLayer(this.buttonLayerName,10)
-        this.addUILayer(this.mainMenuLayerName);
-        // this.addUILayer(this.buttonLayerName);
-       
-    }
+        this.addLayer(this.mainMenuLayerName);
+        // this.addUILayer(this.mainMenuLayerName);
+        this.addUILayer(this.buttonLayerName);
+        this.addUILayer(this.pauseMenuLayerName);
+        this.getLayer(this.buttonLayerName).setDepth(1);
+        this.getLayer(this.pauseMenuLayerName).setDepth(2);
+    
+    }   
 
 
 
@@ -176,7 +237,7 @@ export default class LevelScene extends HW4Scene {
     protected initializePlayer(): void {
         let player = this.add.animatedSprite(PlayerActor, "player1", this.mainMenuLayerName);
         this.player = player
-        player.position.set(40, 400);
+        player.position.set(400, 10);
         player.battleGroup = 2;
 
         player.health = 10;
@@ -194,13 +255,11 @@ export default class LevelScene extends HW4Scene {
 
         // Start the player in the "IDLE" animation
         player.animation.play("IDLE");
-
         this.battlers.push(player);
         this.viewport.follow(player);
     }
     public initCurrLabel(){
         this.currLabels = <Array<Label>> this.getSceneGraph().getNodesAt(this.player.position)
-        console.log(this.currLabels)
         this.currLabels.forEach(label=>{if (label.backgroundColor)label.backgroundColor=Color.TRANSPARENT})
     }
     public increaseVision(){
@@ -212,15 +271,16 @@ export default class LevelScene extends HW4Scene {
             for (let j = 0; j <= len; j++) {
                 const x = i * this.labelSize;
                 const y = j * this.labelSize + this.labelSize / 2;
-                this.addBlackLabel(x, y);
+                const options = {
+                    position: new Vec2(x, y),
+                    text: "",
+                }
+                this.addBlackLabel(options);
             }
         }
     }
-    public addBlackLabel(x: number, y: number) {
-        const options = {
-            position: new Vec2(x, y),
-            text: "",
-        }
+    public addBlackLabel(options:Record<string, any>) {
+       
         const label = <Label>this.add.uiElement(UIElementType.LABEL, this.mainMenuLayerName, options);
         label.size.set(this.labelSize *2, this.labelSize *2);
         label.borderWidth = 0;

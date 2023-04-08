@@ -11,7 +11,7 @@ import { BackButtonEvent } from "../CustomizedButton";
 import SelectLevelMenuScene from "./SelectLevelMenuScene";
 import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
 import Button from "../../Wolfie2D/Nodes/UIElements/Button";
-import MainMenu from "./MainMenu";
+import MainMenu from "./MainMenuScene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 
 /* #################### CLASS DEFINITION #################### */
