@@ -14,14 +14,15 @@ import Button from "../../Wolfie2D/Nodes/UIElements/Button";
 import MainMenu from "./MainMenuScene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import { helpTextArray } from "../Text";
+import HW4Scene from "./HW4Scene";
 /* #################### CLASS DEFINITION #################### */
 
 // Welcome to Wolfie2D!
 // This is a simple sample scene so something displays when you run the game.
-export default class StartScene extends Scene {
+export default class StartScene extends HW4Scene {
     /* ########## MEMBER DEFINITIONS ##########*/
     private backgroundImageKey: "backgroundImage";
-    private mainMenuLayerName: "startScene";
+    // private mainMenuLayerName: string = "startScene";
     private backgroundImage: Sprite;
     private ButtonSelection: typeof BackButtonEvent;
     loadScene(): void {
@@ -37,13 +38,13 @@ export default class StartScene extends Scene {
     // Once again, this occurs strictly after loadScene(), so anything you loaded there will be available
     startScene(): void {
         this.addUILayer(this.mainMenuLayerName)
-    
         this.backgroundImage = this.add.sprite(this.backgroundImageKey, this.mainMenuLayerName);
         let center = this.viewport.getCenter();
         this.backgroundImage.position.set(center.x, center.y);
         let textOption = {
             position: new Vec2(center.x, center.y - 400),
-            text: "Helps"
+            text: "Helps",
+            layerName:this.mainMenuLayerName,
         }
         this.addText(textOption);
         let yInitPoistion = center.y - 400;
@@ -54,14 +55,10 @@ export default class StartScene extends Scene {
                 position: new Vec2(center.x-320, yInitPoistion),
                 text: text,
                 align:true,
+                layerName:this.mainMenuLayerName,
             }
            this.addText(textOption);
         }
-        // textOption = {
-        //     position: new Vec2(center.x, center.y - 400),
-        //     text: newText,
-        // }
-        // this.addText(textOption)
         const leftArrow = '\u2190';
         let buttonOption = {
             position: new Vec2(center.x - 470, center.y - 470),
@@ -74,15 +71,6 @@ export default class StartScene extends Scene {
         while (this.receiver.hasNextEvent()) {
             this.handleEvent(this.receiver.getNextEvent());
         }
-    }
-    public addText(option: Record<string, any>) {
-        const name = <Label>this.add.uiElement(UIElementType.LABEL, this.mainMenuLayerName, option);
-        name.size.set(300, 100);
-        name.borderWidth = 2;
-        name.setTextColor(Color.WHITE)
-        name.setFontsize(28);
-        if (option.align)
-            name.setHAlign("left")
     }
     public addButtons(buttonName: string, option: Record<string, any>) {
         const play = <Label>this.add.uiElement(UIElementType.BUTTON, this.mainMenuLayerName, option);

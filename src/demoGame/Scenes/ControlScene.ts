@@ -14,14 +14,14 @@ import Button from "../../Wolfie2D/Nodes/UIElements/Button";
 import MainMenu from "./MainMenuScene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import { controlTextArray } from "../Text";
+import HW4Scene from "./HW4Scene";
 /* #################### CLASS DEFINITION #################### */
 
 // Welcome to Wolfie2D!
 // This is a simple sample scene so something displays when you run the game.
-export default class StartScene extends Scene {
+export default class StartScene extends HW4Scene {
     /* ########## MEMBER DEFINITIONS ##########*/
     private backgroundImageKey: "backgroundImage";
-    private mainMenuLayerName: "startScene";
     private backgroundImage: Sprite;
     private ButtonSelection: typeof BackButtonEvent;
     loadScene(): void {
@@ -43,7 +43,8 @@ export default class StartScene extends Scene {
         this.backgroundImage.position.set(center.x, center.y);
         let textOption = {
             position: new Vec2(center.x, center.y - 400),
-            text: "Controls"
+            text: "Controls",
+            layerName:this.mainMenuLayerName,
         }
         this.addText(textOption);
         const controlText = controlTextArray;
@@ -54,6 +55,7 @@ export default class StartScene extends Scene {
                 position: new Vec2(center.x-150, yInitPoistion),
                 text: "• "+text,
                 align:true,
+                layerName:this.mainMenuLayerName,
             }
            this.addText(textOption);
         }
@@ -69,15 +71,7 @@ export default class StartScene extends Scene {
             this.handleEvent(this.receiver.getNextEvent());
         }
     }
-    public addText(option: Record<string, any>) {
-        const name = <Label>this.add.uiElement(UIElementType.LABEL, this.mainMenuLayerName, option);
-        name.size.set(400, 100);
-        name.borderWidth = 2;
-        name.setTextColor(Color.WHITE)
-        name.setFontsize(50);
-        if(option.align)
-        name.setHAlign("left")
-    }
+  
     public addButtons(buttonName: string, option: Record<string, any>) {
         const play = <Label>this.add.uiElement(UIElementType.BUTTON, this.mainMenuLayerName, option);
         play.size.set(50, 50);
