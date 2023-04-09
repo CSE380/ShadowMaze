@@ -6,23 +6,27 @@ import Color from "../../Wolfie2D/Utils/Color";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
 import AstarDemoScene from "./AstarDemoScene";
 import {  SelectMenuButtonEvent } from "../CustomizedButton";
-import SelectLevelMenuScene from "./SelectLevelMenuScene";
+import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
 import LevelScene from "./LevelScene";
 export default class MainMenu extends Scene {
-    private mainMenuLayerName:"mainMenu";
-    private backgroundImageKey:"backgroundImage";
+    private mainMenuLayerName="mainMenu";
+    private backgroundImageKey="backgroundImage";
     private mainMenu: Layer;
+    private backgroundImage: Sprite;
     public loadScene(){
-        this.load.image(this.backgroundImageKey,"hw4_assets/images/fullBackground.jpg");
+        this.load.image(this.backgroundImageKey, "hw4_assets/images/mazeBackground.jpg");
 
     }
 
     public startScene(){
+        this.mainMenu = this.addUILayer(this.mainMenuLayerName);
+        console.log(this.mainMenuLayerName)
         const center = this.viewport.getCenter();
-
+        this.backgroundImage = this.add.sprite(this.backgroundImageKey, this.mainMenuLayerName);
+        console.log(this.backgroundImage)
+        this.backgroundImage.position.set(center.x, center.y);
         // The main menu
         let positionY=center.y - 100;
-        this.mainMenu = this.addUILayer(this.mainMenuLayerName);
         let i = 0 ;
         for(const butttonName in SelectMenuButtonEvent){
             

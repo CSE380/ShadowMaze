@@ -13,22 +13,18 @@ import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
 import Button from "../../Wolfie2D/Nodes/UIElements/Button";
 import MainMenu from "./MainMenuScene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
-
+import HW4Scene from "./HW4Scene";
 /* #################### CLASS DEFINITION #################### */
 
 // Welcome to Wolfie2D!
 // This is a simple sample scene so something displays when you run the game.
-export default class StartScene extends Scene {
+export default class StartScene extends HW4Scene  {
     /* ########## MEMBER DEFINITIONS ##########*/
-    private backgroundImageKey:"backgroundImage";
-    private mainMenuLayerName:"startScene";
-    private backgroundImage: Sprite;
-    private ButtonSelection:typeof StartMenuButtonEvent;
+   
     loadScene(): void {
         // this.load.tilemap("map", "../dist/hw4_assets/tilemaps/test2.json");
         
         this.load.image(this.backgroundImageKey,"hw4_assets/images/splash.jpg");
-        this.ButtonSelection = StartMenuButtonEvent
         // console.log(this.load.getImage("image"));
     }
 
@@ -43,45 +39,32 @@ export default class StartScene extends Scene {
         this.backgroundImage.position.set(center.x, center.y);
         let textOption = {
             position: new Vec2(center.x, center.y - 300),
-            text: "Shadow Maze"
+            text: "Shadow Maze",
+            size:new Vec2(400, 100),
+            fontSize:60,
         }
-        this.addName(textOption);
+        this.addText(textOption);
         let buttonOption = {
             position: new Vec2(center.x, center.y + 100),
-            text: this.ButtonSelection.START_GAME
+            text:  StartMenuButtonEvent.START_GAME,
+            size:new Vec2(300,50),
+            textColor:Color.PURPLE,
+            buttonName:"Start Game",
         }
-       this.addButtons("Start Game",buttonOption );
+       this.addButtons(buttonOption);
     }
     public updateScene(){
         while(this.receiver.hasNextEvent()){
             this.handleEvent(this.receiver.getNextEvent());
         }
     }
-    public addName(options){
-        const textColor=new Color(165, 151, 245,2);
-        const name = <Label>this.add.uiElement(UIElementType.LABEL,this.mainMenuLayerName,options);
-        name.size.set(400, 100);
-        name.borderWidth = 2;
-        name.setTextColor(Color.WHITE)
-        name.setFontsize(60)
-        console.log(name.textColor)
-        // name.borderColor = Color.WHITE;
-        // name.backgroundColor = Color.BLACK;
-    }
-    public addButtons(buttonName:string, options){
-        const play = this.add.uiElement(UIElementType.BUTTON, this.mainMenuLayerName, options);
-        play.size.set(300, 50);
-        play.borderWidth = 2;
-        play.borderColor = Color.WHITE;
-        play.backgroundColor = Color.BLACK;
-        play.onClickEventId = buttonName;
-        this.receiver.subscribe(buttonName);
-    }
+  
+  
    
     public handleEvent(event: GameEvent): void {
         console.log(event.type)
             switch(event.type) {
-                case this.ButtonSelection.START_GAME: {
+                case  StartMenuButtonEvent.START_GAME: {
                     this.sceneManager.changeToScene(MainMenu);
                     break;
                 }

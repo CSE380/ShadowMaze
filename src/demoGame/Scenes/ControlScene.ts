@@ -13,96 +13,57 @@ import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
 import Button from "../../Wolfie2D/Nodes/UIElements/Button";
 import MainMenu from "./MainMenuScene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
-
+import { controlTextArray } from "../Text";
+import HW4Scene from "./HW4Scene";
 /* #################### CLASS DEFINITION #################### */
 
 // Welcome to Wolfie2D!
 // This is a simple sample scene so something displays when you run the game.
-export default class StartScene extends Scene {
+export default class StartScene extends HW4Scene {
     /* ########## MEMBER DEFINITIONS ##########*/
-    private backgroundImageKey: "backgroundImage";
-    private mainMenuLayerName: "startScene";
-    private backgroundImage: Sprite;
-    private ButtonSelection: typeof BackButtonEvent;
     loadScene(): void {
         // this.load.tilemap("map", "../dist/hw4_assets/tilemaps/test2.json");
 
         this.load.image(this.backgroundImageKey, "hw4_assets/images/mazeBackground.jpg");
-        this.ButtonSelection = BackButtonEvent
         // console.log(this.load.getImage("image"));
+       
     }
 
     // startScene() is where you should build any game objects you wish to have in your scene,
     // or where you should initialize any other things you will need in your scene
     // Once again, this occurs strictly after loadScene(), so anything you loaded there will be available
     startScene(): void {
-
         this.addUILayer(this.mainMenuLayerName)
         this.backgroundImage = this.add.sprite(this.backgroundImageKey, this.mainMenuLayerName);
         let center = this.viewport.getCenter();
         this.backgroundImage.position.set(center.x, center.y);
         let textOption = {
             position: new Vec2(center.x, center.y - 400),
-            text: "Controls"
+            text: "Controls",
         }
         this.addText(textOption);
-        const controlText = this.buildControlText();
-        let yInitPoistion = center.y - 400;
-        for(let text of controlText){
-            yInitPoistion += 100
-            let textOption = {
-                position: new Vec2(center.x-150, yInitPoistion),
-                text: "• "+text,
-                align:true,
-            }
-           this.addText(textOption);
+        let controlTextOption = {
+            position: center,
+            text: controlTextArray,
+            margin:100,
         }
-        const leftArrow = '\u2190';
-        let buttonOption = {
-            position: new Vec2(center.x-470, center.y - 470),
-            text: leftArrow
-        }
-        this.addButtons(this.ButtonSelection.BACK,buttonOption);
-    }
-    protected buildControlText(): Array<string> {
-        const keyValues = "W - Move Up\nA - Move Left\nS - Move Down\nD - Move Right\nJ - Attack\nK - Shield\nU - Sword Slash\nEsc - Pause";
-        const lines = keyValues.split('\n');
-        // const keyValuesArray = lines.map(line => line.split(' - ')[0]);
-        return lines;
+        this.addControlTextLayer(controlTextOption);
+        this.addBackButon(center);
     }
     public updateScene() {
         while (this.receiver.hasNextEvent()) {
             this.handleEvent(this.receiver.getNextEvent());
         }
     }
-    public addText(option: Record<string, any>) {
-        const name = <Label>this.add.uiElement(UIElementType.LABEL, this.mainMenuLayerName, option);
-        name.size.set(400, 100);
-        name.borderWidth = 2;
-        name.setTextColor(Color.WHITE)
-        name.setFontsize(50);
-        if(option.align)
-        name.setHAlign("left")
-    }
-    public addButtons(buttonName: string, option: Record<string, any>) {
-        const play = <Label>this.add.uiElement(UIElementType.BUTTON, this.mainMenuLayerName, option);
-        play.size.set(50, 50);
-        play.borderWidth = 0;
-        play.borderColor = Color.TRANSPARENT;
-        play.backgroundColor = Color.BLACK;
-        play.onClickEventId = buttonName;
-        play.setFontsize(50);
-        this.receiver.subscribe(buttonName);
-    }
+    
 
     public handleEvent(event: GameEvent): void {
         console.log(event.type)
         switch (event.type) {
-            case this.ButtonSelection.BACK: {
+            case BackButtonEvent.BACK: {
                 this.sceneManager.changeToScene(MainMenu);
                 break;
             }
-
         }
     }
 }
