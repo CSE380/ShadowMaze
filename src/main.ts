@@ -36,7 +36,7 @@ import HelpScene from "./demoGame/Scenes/HelpScene";
     // Create a game with the options specified
     const game = new Game(options);
     // Start our game
-    game.start(StartScene, {});
+    game.start(LevelScene, {});
 })();
 
 function runTests(){};

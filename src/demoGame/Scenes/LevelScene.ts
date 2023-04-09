@@ -53,8 +53,9 @@ export default class LevelScene extends HW4Scene {
     private mesh:Navmesh
     private wallSize; number;
     private mainMenuLayerName: "gameMenu";
-    private buttonLayerName: "buttonLayer";
+    private pauseButtonLayerName: "buttonLayer";
     private pauseMenuLayerName: "pauseMenu";
+    private emptyMenuLayerName: "emptyMenu";
     private bases: BattlerBase[];
     protected player: PlayerActor;
     private healthpacks: Array<Healthpack>;
@@ -66,6 +67,7 @@ export default class LevelScene extends HW4Scene {
     // The position graph for the navmesh
     private graph: PositionGraph;
     private restartButton:string;
+    private isPauseMenuHidden:boolean;
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, options);
 
@@ -75,9 +77,11 @@ export default class LevelScene extends HW4Scene {
         this.laserguns = new Array<LaserGun>();
         this.healthpacks = new Array<Healthpack>();
         this.ButtonSelection = MainMenuButtonEvent;
-        this.buttonLayerName= "buttonLayer";
+        this.pauseButtonLayerName= "buttonLayer";
         this.restartButton = "restart";
+        this.emptyMenuLayerName ="emptyMenu";
         this.pauseMenuLayerName = "pauseMenu";
+        this.isPauseMenuHidden = true;
     }
 
     /**
@@ -124,7 +128,7 @@ export default class LevelScene extends HW4Scene {
         let buttonOption = {
             position: new Vec2(475, 10),
             text: pauseSign,
-            layerName:this.buttonLayerName,
+            layerName:this.pauseButtonLayerName,
         }
         this.addButtons(this.ButtonSelection.PAUSE, buttonOption);
         
@@ -132,7 +136,7 @@ export default class LevelScene extends HW4Scene {
             position: new Vec2(this.center.x, this.center.y),
             text: "",
             size:new Vec2(300, 450),
-            layerName:this.buttonLayerName,
+            layerName:this.emptyMenuLayerName,
         }
         this.addText(emptyMenuOption);
         let pauseTextOption = {
@@ -171,7 +175,6 @@ export default class LevelScene extends HW4Scene {
         newButton.setTextColor(Color.PURPLE);
         newButton.onClickEventId = buttonName;
         this.receiver.subscribe(buttonName);
-        console.log(newButton)
     }
 
     public handleEvent(event: GameEvent): void {
@@ -180,6 +183,7 @@ export default class LevelScene extends HW4Scene {
             case this.ButtonSelection.PAUSE: {
                 // this.sceneManager.changeToScene(MainMenu);
                 console.log("pause")
+                this.showPauseMenu(this.isPauseMenuHidden);
                 break;
             }
             case this.restartButton: {
@@ -211,6 +215,7 @@ export default class LevelScene extends HW4Scene {
         }
        
         if(Input.isKeyJustPressed("escape")){
+            this.isPauseMenuHidden = !this.isPauseMenuHidden;
             this.emitter.fireEvent(this.ButtonSelection.PAUSE)
         }
         this.updateLabel()
@@ -221,13 +226,20 @@ export default class LevelScene extends HW4Scene {
         // this.addLayer(this.buttonLayerName,10)
         this.addLayer(this.mainMenuLayerName);
         // this.addUILayer(this.mainMenuLayerName);
-        this.addUILayer(this.buttonLayerName);
+        this.addUILayer(this.pauseButtonLayerName);
+        this.addUILayer(this.emptyMenuLayerName);
         this.addUILayer(this.pauseMenuLayerName);
-        this.getLayer(this.buttonLayerName).setDepth(1);
-        this.getLayer(this.pauseMenuLayerName).setDepth(2);
-    
+       
+        this.getLayer(this.pauseButtonLayerName).setDepth(1);
+        this.getLayer(this.emptyMenuLayerName).setDepth(2);
+        this.getLayer(this.pauseMenuLayerName).setDepth(3);
+        this.getLayer(this.emptyMenuLayerName).setHidden(this.isPauseMenuHidden);
+        this.getLayer(this.pauseMenuLayerName).setHidden(this.isPauseMenuHidden);
     }   
-
+    protected showPauseMenu(flag:boolean):void{
+        this.getLayer(this.emptyMenuLayerName).setHidden(flag);
+        this.getLayer(this.pauseMenuLayerName).setHidden(flag);
+    }
 
 
 
@@ -260,7 +272,7 @@ export default class LevelScene extends HW4Scene {
     }
     public initCurrLabel(){
         this.currLabels = <Array<Label>> this.getSceneGraph().getNodesAt(this.player.position)
-        this.currLabels.forEach(label=>{if (label.backgroundColor)label.backgroundColor=Color.TRANSPARENT})
+        this.currLabels.forEach(label=>{this.updateColor(label)})
     }
     public increaseVision(){
         this.labelSize = this.labelSize*2;
@@ -280,7 +292,6 @@ export default class LevelScene extends HW4Scene {
         }
     }
     public addBlackLabel(options:Record<string, any>) {
-       
         const label = <Label>this.add.uiElement(UIElementType.LABEL, this.mainMenuLayerName, options);
         label.size.set(this.labelSize *2, this.labelSize *2);
         label.borderWidth = 0;
@@ -290,10 +301,21 @@ export default class LevelScene extends HW4Scene {
     }
     public updateLabel(){
         this.nextLabels= <Array<Label>>this.getSceneGraph().getNodesAt(this.player.position)
-        this.currLabels.forEach(label=>{if (label.backgroundColor)label.backgroundColor=Color.BLACK})
-        this.nextLabels.forEach(label=>{if (label.backgroundColor)label.backgroundColor=Color.TRANSPARENT})
+        this.currLabels.forEach(label=>this.updateColor(label))
+        this.nextLabels.forEach(label=>this.updateColor(label))
         this.currLabels = this.nextLabels;
     }
-    
+    public updateColor(label:Label){
+        if(label.backgroundColor){
+            if(label.backgroundColor.isEqual(Color.BLACK)){
+                label.backgroundColor=Color.TRANSPARENT;
+            }
+            else if (label.backgroundColor.isEqual(Color.TRANSPARENT)){
+                label.backgroundColor = Color.BLACK;
+            }
+        }
+       
+
+    }
    
 }
