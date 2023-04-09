@@ -24,7 +24,6 @@ export default class MainMenu extends Scene {
     private backgroundImageKey:"backgroundImage";
     public loadScene(){
         this.load.image(this.backgroundImageKey,"hw4_assets/images/fullBackground.jpg");
-
     }
 
     public startScene(){
@@ -44,7 +43,7 @@ export default class MainMenu extends Scene {
                 position:new Vec2(center.x,positionY),
                 text:buttonName,
             }
-            this.addButtons(options );
+            this.addButtons(options);
         }
     }
     public addButtons(options:Record<string, any>){

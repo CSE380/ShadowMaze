@@ -13,7 +13,7 @@ import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
 import Button from "../../Wolfie2D/Nodes/UIElements/Button";
 import MainMenu from "./MainMenuScene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
-
+import { controlTextArray } from "../Text";
 /* #################### CLASS DEFINITION #################### */
 
 // Welcome to Wolfie2D!
@@ -46,7 +46,7 @@ export default class StartScene extends Scene {
             text: "Controls"
         }
         this.addText(textOption);
-        const controlText = this.buildControlText();
+        const controlText = controlTextArray;
         let yInitPoistion = center.y - 400;
         for(let text of controlText){
             yInitPoistion += 100
@@ -63,12 +63,6 @@ export default class StartScene extends Scene {
             text: leftArrow
         }
         this.addButtons(this.ButtonSelection.BACK,buttonOption);
-    }
-    protected buildControlText(): Array<string> {
-        const keyValues = "W - Move Up\nA - Move Left\nS - Move Down\nD - Move Right\nJ - Attack\nK - Shield\nU - Sword Slash\nEsc - Pause";
-        const lines = keyValues.split('\n');
-        // const keyValuesArray = lines.map(line => line.split(' - ')[0]);
-        return lines;
     }
     public updateScene() {
         while (this.receiver.hasNextEvent()) {

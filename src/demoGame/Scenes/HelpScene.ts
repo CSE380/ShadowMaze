@@ -13,7 +13,7 @@ import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
 import Button from "../../Wolfie2D/Nodes/UIElements/Button";
 import MainMenu from "./MainMenuScene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
-
+import { helpTextArray } from "../Text";
 /* #################### CLASS DEFINITION #################### */
 
 // Welcome to Wolfie2D!
@@ -36,8 +36,8 @@ export default class StartScene extends Scene {
     // or where you should initialize any other things you will need in your scene
     // Once again, this occurs strictly after loadScene(), so anything you loaded there will be available
     startScene(): void {
-
         this.addUILayer(this.mainMenuLayerName)
+    
         this.backgroundImage = this.add.sprite(this.backgroundImageKey, this.mainMenuLayerName);
         let center = this.viewport.getCenter();
         this.backgroundImage.position.set(center.x, center.y);
@@ -47,7 +47,7 @@ export default class StartScene extends Scene {
         }
         this.addText(textOption);
         let yInitPoistion = center.y - 400;
-        const newText = this.buildText();
+        const newText = helpTextArray;
         for(let text of newText){
             yInitPoistion += 50
             let textOption = {
@@ -61,7 +61,6 @@ export default class StartScene extends Scene {
         //     position: new Vec2(center.x, center.y - 400),
         //     text: newText,
         // }
-        this.buildText();
         // this.addText(textOption)
         const leftArrow = '\u2190';
         let buttonOption = {
@@ -70,22 +69,7 @@ export default class StartScene extends Scene {
         }
         this.addButtons(this.ButtonSelection.BACK, buttonOption);
     }
-    protected buildText(): Array<string> {
-        const paragraph = "The prince’s goal is to make it out of the maze alive! He has a sword and shield to help him do so, as well as an ultimate ability in the form of a flying sword slash. Using the attack button will swing his sword at the prince’s enemies in front of him, dealing damage. To use his shield, hold down the shield button to absorb incoming damage. Be careful though, the shield will go on cool-down if it takes too much damage. You can also parry attacks by pressing the shield button right when an attack will hit you. This will rebound ranged attacks, and stun melee enemies.";
-        const MAX_LINE_LENGTH = 70;
-        const lines = paragraph.split(" ");
-        let currentLine = "";
-        const result = lines.reduce((acc, word) => {
-          if (currentLine.length + word.length + 1 > MAX_LINE_LENGTH) {
-            acc.push(currentLine.trim());
-            currentLine = "";
-          }
-          currentLine += `${word} `;
-          return acc;
-        }, []); 
-        result.push(currentLine.trim());
-        return result;
-    }
+   
     public updateScene() {
         while (this.receiver.hasNextEvent()) {
             this.handleEvent(this.receiver.getNextEvent());
