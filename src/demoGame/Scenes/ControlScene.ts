@@ -21,14 +21,10 @@ import HW4Scene from "./HW4Scene";
 // This is a simple sample scene so something displays when you run the game.
 export default class StartScene extends HW4Scene {
     /* ########## MEMBER DEFINITIONS ##########*/
-    private backgroundImageKey: "backgroundImage";
-    private backgroundImage: Sprite;
-    private ButtonSelection: typeof BackButtonEvent;
     loadScene(): void {
         // this.load.tilemap("map", "../dist/hw4_assets/tilemaps/test2.json");
 
         this.load.image(this.backgroundImageKey, "hw4_assets/images/mazeBackground.jpg");
-        this.ButtonSelection = BackButtonEvent
         // console.log(this.load.getImage("image"));
     }
 
@@ -47,50 +43,23 @@ export default class StartScene extends HW4Scene {
             layerName:this.mainMenuLayerName,
         }
         this.addText(textOption);
-        const controlText = controlTextArray;
-        let yInitPoistion = center.y - 400;
-        for(let text of controlText){
-            yInitPoistion += 100
-            let textOption = {
-                position: new Vec2(center.x-150, yInitPoistion),
-                text: "• "+text,
-                align:true,
-                layerName:this.mainMenuLayerName,
-            }
-           this.addText(textOption);
-        }
-        const leftArrow = '\u2190';
-        let buttonOption = {
-            position: new Vec2(center.x-470, center.y - 470),
-            text: leftArrow
-        }
-        this.addButtons(this.ButtonSelection.BACK,buttonOption);
+        this.addControlText(center,controlTextArray)
+        this.addBackButon(center);
     }
     public updateScene() {
         while (this.receiver.hasNextEvent()) {
             this.handleEvent(this.receiver.getNextEvent());
         }
     }
-  
-    public addButtons(buttonName: string, option: Record<string, any>) {
-        const play = <Label>this.add.uiElement(UIElementType.BUTTON, this.mainMenuLayerName, option);
-        play.size.set(50, 50);
-        play.borderWidth = 0;
-        play.borderColor = Color.TRANSPARENT;
-        play.backgroundColor = Color.BLACK;
-        play.onClickEventId = buttonName;
-        play.setFontsize(50);
-        this.receiver.subscribe(buttonName);
-    }
+    
 
     public handleEvent(event: GameEvent): void {
         console.log(event.type)
         switch (event.type) {
-            case this.ButtonSelection.BACK: {
+            case BackButtonEvent.BACK: {
                 this.sceneManager.changeToScene(MainMenu);
                 break;
             }
-
         }
     }
 }

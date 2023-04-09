@@ -81,7 +81,7 @@ export default class LevelScene extends HW4Scene {
         this.laserguns = new Array<LaserGun>();
         this.healthpacks = new Array<Healthpack>();
         this.ButtonSelection = MainMenuButtonEvent;
-        this.isPauseMenuHidden = true;
+        this.isPauseMenuHidden = false;
         for (const layerName of this.layerNames) {
             this[layerName] = layerName;
         }
@@ -124,8 +124,11 @@ export default class LevelScene extends HW4Scene {
         // this.addBlackLabel(0, 100);
         this.initializePlayer();
         this.addPauseMenu();
-        
+        this.addControlText();
        
+    }
+    public addControlText(){
+        
     }
     public addPauseMenu(){
         const pauseSign = "\u23F8";
@@ -251,7 +254,7 @@ export default class LevelScene extends HW4Scene {
     }
     protected showControlText(){
 
-    }
+    }   
 
     /**
      * Initializes the player in the scene
