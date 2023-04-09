@@ -10,33 +10,62 @@ import { UIElementType } from "../../Wolfie2D/Nodes/UIElements/UIElementTypes";
 import { BackButtonEvent } from "../CustomizedButton";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
 import MainMenu from "./MainMenuScene";
-import { helpTextArray } from "../Text";
+import { helpTextArray,controlTextArray } from "../Text";
 import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
-export default class HW4Scene extends Scene {
+import UIElement from "../../Wolfie2D/Nodes/UIElement";
+import SceneManager from "../../Wolfie2D/Scene/SceneManager";
+import Viewport from "../../Wolfie2D/SceneGraph/Viewport";
+import RenderingManager from "../../Wolfie2D/Rendering/RenderingManager";
+export default abstract class HW4Scene extends Scene {
     protected mainMenuLayerName="gameMenu";
     protected backgroundImageKey: "backgroundImage";
     protected backgroundImage: Sprite;
+    protected center:Vec2;
+    public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
+        super(viewport, sceneManager, renderingManager,options);
+        this.center = this.getViewport().getCenter();
+        console.log(this.center)
+    }
+    public loadScene(): void {
+       
+    }
     public addText(option: Record<string, any>) {
-        const newTextLabel = <Label>this.add.uiElement(UIElementType.LABEL, option.layerName, option);
+        const newTextLabel = <Label>this.add.uiElement(UIElementType.LABEL, option.layerName|| this.mainMenuLayerName, option);
         if(option.size)
         newTextLabel.size.set(option.size.x,option.size.y);
         else
         newTextLabel.size.set(300,100);
         newTextLabel.borderWidth = 2;
-        newTextLabel.setTextColor(Color.WHITE)
-        newTextLabel.setFontsize(28);
+        newTextLabel.setTextColor(option.textColor||Color.WHITE)
+        newTextLabel.setFontsize(option.fontSize|| 28);
+        newTextLabel.setBackgroundColor(option.backgroundColor||Color.BLACK)
         if (option.align)
-            newTextLabel.setHAlign("left")
+            newTextLabel.setHAlign(option.align)
     }
-    public addControlText(position:Vec2,controlText:Array<string>){
+    public addButtons( option: Record<string, any>) {
+        const newButton = <Label>this.add.uiElement(UIElementType.BUTTON, option.layerName|| this.mainMenuLayerName, option);
+        newButton.size.set(50,50);
+        if(option.size) newButton.size.set(option.size.x,option.size.y);
+        newButton.borderWidth = 0;
+        newButton.borderColor = Color.TRANSPARENT;
+        console.log(option.backgroundColor)
+        newButton.setBackgroundColor(option.backgroundColor||Color.BLACK)
+        newButton.setTextColor(option.textColor||Color.WHITE)
+        newButton.onClickEventId = option.buttonName;
+        newButton.setFontsize(50);
+        this.receiver.subscribe(option.buttonName);
+    }
+    public addControlTextLayer(option: Record<string, any>){
+        let position = option.position;
         let yInitPoistion = position.y - 400;
-        for(let text of controlText){
-            yInitPoistion += 100
+        for(let text of controlTextArray){
+            yInitPoistion += option.margin
             let textOption = {
                 position: new Vec2(position.x-150, yInitPoistion),
                 text: "• "+text,
                 align:true,
-                layerName:this.mainMenuLayerName,
+                layerName:option.layerName,
+                fontSize:option.fontSize,
             }
            this.addText(textOption);
         }
@@ -47,39 +76,29 @@ export default class HW4Scene extends Scene {
             position: new Vec2(position.x-470, position.y - 470),
             text: leftArrow,
             buttonName:BackButtonEvent.BACK,
-            layerName:this.mainMenuLayerName
         }
         this.addButtons(buttonOption);
     }
-    public addButtons( option: Record<string, any>) {
-        const newButton = <Label>this.add.uiElement(UIElementType.BUTTON, option.layerName, option);
-        newButton.size.set(50, 50);
-        newButton.borderWidth = 0;
-        newButton.borderColor = Color.TRANSPARENT;
-        newButton.backgroundColor = Color.BLACK;
-        newButton.onClickEventId = option.buttonName;
-        newButton.setFontsize(50);
-        this.receiver.subscribe(option.buttonName);
-    }
+    public addHelpTextLayer(option: Record<string, any>) {
+        let position = option.position;
+        let yInitPoistion = position.y - 400;
+        const newText = helpTextArray;
+        for (let text of newText) {
+            yInitPoistion += option.margin
+            let textOption = {
+                position: new Vec2(position.x - 320, yInitPoistion),
+                text: text,
+                align:"left",
+            }
+            this.addText(textOption);
+        }
+    } 
     public updateScene() {
         while (this.receiver.hasNextEvent()) {
             this.handleEvent(this.receiver.getNextEvent());
         }
     }
-    public addHelpText(position:Vec2) {
-        let yInitPoistion = position.y - 400;
-        const newText = helpTextArray;
-        for (let text of newText) {
-            yInitPoistion += 50
-            let textOption = {
-                position: new Vec2(position.x - 320, yInitPoistion),
-                text: text,
-                align: true,
-                layerName: this.mainMenuLayerName,
-            }
-            this.addText(textOption);
-        }
-    } 
+   
     public handleEvent(event: GameEvent): void {
         console.log(event.type)
         switch (event.type) {

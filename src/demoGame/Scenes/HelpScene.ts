@@ -39,10 +39,13 @@ export default class StartScene extends HW4Scene {
         let textOption = {
             position: new Vec2(center.x, center.y - 400),
             text: "Helps",
-            layerName: this.mainMenuLayerName,
+        }
+        let helptextOption = {
+            position: center,
+            margin:50,
         }
         this.addText(textOption);
-        this.addHelpText(center);
+        this.addHelpTextLayer(helptextOption);
         this.addBackButon(center);
     }
    

@@ -39,13 +39,16 @@ export default class StartScene extends HW4Scene  {
         this.backgroundImage.position.set(center.x, center.y);
         let textOption = {
             position: new Vec2(center.x, center.y - 300),
-            text: "Shadow Maze"
+            text: "Shadow Maze",
+            size:new Vec2(400, 100),
+            fontSize:60,
         }
-        this.addName(textOption);
+        this.addText(textOption);
         let buttonOption = {
             position: new Vec2(center.x, center.y + 100),
             text:  StartMenuButtonEvent.START_GAME,
-            layNamer:this.mainMenuLayerName,
+            size:new Vec2(300,50),
+            textColor:Color.PURPLE,
             buttonName:"Start Game",
         }
        this.addButtons(buttonOption);
@@ -55,13 +58,7 @@ export default class StartScene extends HW4Scene  {
             this.handleEvent(this.receiver.getNextEvent());
         }
     }
-    public addName(options){
-        const name = <Label>this.add.uiElement(UIElementType.LABEL,this.mainMenuLayerName,options);
-        name.size.set(400, 100);
-        name.borderWidth = 2;
-        name.setTextColor(Color.WHITE)
-        name.setFontsize(60)        
-    }
+  
   
    
     public handleEvent(event: GameEvent): void {

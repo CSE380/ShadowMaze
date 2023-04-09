@@ -26,13 +26,13 @@ export default class StartScene extends HW4Scene {
 
         this.load.image(this.backgroundImageKey, "hw4_assets/images/mazeBackground.jpg");
         // console.log(this.load.getImage("image"));
+       
     }
 
     // startScene() is where you should build any game objects you wish to have in your scene,
     // or where you should initialize any other things you will need in your scene
     // Once again, this occurs strictly after loadScene(), so anything you loaded there will be available
     startScene(): void {
-
         this.addUILayer(this.mainMenuLayerName)
         this.backgroundImage = this.add.sprite(this.backgroundImageKey, this.mainMenuLayerName);
         let center = this.viewport.getCenter();
@@ -40,10 +40,14 @@ export default class StartScene extends HW4Scene {
         let textOption = {
             position: new Vec2(center.x, center.y - 400),
             text: "Controls",
-            layerName:this.mainMenuLayerName,
         }
         this.addText(textOption);
-        this.addControlText(center,controlTextArray)
+        let controlTextOption = {
+            position: center,
+            text: controlTextArray,
+            margin:100,
+        }
+        this.addControlTextLayer(controlTextOption);
         this.addBackButon(center);
     }
     public updateScene() {

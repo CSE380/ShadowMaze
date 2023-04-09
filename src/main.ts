@@ -38,7 +38,9 @@ import SelectLevelMenuScene from "./demoGame/Scenes/SelectLevelMenuScene";
     // Create a game with the options specified
     const game = new Game(options);
     // Start our game
-    game.start(HelpScene, {});
+    game.start(LevelScene, {});
+    // game.start(HelpScene, {});
+    // game.start(ControlScene,{});
 })();
 
 function runTests(){};
