@@ -7,7 +7,7 @@ import GameEvent from "../../Wolfie2D/Events/GameEvent";
 import AstarDemoScene from "./AstarDemoScene";
 import {  SelectMenuButtonEvent } from "../CustomizedButton";
 import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
-import LevelScene from "./LevelScene";
+import LevelScene from "./introLevelScene";
 export default class MainMenu extends Scene {
     private mainMenuLayerName="mainMenu";
     private backgroundImageKey="backgroundImage";

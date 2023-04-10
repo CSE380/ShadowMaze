@@ -33,7 +33,7 @@ import { ClosestPositioned } from "../GameSystems/Searching/HW4Reducers";
 import BasicTargetable from "../GameSystems/Targeting/BasicTargetable";
 import Position from "../GameSystems/Targeting/Position";
 import AstarStrategy from "../Pathfinding/AstarStrategy";
-import HW4Scene from "./HW4Scene";
+import HW4Scene from "./abstractScene";
 
 const BattlerGroups = {
     RED: 1,

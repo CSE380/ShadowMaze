@@ -14,7 +14,7 @@ import Button from "../../Wolfie2D/Nodes/UIElements/Button";
 import MainMenu from "./MainMenuScene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import { helpTextArray } from "../Text";
-import HW4Scene from "./HW4Scene";
+import HW4Scene from "./abstractScene";
 /* #################### CLASS DEFINITION #################### */
 
 // Welcome to Wolfie2D!
