@@ -2,7 +2,7 @@ import Spritesheet from "../../Wolfie2D/DataTypes/Spritesheet";
 import Vec2 from "../../Wolfie2D/DataTypes/Vec2";
 import AnimatedSprite from "../../Wolfie2D/Nodes/Sprites/AnimatedSprite"
 import NavigationPath from "../../Wolfie2D/Pathfinding/NavigationPath";
-import { BattlerEvent, HudEvent } from "../Events";
+import { BattlerEvent, HudEvent } from "../ProjectEvents";
 import Inventory from "../GameSystems/ItemSystem/Inventory";
 import HW4Scene from "../Scenes/abstractScene";
 import BasicTargetable from "../GameSystems/Targeting/BasicTargetable";

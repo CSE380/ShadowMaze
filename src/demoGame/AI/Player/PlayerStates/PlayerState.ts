@@ -1,6 +1,6 @@
 import State from "../../../../Wolfie2D/DataTypes/State/State";
 import GameEvent from "../../../../Wolfie2D/Events/GameEvent";
-import { BattlerEvent, HudEvent, ItemEvent } from "../../../Events"
+import { BattlerEvent, HudEvent, ItemEvent } from "../../../ProjectEvents"
 import Item from "../../../GameSystems/ItemSystem/Item";
 import PlayerAI from "../PlayerAI";
 

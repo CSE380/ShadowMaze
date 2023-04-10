@@ -20,7 +20,6 @@ import PlayerActor from "../Actors/PlayerActor";
 // import GuardBehavior from "../AI/NPC/NPCBehavior/GaurdBehavior";
 // import HealerBehavior from "../AI/NPC/NPCBehavior/HealerBehavior";
 import PlayerAI from "../AI/Player/PlayerAI";
-import { ItemEvent, PlayerEvent, BattlerEvent, HudEvent } from "../Events";
 import Battler from "../GameSystems/BattleSystem/Battler";
 import BattlerBase from "../GameSystems/BattleSystem/BattlerBase";
 import HealthbarHUD from "../GameSystems/HUD/HealthbarHUD";
@@ -40,6 +39,8 @@ import {MainMenuButtonEvent } from "../CustomizedButton";
 import Input from "../../Wolfie2D/Input/Input";
 import { controlTextArray,helpTextArray } from "../Text";
 import { layerNameArray } from "../LayerName";
+import { PhysicsGroups } from "../PhysicsGroups";
+import { PlayerEvents } from "../ProjectEvents";
 enum PauseMenuState {
     Hidden,
     Visible,
@@ -60,6 +61,7 @@ export default class LevelScene extends HW4Scene {
     private nextLabels : Array<Label>;
     private mesh:Navmesh
     private wallSize: number;
+//    private levelEndPosition=new Vec2(400,400);
     private gameMenu= "gameMenu";
     private pauseButtonLayer= "pauseButtonLayer";
     private pauseMenuLayer= "pauseMenuLayer";
@@ -119,26 +121,21 @@ export default class LevelScene extends HW4Scene {
         this.wallSize = this.walls.size.x;
         // Set the viewport bounds to the tilemap
         let tilemapSize: Vec2 = this.walls.size;
-        console.log(this.getViewport().getZoomLevel())
         this.viewport.setBounds(0, 0, tilemapSize.x, tilemapSize.y);
         this.viewport.setZoomLevel(2);
-        console.log(this.getViewport().getZoomLevel())
         this.initLayers();
         // create screen first 
-        // this.initBlackScreen();
+        this.initBlackScreen();
         this.center = this.viewport.getHalfSize();
         // this.addBlackLabel(0, 100);
         this.initializePlayer();
-        this.initLevelEnd();
         this.initPauseMenuLayer();
-        // this.initializeLevelEnds();
+        this.initializeLevelEnds();
         // this.addLevelEndLabel();
         // this.initControlTextLayer();
         // this.initHelpTextLayer();
     }
-    public initLevelEnd(){
-
-    }
+    
     public initControlTextLayer(){
         let controlTextOption = {
             position: this.viewport.getCenter(),
@@ -223,7 +220,7 @@ export default class LevelScene extends HW4Scene {
                 break;
             }
             case MainMenuButtonEvent.Controls: {
-                this.showControlText();
+                // this.showControlText();
                 break;
             }
             case MainMenuButtonEvent.Help: {
@@ -233,6 +230,11 @@ export default class LevelScene extends HW4Scene {
             case MainMenuButtonEvent.Exit:{
                 this.viewport.setZoomLevel(1);
                 this.sceneManager.changeToScene(StartScene);
+                break;
+            }
+            case PlayerEvents.PLAYER_ENTERED_LEVEL_END:{
+                this.viewport.setZoomLevel(1);
+                this.sceneManager.changeToScene(SelectLevelMenuScene);
             }
         }
     }
@@ -244,7 +246,8 @@ export default class LevelScene extends HW4Scene {
             this.isPauseMenuHidden = !this.isPauseMenuHidden;
             this.emitter.fireEvent(this.ButtonSelection.PAUSE)
         }
-        this.updateLabel()
+        this.updateLabel();
+        this.isLevelEnd();
     }
    
     /** Initializes the layers in the scene */
@@ -264,9 +267,6 @@ export default class LevelScene extends HW4Scene {
         this.getLayer(this.pauseMenuLayer).setHidden(flag);
     }
    
-    protected showControlText(){
-
-    }   
       
     /**
      * Initializes the player in the scene
@@ -274,14 +274,14 @@ export default class LevelScene extends HW4Scene {
     protected initializePlayer(): void {
         let player = this.add.animatedSprite(PlayerActor, "prince", this.gameMenu);
         this.player = player
-        player.position.set(10, 400);
+        player.position.set(this.playerInitPosition.x,this.playerInitPosition.y);
         player.battleGroup = 2;
 
         player.health = 10;
         player.maxHealth = 10;
         // Give the player physics
         player.addPhysics(new AABB(Vec2.ZERO, new Vec2(8, 8)));
-      
+        // player.setGroup(PhysicsGroups.PLAYER);
         this.initCurrLabel();
         // Give the player a healthbar
         let healthbar = new HealthbarHUD(this, player, this.gameMenu, {size: player.size.clone().scaled(2, 1/2), offset: player.size.clone().scaled(0, -1/2)});
@@ -326,9 +326,24 @@ export default class LevelScene extends HW4Scene {
     }
     public updateLabel(){
         this.nextLabels= <Array<Label>>this.getSceneGraph().getNodesAt(this.player.position)
-        this.currLabels.forEach(label=>this.updateColor(label))
+        this.currLabels.forEach(label=>{this.updateColor(label)})
         this.nextLabels.forEach(label=>this.updateColor(label))
         this.currLabels = this.nextLabels;
+    }
+    public isLevelEnd(){
+        const label = this.levelEndArea;
+        // console.log(this.player.position.x)
+        // // console.log(this.player.position.y)
+        // console.log(label.position.x)
+        // console.log(label.position.y)
+        // console.log(label.backgroundColor == this.levelEndColor)
+        if(Math.abs(label.position.x-this.player.position.x)<=3&&(Math.abs(label.position.y-this.player.position.y)<=3)){
+           console.log("fire")
+            this.emitter.fireEvent(PlayerEvents.PLAYER_ENTERED_LEVEL_END)
+        }
+    }
+    public checkCollison(){
+        
     }
     public updateColor(label:Label){
         if(label.backgroundColor){

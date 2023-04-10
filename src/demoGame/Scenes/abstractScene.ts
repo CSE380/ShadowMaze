@@ -18,6 +18,10 @@ import Viewport from "../../Wolfie2D/SceneGraph/Viewport";
 import RenderingManager from "../../Wolfie2D/Rendering/RenderingManager";
 import Rect from "../../Wolfie2D/Nodes/Graphics/Rect";
 import { GraphicType } from "../../Wolfie2D/Nodes/Graphics/GraphicTypes";
+import { PhysicsGroups } from "../PhysicsGroups";
+import { PlayerEvents } from "../ProjectEvents";
+import SelectLevelMenuScene from "./SelectLevelMenuScene";
+
 export default abstract class HW4Scene extends Scene {
     protected mainMenuLayerName="gameMenu";
     protected backgroundImageKey: "backgroundImage";
@@ -25,15 +29,23 @@ export default abstract class HW4Scene extends Scene {
     protected center:Vec2;
     protected levelEndArea: Rect;
     protected levelEndLabel: Label;
-    protected levelEndPosition: Vec2;
-    protected levelEndHalfSize: Vec2;
+    protected playerInitPosition=new Vec2(15,400);
+    protected levelEndPosition=new Vec2(30,450);
+    protected levelEndHalfSize=new Vec2(25, 25)
+    protected levelEndColor=new Color(255, 0, 0, 0.5);
+
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
-        super(viewport, sceneManager, renderingManager,options);
+        super(viewport, sceneManager, renderingManager,{...options,physics:{
+            groupNames: [PhysicsGroups.PLAYER],
+        }});
         this.center = this.getViewport().getCenter();
-        console.log(this.center)
+        this.initSubscribe();
     }
     public loadScene(): void {
-       
+
+    }
+    protected initSubscribe(){
+        this.receiver.subscribe(PlayerEvents.PLAYER_ENTERED_LEVEL_END)
     }
     protected addText(option: Record<string, any>) {
         const newTextLabel = <Label>this.add.uiElement(UIElementType.LABEL, option.layerName|| this.mainMenuLayerName, option);
@@ -56,10 +68,13 @@ export default abstract class HW4Scene extends Scene {
     //     this.levelEndArea.color = new Color(255, 0, 255, .20);
     // }
     protected initializeLevelEnds(){
+      
         this.levelEndArea = <Rect>this.add.graphic(GraphicType.RECT, this.mainMenuLayerName, { position: this.levelEndPosition, size: this.levelEndHalfSize });
         this.levelEndArea.addPhysics(undefined, undefined, false, true);
+        this.levelEndArea.setTrigger(PhysicsGroups.PLAYER, PlayerEvents.PLAYER_ENTERED_LEVEL_END, null);
         // this.levelEndArea.setTrigger(HW3PhysicsGroups.PLAYER, HW3Events.PLAYER_ENTERED_LEVEL_END, null);
-        this.levelEndArea.color = new Color(255, 0, 255, .20);
+        this.levelEndArea.color = this.levelEndColor;
+        console.log(this.levelEndArea)
     }
     protected addLevelEndLabel(){
         this.levelEndLabel = <Label>this.add.uiElement(UIElementType.LABEL, this.mainMenuLayerName, { position: new Vec2(250, 100), text: "Level Complete" });
@@ -69,7 +84,6 @@ export default abstract class HW4Scene extends Scene {
         this.levelEndLabel.textColor = Color.WHITE;
         this.levelEndLabel.fontSize = 48;
         this.levelEndLabel.font = "PixelSimple";
-        console.log(this.levelEndLabel)
     }
     protected addButtons( option: Record<string, any>) {
         const newButton = <Label>this.add.uiElement(UIElementType.BUTTON, option.layerName|| this.mainMenuLayerName, option);
@@ -77,7 +91,6 @@ export default abstract class HW4Scene extends Scene {
         if(option.size) newButton.size.set(option.size.x,option.size.y);
         newButton.borderWidth = 0;
         newButton.borderColor = Color.TRANSPARENT;
-        console.log(option.backgroundColor)
         newButton.setBackgroundColor(option.backgroundColor||Color.BLACK)
         newButton.setTextColor(option.textColor||Color.WHITE)
         newButton.onClickEventId = option.buttonName;
@@ -134,6 +147,11 @@ export default abstract class HW4Scene extends Scene {
             case BackButtonEvent.BACK: {
                 this.sceneManager.changeToScene(MainMenu);
                 break;
+            }
+            case PlayerEvents.PLAYER_ENTERED_LEVEL_END:{
+                console.log("enter")
+                this.viewport.setZoomLevel(1);
+                this.sceneManager.changeToScene(SelectLevelMenuScene);
             }
         }
     }

@@ -22,7 +22,18 @@ export enum HudEvent {
     USE_HPACK="USE_HPACK"
 }
 
-export enum PlayerEvent {
-    PLAYER_KILLED = "PLAYER_KILLED"
+// export enum PlayerEvent {
+//     PLAYER_KILLED = "PLAYER_KILLED",
+
+// }
+
+/**
+ * A set of events for HW4
+ */
+export const PlayerEvents = {
+    LEVEL_START: "LEVEL_START",
+    LEVEL_END: "LEVEL_END",
+    PLAYER_ENTERED_LEVEL_END: "PLAYER_ENTERED_LEVEL_END",
+
     
-}
+} as const;

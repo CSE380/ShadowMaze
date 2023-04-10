@@ -17,7 +17,7 @@ import GameNode from "../../Wolfie2D/Nodes/GameNode";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import PlayerActor from "../Actors/PlayerActor";
 import HealthbarHUD from "../GameSystems/HUD/HealthbarHUD";
-import { ItemEvent } from "../Events";
+import { ItemEvent } from "../ProjectEvents";
 import PlayerAI from "../AI/Player/PlayerAI";
 /**
  * This is a dummy scene to test if your implementation of A* is working or not. If your implementation 
