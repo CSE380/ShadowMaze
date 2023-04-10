@@ -26,3 +26,4 @@ export enum BackButtonEvent {
 export enum PauseButtonEvent {
     PAUSE="PAUSE",
 }
+

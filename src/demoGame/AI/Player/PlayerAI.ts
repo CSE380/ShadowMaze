@@ -7,11 +7,11 @@ import { ItemEvent } from "../../Events";
 import Inventory from "../../GameSystems/ItemSystem/Inventory";
 import Item from "../../GameSystems/ItemSystem/Item";
 import PlayerController from "./PlayerController";
-import { Idle, Invincible, Moving, Dead, PlayerStateType } from "./PlayerStates/PlayerState";
+import { Idle, Shielding, Moving, Dead, PlayerStateType, Attacking } from "./PlayerStates/PlayerState";
 
 /**
  * The AI that controls the player. The players AI has been configured as a Finite State Machine (FSM)
- * with 4 states; Idle, Moving, Invincible, and Dead.
+ * with 4 states; Idle, Moving, shielding, and Dead.
  */
 export default class PlayerAI extends StateMachineAI implements AI {
 
@@ -31,7 +31,8 @@ export default class PlayerAI extends StateMachineAI implements AI {
         // Add the players states to it's StateMachine
         this.addState(PlayerStateType.IDLE, new Idle(this, this.owner));
         this.addState(PlayerStateType.MOVING, new Moving(this, this.owner));
-        // this.addState(PlayerStateType.ATTACKING, new Attacking(this, this.owner));
+        this.addState(PlayerStateType.SHIELDING, new Shielding(this,  this.owner));
+        this.addState(PlayerStateType.ATTACKING, new Attacking(this, this.owner));
         
         // Initialize the players state to Idle
         this.initialize(PlayerStateType.IDLE);

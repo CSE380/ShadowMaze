@@ -21,10 +21,16 @@ export default class Idle extends PlayerState {
 
     public override update(deltaT: number): void {
         super.update(deltaT);
-        console.log("hi");
+        if (this.parent.controller.shielding) {
+            this.finished(PlayerStateType.SHIELDING)
+        }
+        if (this.parent.controller.attacking) {
+            this.finished(PlayerStateType.ATTACKING);
+        }
         if (!this.parent.controller.moveDir.equals(Vec2.ZERO)) {
             this.finished(PlayerStateType.MOVING);
         }
+
     }
 
     public override onExit(): Record<string, any> { 

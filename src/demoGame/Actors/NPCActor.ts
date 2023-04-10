@@ -20,8 +20,8 @@ export default class NPCActor extends AnimatedSprite implements Battler, Targeti
     /** Override the type of the scene to be the HW4 scene */
     protected scene: HW4Scene
 
-    // An invincible timer for our NPCs
-    protected invincibleTimer: Timer;
+    // An shielding timer for our NPCs
+    protected shieldingTimer: Timer;
 
     // The key of the Navmesh to use to build paths for this NPCActor
     protected _navkey: string;
@@ -36,7 +36,7 @@ export default class NPCActor extends AnimatedSprite implements Battler, Targeti
         this._navkey = "navkey";
         this._battler = new BasicBattler(this);
         this._targeting = new BasicTargeting(this);
-        this.invincibleTimer = new Timer(1000);
+        this.shieldingTimer = new Timer(1000);
 
         this.receiver.subscribe("use-hpack");
     }

@@ -9,7 +9,7 @@ export enum PlayerAnimationType {
     IDLE = "IDLE",
     MOVING = "MOVING",
     ATTACKING = "ATTACKING",
-    SHEILDING = "SHEILDING"
+    SHIELDING = "SHIELDING"
 }
 
 
@@ -17,6 +17,7 @@ export enum PlayerStateType {
     IDLE = "IDLE",
     ATTACKING = "ATTACKING",
     MOVING = "MOVING",
+    SHIELDING = "SHIELDING"
 }
 
 export default abstract class PlayerState extends State {
@@ -32,9 +33,9 @@ export default abstract class PlayerState extends State {
     public override onEnter(options: Record<string, any>): void {}
     public override onExit(): Record<string, any> { return {}; }
     public override update(deltaT: number): void {
+
         if (this.parent.owner.animation.isPlaying(PlayerAnimations.IDLE)) {
             this.parent.owner.rotation = 0;
-            return;
         }
         // Adjust the angle the player is facing 
         // this.parent.owner.rotation = this.parent.controller.rotation;
@@ -76,6 +77,13 @@ export default abstract class PlayerState extends State {
         // Move the player
         this.parent.owner.move(this.parent.controller.moveDir);
 
+        // if (this.parent.controller.attacking) {
+
+        // }
+        // if (this.parent.controller.shielding) {
+
+        // }
+
         // Handle the player trying to pick up an item
         if (this.parent.controller.pickingUp) {
             // Request an item from the scene
@@ -103,10 +111,11 @@ export default abstract class PlayerState extends State {
 }
 
 import Idle from "./Idle";
-import Invincible from "./Invincible";
+import Shielding from "./Shielding";
 import Moving from "./Moving";
+import Attacking from "./Attacking";
 import Dead from "./Dead";
 import PlayerActor from "../../../Actors/PlayerActor";
 import MathUtils from "../../../../Wolfie2D/Utils/MathUtils";
 import { PlayerAnimations } from "../PlayerController";
-export { Idle, Invincible, Moving, Dead} 
+export { Idle, Shielding, Moving, Dead, Attacking} 

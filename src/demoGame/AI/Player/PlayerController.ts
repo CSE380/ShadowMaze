@@ -1,3 +1,4 @@
+import StateMachineAI from "../../../Wolfie2D/AI/StateMachineAI";
 import Vec2 from "../../../Wolfie2D/DataTypes/Vec2";
 import Input from "../../../Wolfie2D/Input/Input";
 import AnimatedSprite from "../../../Wolfie2D/Nodes/Sprites/AnimatedSprite";
@@ -11,21 +12,24 @@ export enum PlayerInput {
     MOVE_LEFT = "MOVE_LEFT",
     MOVE_RIGHT = "MOVE_RIGHT",
     ATTACKING = "ATTACKING",
+    SHIELDING = "SHIELDING",
+    ULTIMATE = "ULTIMATE",
     PICKUP_ITEM = "PICKUP_ITEM",
     DROP_ITEM = "DROP_ITEM"
 }
 
 export const PlayerAnimations = {
     IDLE : "IDLE",
-    ATTACKING: "ATTACAKING",
-    MOVING : "MOVING"
+    ATTACKING: "ATTACKING",
+    MOVING : "MOVING",
+    SHIELDING: "SHIELDING"
 } as const
 
 /**
  * The PlayerController class handles processing the input recieved from the user and exposes  
  * a set of methods to make dealing with the user input a bit simpler.
  */
-export default class PlayerController {
+export default class PlayerController{
 
     /** The GameNode that owns the AI */
     protected owner: AnimatedSprite;
@@ -71,10 +75,16 @@ export default class PlayerController {
      */
     public get pickingUp(): boolean { return Input.isJustPressed(PlayerInput.PICKUP_ITEM); }
 
+    public get attacking(): boolean { return Input.isJustPressed(PlayerInput.ATTACKING); }
+
+    public get shielding(): boolean { return Input.isJustPressed(PlayerInput.SHIELDING); }
+
+
     /** 
      * Checks if the player is attempting to drop their held item or not.
      * @return true if the player is attempting to drop their held item; false otherwise.
      */
     public get dropping(): boolean { return Input.isJustPressed(PlayerInput.DROP_ITEM); }
+
 
 }
