@@ -1,0 +1,21 @@
+{ "compressionlevel":-1,
+ "infinite":false,
+ "layers":[
+        {
+       "data":[0],
+         "id":1,
+         "name":"Tile Layer 1",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true
+        }],
+
+ "orientation":"isometric",
+ "renderorder":"right-down",
+ "tiledversion":"1.8.2",
+ "tileheight":102,
+ "tilewidth":1024,
+ "image":"iso-64x64-building.png",
+ "version":"1.8",
+ "width":1024
+}

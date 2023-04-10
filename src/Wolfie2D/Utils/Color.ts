@@ -107,7 +107,9 @@ export default class Color {
 	static get ORANGE(): Color {
 		return new Color(255, 100, 0, 1);
 	}
-
+	static get PURPLE(): Color{
+		return new Color(112, 90, 248, 1);
+	}
 	/**
 	 * Sets the color to the values provided
 	 * @param r Red
@@ -145,7 +147,11 @@ export default class Color {
 	toArray(): [number, number, number, number] {
 		return [this.r, this.g, this.b, this.a];
 	}
-	
+	isEqual(color:Color):boolean{
+		if(color.a == this.a && color.r == this.r && color.g == this.g && color.b == this.b )
+     		return true;
+		else false;
+	}
 	/**
 	 * Returns the color as a string of the form #RRGGBB
 	 * @returns #RRGGBB

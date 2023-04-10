@@ -1,5 +1,5 @@
 import Game from "./Wolfie2D/Loop/Game";
-import MainMenu from "./demoGame/Scenes/MainMenu";
+import MainMenu from "./demoGame/Scenes/MainMenuScene";
 import { PlayerInput } from "./demoGame/AI/Player/PlayerController";
 import default_scene from "./default_scene";
 import AStarDemoScene from "./demoGame/Scenes/AstarDemoScene";
@@ -8,6 +8,8 @@ import LevelScene from "./demoGame/Scenes/LevelScene";
 import StartScene from "./demoGame/Scenes/StartScene";
 import ControlScene from "./demoGame/Scenes/ControlScene";
 import HelpScene from "./demoGame/Scenes/HelpScene";
+import SelectLevelMenuScene from "./demoGame/Scenes/SelectLevelMenuScene";
+
 // The main function is your entrypoint into Wolfie2D. Specify your first scene and any options here.
 (function main(){
     // Run any tests
@@ -36,8 +38,9 @@ import HelpScene from "./demoGame/Scenes/HelpScene";
     // Create a game with the options specified
     const game = new Game(options);
     // Start our game
-    game.start(StartScene, {});
-
+    game.start(LevelScene, {});
+    // game.start(HelpScene, {});
+    // game.start(ControlScene,{});
 })();
 
 function runTests(){};

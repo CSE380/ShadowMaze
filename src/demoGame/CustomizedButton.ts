@@ -1,8 +1,9 @@
 export enum MainMenuButtonEvent {
-    SELECT_LEVELS="Select levels",
-    CONTROLS = "Controls",
-    HELP = "Help",
-    EXIT="Exit",
+    Restart="Restart",
+    Select_levels="Select levels",
+    Controls = "Controls",
+    Help = "Help",
+    Exit="Exit",
 }
 
 export enum SelectMenuButtonEvent {

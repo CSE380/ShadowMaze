@@ -6,12 +6,12 @@ import Color from "../../Wolfie2D/Utils/Color";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import MainHW4Scene from "./MainHW4Scene";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
-import ControlScene from "./ControlScene";
 import GuardDemoScene from "./GuardDemoScene";
 import { MainMenuButtonEvent } from "../CustomizedButton";
 import SelectLevelMenuScene from "./SelectLevelMenuScene";
 import HelpScene from "./HelpScene";
 import StartScene from "./StartScene";
+import ControlScene from "./ControlScene";
 import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
 export default class MainMenu extends Scene {
     private mainMenuLayerName:"mainMenu";
@@ -24,7 +24,6 @@ export default class MainMenu extends Scene {
     private backgroundImageKey:"backgroundImage";
     public loadScene(){
         this.load.image(this.backgroundImageKey,"hw4_assets/images/fullBackground.jpg");
-
     }
 
     public startScene(){
@@ -35,24 +34,29 @@ export default class MainMenu extends Scene {
         // The main menu
         let positionY=center.y - 400;
        
-        for(const butttonName in MainMenuButtonEvent){
+        for(let buttonName in MainMenuButtonEvent){
+            if(buttonName == "Restart") continue;
             positionY = positionY + 100;
-            this.addButtons(butttonName,center.x,positionY );
+            if(buttonName == "Select_levels") 
+                buttonName = "Select levels"           
+            const options={
+                position:new Vec2(center.x,positionY),
+                text:buttonName,
+            }
+            this.addButtons(options);
         }
     }
-    public addButtons(buttonName:string, x:number,y:number){
-        const options={
-            position:new Vec2(x,y),
-            text:MainMenuButtonEvent[buttonName],
-        }
-        const play = this.add.uiElement(UIElementType.BUTTON, this.mainMenuLayerName, options);
+    public addButtons(options:Record<string, any>){
+       
+        const newButton = <Label>this.add.uiElement(UIElementType.BUTTON, this.mainMenuLayerName, options);
         
-        play.size.set(300, 50);
-        play.borderWidth = 2;
-        play.borderColor = Color.WHITE;
-        play.backgroundColor = Color.BLACK;
-        play.onClickEventId = buttonName;
-        this.receiver.subscribe(buttonName);
+        newButton.size.set(300, 50);
+        newButton.borderWidth = 2;
+        newButton.borderColor = Color.TRANSPARENT;
+        newButton.backgroundColor = Color.BLACK;
+        newButton.setTextColor(Color.PURPLE);
+        newButton.onClickEventId = options.text;
+        this.receiver.subscribe(options.text);
     }
     public updateScene(){
         while(this.receiver.hasNextEvent()){
@@ -62,21 +66,21 @@ export default class MainMenu extends Scene {
 
     public handleEvent(event: GameEvent): void {
         console.log(event.type)
-        switch(MainMenuButtonEvent[event.type]) {
-            case MainMenuButtonEvent.SELECT_LEVELS: {
+        switch(event.type) {
+            case MainMenuButtonEvent.Select_levels: {
               
                 this.sceneManager.changeToScene(SelectLevelMenuScene);
                 break;
             }
-            case MainMenuButtonEvent.CONTROLS: {
+            case MainMenuButtonEvent.Controls: {
                 this.sceneManager.changeToScene(ControlScene);
                 break;
             }
-            case MainMenuButtonEvent.HELP: {
+            case MainMenuButtonEvent.Help: {
                 this.sceneManager.changeToScene(HelpScene);
                 break;
             }
-            case MainMenuButtonEvent.EXIT:{
+            case MainMenuButtonEvent.Exit:{
                 this.sceneManager.changeToScene(StartScene);
             }
         }
