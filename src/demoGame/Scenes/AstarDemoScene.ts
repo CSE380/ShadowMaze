@@ -86,11 +86,7 @@ export default class AStarDemoScene extends Scene {
         this.mesh.registerStrategy("astar", new AstarStrategy(this.mesh));
 
         // TODO Set the navigation strategy to be A*
-<<<<<<< HEAD
-        navmesh.setStrategy("astar");
-=======
         this.mesh.setStrategy("astar");
->>>>>>> e7695408549edd31cd768856c113b7b34e4b30d2
 
         // Create a dummy NPC
        this.initializePlayer();
