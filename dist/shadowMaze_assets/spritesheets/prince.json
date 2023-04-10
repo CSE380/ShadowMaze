@@ -14,29 +14,33 @@
       "name": "IDLE",
       "frames": [
         {
-          "index": 2,
-          "duration": 10
+          "index": 0,
+          "duration": 5
+        },
+        {
+          "index": 1,
+          "duration": 5
         }
       ]
     },
     {
-      "name": "WALKING",
+      "name": "MOVING",
       "frames": [
         {
           "index": 2,
-          "duration": 10
+          "duration": 5
         },
         {
           "index": 3,
-          "duration": 10
+          "duration": 5
         },
         {
           "index": 4,
-          "duration": 10
+          "duration": 5
         },
         {
           "index": 5,
-          "duration": 10
+          "duration": 5
         }
       ]
     },

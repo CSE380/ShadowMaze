@@ -1,12 +1,13 @@
 import Vec2 from "../../../../Wolfie2D/DataTypes/Vec2";
 import GameEvent from "../../../../Wolfie2D/Events/GameEvent";
 import { PlayerAnimationType, PlayerStateType } from "./PlayerState";
+import { PlayerAnimations } from "../PlayerController";
 import PlayerState from "./PlayerState";
 
 export default class Idle extends PlayerState {
 
     public override onEnter(options: Record<string, any>): void {
-        this.parent.owner.animation.playIfNotAlready(PlayerAnimationType.IDLE, true);
+        this.parent.owner.animation.playIfNotAlready(PlayerAnimations.IDLE, true);
     }
 
     public override handleInput(event: GameEvent): void {
@@ -20,6 +21,7 @@ export default class Idle extends PlayerState {
 
     public override update(deltaT: number): void {
         super.update(deltaT);
+        console.log("hi");
         if (!this.parent.controller.moveDir.equals(Vec2.ZERO)) {
             this.finished(PlayerStateType.MOVING);
         }

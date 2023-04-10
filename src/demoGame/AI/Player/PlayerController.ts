@@ -15,6 +15,12 @@ export enum PlayerInput {
     DROP_ITEM = "DROP_ITEM"
 }
 
+export const PlayerAnimations = {
+    IDLE : "IDLE",
+    ATTACKING: "ATTACAKING",
+    MOVING : "MOVING"
+} as const
+
 /**
  * The PlayerController class handles processing the input recieved from the user and exposes  
  * a set of methods to make dealing with the user input a bit simpler.

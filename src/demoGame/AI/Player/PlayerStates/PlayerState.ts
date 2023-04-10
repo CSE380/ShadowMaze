@@ -6,16 +6,17 @@ import PlayerAI from "../PlayerAI";
 
 
 export enum PlayerAnimationType {
-    IDLE = "IDLE"
+    IDLE = "IDLE",
+    MOVING = "MOVING",
+    ATTACKING = "ATTACKING",
+    SHEILDING = "SHEILDING"
 }
 
 
 export enum PlayerStateType {
     IDLE = "IDLE",
-    INVINCIBLE = "INVINCIBLE",
     ATTACKING = "ATTACKING",
     MOVING = "MOVING",
-    DEAD = "DEAD"
 }
 
 export default abstract class PlayerState extends State {
@@ -31,12 +32,14 @@ export default abstract class PlayerState extends State {
     public override onEnter(options: Record<string, any>): void {}
     public override onExit(): Record<string, any> { return {}; }
     public override update(deltaT: number): void {
-
+        if (this.parent.owner.animation.isPlaying(PlayerAnimations.IDLE)) {
+            this.parent.owner.rotation = 0;
+            return;
+        }
         // Adjust the angle the player is facing 
         // this.parent.owner.rotation = this.parent.controller.rotation;
-        console.log(this.parent.controller.rotation);
-        console.log(this.parent.controller.moveDir.toString());
         let princeDirection = this.parent.controller.moveDir;
+        //change direction of the prince
         if (princeDirection.x == 0) {
             if (princeDirection.y > 0) {
                 this.parent.owner.rotation = 3;
@@ -105,4 +108,5 @@ import Moving from "./Moving";
 import Dead from "./Dead";
 import PlayerActor from "../../../Actors/PlayerActor";
 import MathUtils from "../../../../Wolfie2D/Utils/MathUtils";
+import { PlayerAnimations } from "../PlayerController";
 export { Idle, Invincible, Moving, Dead} 
