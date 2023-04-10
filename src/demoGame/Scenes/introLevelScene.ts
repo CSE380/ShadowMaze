@@ -100,7 +100,7 @@ export default class LevelScene extends HW4Scene {
      */
     public override loadScene() {
         // Load the player and enemy spritesheets
-        this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince.json");
+        this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince_v2.json");
 
         // Load the tilemap
         this.load.tilemap("level", "shadowMaze_assets/tilemaps/introLevel.json");
