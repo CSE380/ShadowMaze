@@ -23,7 +23,7 @@ export default class MainMenu extends Scene {
 
     private backgroundImageKey:"backgroundImage";
     public loadScene(){
-        this.load.image(this.backgroundImageKey,"hw4_assets/images/fullBackground.jpg");
+        this.load.image(this.backgroundImageKey,"shadowMaze_assets/images/fullBackground.jpg");
     }
 
     public startScene(){

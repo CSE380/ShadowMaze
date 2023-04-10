@@ -33,7 +33,43 @@ export default abstract class PlayerState extends State {
     public override update(deltaT: number): void {
 
         // Adjust the angle the player is facing 
-        this.parent.owner.rotation = this.parent.controller.rotation;
+        // this.parent.owner.rotation = this.parent.controller.rotation;
+        console.log(this.parent.controller.rotation);
+        console.log(this.parent.controller.moveDir.toString());
+        let princeDirection = this.parent.controller.moveDir;
+        if (princeDirection.x == 0) {
+            if (princeDirection.y > 0) {
+                this.parent.owner.rotation = 3;
+            }
+            if (princeDirection.y < 0) {
+                this.parent.owner.rotation = 0;
+            }
+        }
+        if (princeDirection.y == 0) {
+            if (princeDirection.x > 0) {
+                this.parent.owner.rotation = 4.5;
+            }
+            if (princeDirection.x < 0) {
+                this.parent.owner.rotation = 1.5;
+            }
+        }
+        if (princeDirection.x < 0) {
+            if (princeDirection.y < 0) {
+                this.parent.owner.rotation = 0.75;
+            }
+            if (princeDirection.y > 0) {
+                this.parent.owner.rotation = 2.25;
+            }
+        }
+        if (princeDirection.x > 0) {
+            if (princeDirection.y < 0) {
+                this.parent.owner.rotation = 5.25;
+            }
+            if (princeDirection.y > 0) {
+                this.parent.owner.rotation = 3.75;
+            }
+        }
+
         // Move the player
         this.parent.owner.move(this.parent.controller.moveDir);
 
@@ -68,4 +104,5 @@ import Invincible from "./Invincible";
 import Moving from "./Moving";
 import Dead from "./Dead";
 import PlayerActor from "../../../Actors/PlayerActor";
+import MathUtils from "../../../../Wolfie2D/Utils/MathUtils";
 export { Idle, Invincible, Moving, Dead} 

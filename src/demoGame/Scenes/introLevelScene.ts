@@ -100,10 +100,10 @@ export default class LevelScene extends HW4Scene {
      */
     public override loadScene() {
         // Load the player and enemy spritesheets
-        this.load.spritesheet("player1", "hw4_assets/spritesheets/player1.json");
+        this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince.json");
 
         // Load the tilemap
-        this.load.tilemap("level", "hw4_assets/tilemaps/introLevel.json");
+        this.load.tilemap("level", "shadowMaze_assets/tilemaps/introLevel.json");
 
 
     }
@@ -272,7 +272,7 @@ export default class LevelScene extends HW4Scene {
      * Initializes the player in the scene
      */
     protected initializePlayer(): void {
-        let player = this.add.animatedSprite(PlayerActor, "player1", this.gameMenu);
+        let player = this.add.animatedSprite(PlayerActor, "prince", this.gameMenu);
         this.player = player
         player.position.set(10, 400);
         player.battleGroup = 2;

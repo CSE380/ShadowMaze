@@ -14,7 +14,7 @@ export default class MainMenu extends Scene {
     private mainMenu: Layer;
     private backgroundImage: Sprite;
     public loadScene(){
-        this.load.image(this.backgroundImageKey, "hw4_assets/images/mazeBackground.jpg");
+        this.load.image(this.backgroundImageKey, "shadowMaze_assets/images/mazeBackground.jpg");
 
     }
 

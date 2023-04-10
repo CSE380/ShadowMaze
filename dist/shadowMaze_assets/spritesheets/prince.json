@@ -1,8 +1,8 @@
 {
   "name": "prince",
   "spriteSheetImage": "prince.png",
-  "spriteWidth": 128,
-  "spriteHeight": 128,
+  "spriteWidth": 32,
+  "spriteHeight": 32,
   "leftBuffer": 0,
   "rightBuffer": 0,
   "topBuffer": 0,
@@ -11,8 +11,16 @@
   "rows": 5,
   "animations": [
     {
+      "name": "IDLE",
+      "frames": [
+        {
+          "index": 2,
+          "duration": 10
+        }
+      ]
+    },
+    {
       "name": "WALKING",
-      "repeat": true,
       "frames": [
         {
           "index": 2,
@@ -34,7 +42,6 @@
     },
     {
       "name": "ATTACKING",
-      "repeat": true,
       "frames": [
         {
           "index": 9,
@@ -72,7 +79,6 @@
     },
     {
       "name": "SHIELDING",
-      "repeat": true,
       "frames": [
         {
           "index": 6,

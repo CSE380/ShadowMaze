@@ -22,9 +22,9 @@ export default class StartScene extends HW4Scene  {
     /* ########## MEMBER DEFINITIONS ##########*/
    
     loadScene(): void {
-        // this.load.tilemap("map", "../dist/hw4_assets/tilemaps/test2.json");
+        // this.load.tilemap("map", "../dist/shadowMaze_assets/tilemaps/test2.json");
         
-        this.load.image(this.backgroundImageKey,"hw4_assets/images/splash.jpg");
+        this.load.image(this.backgroundImageKey,"shadowMaze_assets/images/splash.jpg");
         // console.log(this.load.getImage("image"));
     }
 

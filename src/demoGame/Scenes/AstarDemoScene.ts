@@ -39,9 +39,9 @@ export default class AStarDemoScene extends Scene {
 
     // private player: PlayerActor;
     public loadScene(): void {
-        this.load.spritesheet("player1", "hw4_assets/spritesheets/player1.json");
-        this.load.tilemap("level", "hw4_assets/tilemaps/introLevel.json");
-        this.load.spritesheet("BlueEnemy", "hw4_assets/spritesheets/BlueEnemy.json");
+        this.load.spritesheet("player1", "shadowMaze_assets/spritesheets/player1.json");
+        this.load.tilemap("level", "shadowMaze_assets/tilemaps/introLevel.json");
+        this.load.spritesheet("BlueEnemy", "shadowMaze_assets/spritesheets/BlueEnemy.json");
         this.addLayer("primary", 10)
         this.labelSize = 16
         this.healthbars = new Map<number, HealthbarHUD>();
