@@ -40,11 +40,17 @@ import {MainMenuButtonEvent } from "../CustomizedButton";
 import Input from "../../Wolfie2D/Input/Input";
 import { controlTextArray,helpTextArray } from "../Text";
 import { layerNameArray } from "../LayerName";
+enum PauseMenuState {
+    Hidden,
+    Visible,
+    ControlsText,
+    HelpText,
+  }
 export default class LevelScene extends HW4Scene {
 
     /** GameSystems in the HW4 Scene */
     private inventoryHud: InventoryHUD;
-
+    private state: PauseMenuState = PauseMenuState.Hidden;
     /** All the battlers in the HW4Scene (including the player) */
     private battlers: (Battler & Actor)[];
     /** Healthbars for the battlers */
@@ -72,6 +78,7 @@ export default class LevelScene extends HW4Scene {
     private graph: PositionGraph;
     private restartButton:string;
     private isPauseMenuHidden:boolean;
+    
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, options);
 
@@ -81,7 +88,7 @@ export default class LevelScene extends HW4Scene {
         this.laserguns = new Array<LaserGun>();
         this.healthpacks = new Array<Healthpack>();
         this.ButtonSelection = MainMenuButtonEvent;
-        // this.isPauseMenuHidden = true;
+        this.isPauseMenuHidden = true;
         for (const layerName of this.layerNames) {
             this[layerName] = layerName;
         }
@@ -118,14 +125,19 @@ export default class LevelScene extends HW4Scene {
         console.log(this.getViewport().getZoomLevel())
         this.initLayers();
         // create screen first 
-        this.initBlackScreen();
+        // this.initBlackScreen();
         this.center = this.viewport.getHalfSize();
         // this.addBlackLabel(0, 100);
         this.initializePlayer();
-       
+        this.initLevelEnd();
         this.initPauseMenuLayer();
+        this.initializeLevelEnds();
+        // this.addLevelEndLabel();
         // this.initControlTextLayer();
         // this.initHelpTextLayer();
+    }
+    public initLevelEnd(){
+
     }
     public initControlTextLayer(){
         let controlTextOption = {
@@ -215,7 +227,7 @@ export default class LevelScene extends HW4Scene {
                 break;
             }
             case MainMenuButtonEvent.Help: {
-                this.sceneManager.changeToScene(HelpScene);
+                // this.sceneManager.changeToScene(HelpScene);
                 break;
             }
             case MainMenuButtonEvent.Exit:{
@@ -237,12 +249,6 @@ export default class LevelScene extends HW4Scene {
    
     /** Initializes the layers in the scene */
     protected initLayers(): void {
-        // this.addLayer(this.buttonLayerName,10)
-        // this.addUILayer(this.mainMenuLayerName);
-        // // this.addUILayer(this.mainMenuLayerName);
-        // this.addUILayer(this.pauseButtonLayerName);
-        // this.addUILayer(this.emptyMenuLayerName);
-        // this.addUILayer(this.pauseMenuLayerName);
         for(let i = 0;i<this.layerNames.length;i++){
             const layerName = this.layerNames[i];
             this.addLayer(this[layerName],i);
@@ -257,10 +263,11 @@ export default class LevelScene extends HW4Scene {
         this.getLayer(this.emptyMenuLayer).setHidden(flag);
         this.getLayer(this.pauseMenuLayer).setHidden(flag);
     }
+   
     protected showControlText(){
 
     }   
-
+      
     /**
      * Initializes the player in the scene
      */

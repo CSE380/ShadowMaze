@@ -16,11 +16,17 @@ import UIElement from "../../Wolfie2D/Nodes/UIElement";
 import SceneManager from "../../Wolfie2D/Scene/SceneManager";
 import Viewport from "../../Wolfie2D/SceneGraph/Viewport";
 import RenderingManager from "../../Wolfie2D/Rendering/RenderingManager";
+import Rect from "../../Wolfie2D/Nodes/Graphics/Rect";
+import { GraphicType } from "../../Wolfie2D/Nodes/Graphics/GraphicTypes";
 export default abstract class HW4Scene extends Scene {
     protected mainMenuLayerName="gameMenu";
     protected backgroundImageKey: "backgroundImage";
     protected backgroundImage: Sprite;
     protected center:Vec2;
+    protected levelEndArea: Rect;
+    protected levelEndLabel: Label;
+    protected levelEndPosition: Vec2;
+    protected levelEndHalfSize: Vec2;
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager,options);
         this.center = this.getViewport().getCenter();
@@ -29,7 +35,7 @@ export default abstract class HW4Scene extends Scene {
     public loadScene(): void {
        
     }
-    public addText(option: Record<string, any>) {
+    protected addText(option: Record<string, any>) {
         const newTextLabel = <Label>this.add.uiElement(UIElementType.LABEL, option.layerName|| this.mainMenuLayerName, option);
         if(option.size)
         newTextLabel.size.set(option.size.x,option.size.y);
@@ -42,7 +48,30 @@ export default abstract class HW4Scene extends Scene {
         if (option.align)
             newTextLabel.setHAlign(option.align)
     }
-    public addButtons( option: Record<string, any>) {
+    // protected initializeLevelEnds(): void {
+
+    //     this.levelEndArea = <Rect>this.add.graphic(GraphicType.RECT, HW3Layers.PRIMARY, { position: this.levelEndPosition, size: this.levelEndHalfSize });
+    //     this.levelEndArea.addPhysics(undefined, undefined, false, true);
+    //     this.levelEndArea.setTrigger(HW3PhysicsGroups.PLAYER, HW3Events.PLAYER_ENTERED_LEVEL_END, null);
+    //     this.levelEndArea.color = new Color(255, 0, 255, .20);
+    // }
+    protected initializeLevelEnds(){
+        this.levelEndArea = <Rect>this.add.graphic(GraphicType.RECT, this.mainMenuLayerName, { position: this.levelEndPosition, size: this.levelEndHalfSize });
+        this.levelEndArea.addPhysics(undefined, undefined, false, true);
+        // this.levelEndArea.setTrigger(HW3PhysicsGroups.PLAYER, HW3Events.PLAYER_ENTERED_LEVEL_END, null);
+        this.levelEndArea.color = new Color(255, 0, 255, .20);
+    }
+    protected addLevelEndLabel(){
+        this.levelEndLabel = <Label>this.add.uiElement(UIElementType.LABEL, this.mainMenuLayerName, { position: new Vec2(250, 100), text: "Level Complete" });
+        this.levelEndLabel.size.set(1200, 60);
+        this.levelEndLabel.borderRadius = 0;
+        this.levelEndLabel.backgroundColor = new Color(34, 32, 52);
+        this.levelEndLabel.textColor = Color.WHITE;
+        this.levelEndLabel.fontSize = 48;
+        this.levelEndLabel.font = "PixelSimple";
+        console.log(this.levelEndLabel)
+    }
+    protected addButtons( option: Record<string, any>) {
         const newButton = <Label>this.add.uiElement(UIElementType.BUTTON, option.layerName|| this.mainMenuLayerName, option);
         newButton.size.set(50,50);
         if(option.size) newButton.size.set(option.size.x,option.size.y);
@@ -55,7 +84,7 @@ export default abstract class HW4Scene extends Scene {
         newButton.setFontsize(50);
         this.receiver.subscribe(option.buttonName);
     }
-    public addControlTextLayer(option: Record<string, any>){
+    protected addControlTextLayer(option: Record<string, any>){
         let position = option.position;
         let yInitPoistion = position.y - 400;
         for(let text of controlTextArray){
@@ -70,7 +99,7 @@ export default abstract class HW4Scene extends Scene {
            this.addText(textOption);
         }
     }
-    public addBackButon(position:Vec2){
+    protected addBackButon(position:Vec2){
         const leftArrow = '\u2190';
         let buttonOption = {
             position: new Vec2(position.x-470, position.y - 470),
@@ -79,7 +108,7 @@ export default abstract class HW4Scene extends Scene {
         }
         this.addButtons(buttonOption);
     }
-    public addHelpTextLayer(option: Record<string, any>) {
+    protected addHelpTextLayer(option: Record<string, any>) {
         let position = option.position;
         let yInitPoistion = position.y - 400;
         const newText = helpTextArray;
