@@ -29,18 +29,18 @@ export default class HelpScene extends HW4Scene {
         this.backgroundImage.position.set(center.x, center.y);
         let textOption = {
             position: new Vec2(center.x, center.y - 450),
-            text: "Helps",
-            backgroundColor:Color.TRANSPARENT,
-            fontSize:50,
+            text: "Help",
+            backgroundColor: Color.TRANSPARENT,
+            fontSize: 50,
         }
-        let helptextOption = {
+        let helpTextOption = {
             position: center,
-            margin:50,
-            backgroundColor:Color.TRANSPARENT,
-            fontSize:31,
+            margin: 50,
+            backgroundColor: Color.TRANSPARENT,
+            fontSize: 31,
         }
         this.addText(textOption);
-        this.addHelpTextLayer(helptextOption);
+        this.addHelpTextLayer(helpTextOption);
         this.addBackButon(center);
     }
    
