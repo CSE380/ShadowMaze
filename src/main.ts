@@ -2,9 +2,8 @@ import Game from "./Wolfie2D/Loop/Game";
 import MainMenu from "./demoGame/Scenes/MainMenuScene";
 import { PlayerInput } from "./demoGame/AI/Player/PlayerController";
 import default_scene from "./default_scene";
-import AStarDemoScene from "./demoGame/Scenes/AstarDemoScene";
-import MainHW4Scene from "./demoGame/Scenes/MainHW4Scene";
-import LevelScene from "./demoGame/Scenes/LevelScene";
+// import MainHW4Scene from "./demoGame/Scenes/MainHW4Scene";
+import introLevelScene from "./demoGame/Scenes/introLevelScene";
 import StartScene from "./demoGame/Scenes/StartScene";
 import ControlScene from "./demoGame/Scenes/ControlScene";
 import HelpScene from "./demoGame/Scenes/HelpScene";
@@ -26,6 +25,9 @@ import SelectLevelMenuScene from "./demoGame/Scenes/SelectLevelMenuScene";
             {name: PlayerInput.MOVE_RIGHT, keys: ["d"]},
             {name: PlayerInput.PICKUP_ITEM, keys: ["e"]},
             {name: PlayerInput.DROP_ITEM, keys: ["q"]},
+            {name: PlayerInput.ATTACKING, keys: ["j"]},
+            {name: PlayerInput.SHIELDING, keys: ["k"]},
+            {name: PlayerInput.ULTIMATE, keys: ["u"]},
             {name: "slot1", keys: ["1"]},
             {name: "slot2", keys: ["2"]},
         ],
@@ -38,9 +40,10 @@ import SelectLevelMenuScene from "./demoGame/Scenes/SelectLevelMenuScene";
     // Create a game with the options specified
     const game = new Game(options);
     // Start our game
-    game.start(LevelScene, {});
-    // game.start(HelpScene, {});
+    // game.start(introLevelScene, {});
+    game.start(HelpScene, {});
     // game.start(ControlScene,{});
+    // game.start(StartScene,{});
 })();
 
 function runTests(){};

@@ -5,9 +5,9 @@ import GameNode from "../../../Wolfie2D/Nodes/GameNode";
 import Line from "../../../Wolfie2D/Nodes/Graphics/Line";
 import Timer from "../../../Wolfie2D/Timing/Timer";
 import NPCActor from "../../Actors/NPCActor";
-import { ItemEvent } from "../../Events";
+import { ItemEvent } from "../../ProjectEvents";
 import NPCAction from "./NPCActions/NPCAction";
-import { HudEvent } from "../../Events";
+import { HudEvent } from "../../ProjectEvents";
 
 /**
  * An abstract implementation of behavior for an NPC. Each concrete implementation of the

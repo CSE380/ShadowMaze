@@ -1,30 +1,22 @@
 /* #################### IMPORTS #################### */
 // Import from Wolfie2D or your own files here
 import Vec2 from "../../Wolfie2D/DataTypes/Vec2";
-import { UIElementType } from "../../Wolfie2D/Nodes/UIElements/UIElementTypes";
-import Layer from "../../Wolfie2D/Scene/Layer";
-import Scene from "../../Wolfie2D/Scene/Scene";
 import Color from "../../Wolfie2D/Utils/Color";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
-import AstarDemoScene from "./AstarDemoScene";
-import {  StartMenuButtonEvent} from "../CustomizedButton";
-import SelectLevelMenuScene from "./SelectLevelMenuScene";
-import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
-import Button from "../../Wolfie2D/Nodes/UIElements/Button";
+import { StartMenuButtonEvent } from "../CustomizedButton";
 import MainMenu from "./MainMenuScene";
-import Label from "../../Wolfie2D/Nodes/UIElements/Label";
-import HW4Scene from "./HW4Scene";
+import HW4Scene from "./abstractScene";
 /* #################### CLASS DEFINITION #################### */
 
 // Welcome to Wolfie2D!
 // This is a simple sample scene so something displays when you run the game.
-export default class StartScene extends HW4Scene  {
+export default class StartScene extends HW4Scene {
     /* ########## MEMBER DEFINITIONS ##########*/
-   
+
     loadScene(): void {
-        // this.load.tilemap("map", "../dist/hw4_assets/tilemaps/test2.json");
-        
-        this.load.image(this.backgroundImageKey,"hw4_assets/images/splash.jpg");
+        // this.load.tilemap("map", "../dist/shadowMaze_assets/tilemaps/test2.json");
+
+        this.load.image(this.backgroundImageKey, "shadowMaze_assets/images/splash.jpg");
         // console.log(this.load.getImage("image"));
     }
 
@@ -32,43 +24,40 @@ export default class StartScene extends HW4Scene  {
     // or where you should initialize any other things you will need in your scene
     // Once again, this occurs strictly after loadScene(), so anything you loaded there will be available
     startScene(): void {
-        
+
         this.addUILayer(this.mainMenuLayerName)
-        this.backgroundImage = this.add.sprite(this.backgroundImageKey,this.mainMenuLayerName);
+        this.backgroundImage = this.add.sprite(this.backgroundImageKey, this.mainMenuLayerName);
         let center = this.viewport.getCenter();
         this.backgroundImage.position.set(center.x, center.y);
         let textOption = {
             position: new Vec2(center.x, center.y - 300),
             text: "Shadow Maze",
-            size:new Vec2(400, 100),
-            fontSize:60,
+            size: new Vec2(400, 100),
+            fontSize: 60,
+            backgroundColor: Color.TRANSPARENT,
+            font: "Apple Chancery",
         }
         this.addText(textOption);
         let buttonOption = {
             position: new Vec2(center.x, center.y + 100),
-            text:  StartMenuButtonEvent.START_GAME,
-            size:new Vec2(300,50),
-            textColor:Color.PURPLE,
-            buttonName:"Start Game",
+            text: StartMenuButtonEvent.START_GAME,
+            size: new Vec2(300, 50),
+            textColor: Color.PURPLE,
+            buttonName: "Start Game",
         }
-       this.addButtons(buttonOption);
+        this.addButtons(buttonOption);
     }
-    public updateScene(){
-        while(this.receiver.hasNextEvent()){
-            this.handleEvent(this.receiver.getNextEvent());
-        }
-    }
-  
-  
-   
+
+
+
+
     public handleEvent(event: GameEvent): void {
-        console.log(event.type)
-            switch(event.type) {
-                case  StartMenuButtonEvent.START_GAME: {
-                    this.sceneManager.changeToScene(MainMenu);
-                    break;
-                }
-                
+        switch (event.type) {
+            case StartMenuButtonEvent.START_GAME: {
+                this.sceneManager.changeToScene(MainMenu);
+                break;
             }
+
         }
+    }
 }

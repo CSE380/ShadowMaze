@@ -1,6 +1,6 @@
 {
-    "name": "TopdownPlayer1",
-    "spriteSheetImage": "player1.png",
+    "name": "TopdownPrince",
+    "spriteSheetImage": "prince.png",
     "spriteWidth": 16,
     "spriteHeight": 16,
     "columns": 5,

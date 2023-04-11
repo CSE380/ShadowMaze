@@ -4,9 +4,9 @@ import Layer from "../../Wolfie2D/Scene/Layer";
 import Scene from "../../Wolfie2D/Scene/Scene";
 import Color from "../../Wolfie2D/Utils/Color";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
-import MainHW4Scene from "./MainHW4Scene";
+// import MainHW4Scene from "./MainHW4Scene";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
-import GuardDemoScene from "./GuardDemoScene";
+// import GuardDemoScene from "./GuardDemoScene";
 import { MainMenuButtonEvent } from "../CustomizedButton";
 import SelectLevelMenuScene from "./SelectLevelMenuScene";
 import HelpScene from "./HelpScene";
@@ -23,7 +23,7 @@ export default class MainMenu extends Scene {
 
     private backgroundImageKey:"backgroundImage";
     public loadScene(){
-        this.load.image(this.backgroundImageKey,"hw4_assets/images/fullBackground.jpg");
+        this.load.image(this.backgroundImageKey,"shadowMaze_assets/images/fullBackground.jpg");
     }
 
     public startScene(){

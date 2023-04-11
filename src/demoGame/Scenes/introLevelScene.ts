@@ -17,10 +17,9 @@ import Color from "../../Wolfie2D/Utils/Color";
 import MathUtils from "../../Wolfie2D/Utils/MathUtils";
 import NPCActor from "../Actors/NPCActor";
 import PlayerActor from "../Actors/PlayerActor";
-import GuardBehavior from "../AI/NPC/NPCBehavior/GaurdBehavior";
-import HealerBehavior from "../AI/NPC/NPCBehavior/HealerBehavior";
+// import GuardBehavior from "../AI/NPC/NPCBehavior/GaurdBehavior";
+// import HealerBehavior from "../AI/NPC/NPCBehavior/HealerBehavior";
 import PlayerAI from "../AI/Player/PlayerAI";
-import { ItemEvent, PlayerEvent, BattlerEvent, HudEvent } from "../Events";
 import Battler from "../GameSystems/BattleSystem/Battler";
 import BattlerBase from "../GameSystems/BattleSystem/BattlerBase";
 import HealthbarHUD from "../GameSystems/HUD/HealthbarHUD";
@@ -32,7 +31,7 @@ import LaserGun from "../GameSystems/ItemSystem/Items/LaserGun";
 import SelectLevelMenuScene from "./SelectLevelMenuScene";
 import HelpScene from "./HelpScene";
 import StartScene from "./StartScene";
-import HW4Scene from "./HW4Scene";
+import HW4Scene from "./abstractScene";
 import ControlScene from "./ControlScene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import { UIElementType } from "../../Wolfie2D/Nodes/UIElements/UIElementTypes";
@@ -40,11 +39,19 @@ import {MainMenuButtonEvent } from "../CustomizedButton";
 import Input from "../../Wolfie2D/Input/Input";
 import { controlTextArray,helpTextArray } from "../Text";
 import { layerNameArray } from "../LayerName";
+import { PhysicsGroups } from "../PhysicsGroups";
+import { PlayerEvents } from "../ProjectEvents";
+enum PauseMenuState {
+    Hidden,
+    Visible,
+    ControlsText,
+    HelpText,
+  }
 export default class LevelScene extends HW4Scene {
 
     /** GameSystems in the HW4 Scene */
     private inventoryHud: InventoryHUD;
-
+    private state: PauseMenuState = PauseMenuState.Hidden;
     /** All the battlers in the HW4Scene (including the player) */
     private battlers: (Battler & Actor)[];
     /** Healthbars for the battlers */
@@ -54,6 +61,7 @@ export default class LevelScene extends HW4Scene {
     private nextLabels : Array<Label>;
     private mesh:Navmesh
     private wallSize: number;
+//    private levelEndPosition=new Vec2(400,400);
     private gameMenu= "gameMenu";
     private pauseButtonLayer= "pauseButtonLayer";
     private pauseMenuLayer= "pauseMenuLayer";
@@ -62,7 +70,7 @@ export default class LevelScene extends HW4Scene {
     private helpTextLayer = "helpTextLayer";
     private layerNames = ["gameMenu", "pauseButtonLayer","emptyMenuLayer", "pauseMenuLayer", "controlTextLayer","helpTextLayer"];
     private bases: BattlerBase[];
-    protected player: PlayerActor;
+    
     private healthpacks: Array<Healthpack>;
     private laserguns: Array<LaserGun>;
     private ButtonSelection;
@@ -72,16 +80,17 @@ export default class LevelScene extends HW4Scene {
     private graph: PositionGraph;
     private restartButton:string;
     private isPauseMenuHidden:boolean;
+    
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, options);
 
         this.battlers = new Array<Battler & Actor>();
         this.healthbars = new Map<number, HealthbarHUD>();
-        this.labelSize = 64;
+        this.labelSize = 32;
         this.laserguns = new Array<LaserGun>();
         this.healthpacks = new Array<Healthpack>();
         this.ButtonSelection = MainMenuButtonEvent;
-        // this.isPauseMenuHidden = true;
+        this.isPauseMenuHidden = true;
         for (const layerName of this.layerNames) {
             this[layerName] = layerName;
         }
@@ -93,10 +102,10 @@ export default class LevelScene extends HW4Scene {
      */
     public override loadScene() {
         // Load the player and enemy spritesheets
-        this.load.spritesheet("player1", "hw4_assets/spritesheets/player1.json");
+        this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince_v2.json");
 
         // Load the tilemap
-        this.load.tilemap("level", "hw4_assets/tilemaps/introLevel.json");
+        this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
 
 
     }
@@ -112,21 +121,23 @@ export default class LevelScene extends HW4Scene {
         this.wallSize = this.walls.size.x;
         // Set the viewport bounds to the tilemap
         let tilemapSize: Vec2 = this.walls.size;
-        console.log(this.getViewport().getZoomLevel())
         this.viewport.setBounds(0, 0, tilemapSize.x, tilemapSize.y);
         this.viewport.setZoomLevel(2);
-        console.log(this.getViewport().getZoomLevel())
         this.initLayers();
         // create screen first 
         this.initBlackScreen();
         this.center = this.viewport.getHalfSize();
         // this.addBlackLabel(0, 100);
         this.initializePlayer();
-       
         this.initPauseMenuLayer();
+        this.initializeLevelEnds();
+        // this.addLevelEndLabel();
+        // this.addLevelEndLabel();
+        // this.addLevelEndLabel();
         // this.initControlTextLayer();
         // this.initHelpTextLayer();
     }
+    
     public initControlTextLayer(){
         let controlTextOption = {
             position: this.viewport.getCenter(),
@@ -150,9 +161,9 @@ export default class LevelScene extends HW4Scene {
             text: pauseSign,
             layerName:this.pauseButtonLayer,
             buttName:this.ButtonSelection.PAUSE, 
+            backgroundColor: Color.TRANSPARENT,
         }
         this.addButtons(buttonOption);
-        
         let emptyMenuOption = {
             position: this.center,
             text: "",
@@ -179,9 +190,9 @@ export default class LevelScene extends HW4Scene {
                 text: buttonName,
                 layerName :this.pauseMenuLayer,
                 buttonName: buttonName,
-                backgroundColor:new Color(0,0,0,2),
+                backgroundColor:Color.PURPLE,
                 size:new Vec2(300,50),
-                textColor:Color.PURPLE,
+                textColor:Color.WHITE,
             }
             this.addButtons( buttonOption1);
             positionY = positionY + 40;
@@ -193,10 +204,12 @@ export default class LevelScene extends HW4Scene {
   
 
     public handleEvent(event: GameEvent): void {
-        console.log("receive type")
+        // console.log("receive type")
         console.log(event.type)
         switch (event.type) {
             case this.ButtonSelection.PAUSE: {
+                this.isPauseMenuHidden = !this.isPauseMenuHidden;
+               
                 // this.sceneManager.changeToScene(MainMenu);
                 this.showPauseMenu(this.isPauseMenuHidden);
                 break;
@@ -211,16 +224,33 @@ export default class LevelScene extends HW4Scene {
                 break;
             }
             case MainMenuButtonEvent.Controls: {
-                this.showControlText();
+                this.viewport.setZoomLevel(1);
+                this.sceneManager.changeToScene(ControlScene);
                 break;
             }
             case MainMenuButtonEvent.Help: {
+                this.viewport.setZoomLevel(1);
                 this.sceneManager.changeToScene(HelpScene);
                 break;
             }
             case MainMenuButtonEvent.Exit:{
                 this.viewport.setZoomLevel(1);
                 this.sceneManager.changeToScene(StartScene);
+                break;
+            }
+            case PlayerEvents.PLAYER_ENTERED_LEVEL_END:{
+                console.log("levelend")
+                this.handleEnteredLevelEnd();
+                // this.viewport.setZoomLevel(1);
+                // this.sceneManager.changeToScene(SelectLevelMenuScene);
+            }
+            case PlayerEvents.LEVEL_END:{
+              
+                setTimeout(()=>{
+                    this.viewport.setZoomLevel(1);
+                    this.sceneManager.changeToScene(SelectLevelMenuScene);
+                },2000)
+               
             }
         }
     }
@@ -229,20 +259,15 @@ export default class LevelScene extends HW4Scene {
             this.handleEvent(this.receiver.getNextEvent());
         }
         if(Input.isKeyJustPressed("escape")){
-            this.isPauseMenuHidden = !this.isPauseMenuHidden;
+           
             this.emitter.fireEvent(this.ButtonSelection.PAUSE)
         }
-        this.updateLabel()
+        this.updateLabel();
+        this.isLevelEnd();
     }
    
     /** Initializes the layers in the scene */
     protected initLayers(): void {
-        // this.addLayer(this.buttonLayerName,10)
-        // this.addUILayer(this.mainMenuLayerName);
-        // // this.addUILayer(this.mainMenuLayerName);
-        // this.addUILayer(this.pauseButtonLayerName);
-        // this.addUILayer(this.emptyMenuLayerName);
-        // this.addUILayer(this.pauseMenuLayerName);
         for(let i = 0;i<this.layerNames.length;i++){
             const layerName = this.layerNames[i];
             this.addLayer(this[layerName],i);
@@ -257,24 +282,22 @@ export default class LevelScene extends HW4Scene {
         this.getLayer(this.emptyMenuLayer).setHidden(flag);
         this.getLayer(this.pauseMenuLayer).setHidden(flag);
     }
-    protected showControlText(){
-
-    }   
-
+   
+      
     /**
      * Initializes the player in the scene
      */
     protected initializePlayer(): void {
-        let player = this.add.animatedSprite(PlayerActor, "player1", this.gameMenu);
+        let player = this.add.animatedSprite(PlayerActor, "prince", this.gameMenu);
         this.player = player
-        player.position.set(400, 10);
+        player.position.set(this.playerInitPosition.x,this.playerInitPosition.y);
         player.battleGroup = 2;
 
         player.health = 10;
         player.maxHealth = 10;
         // Give the player physics
         player.addPhysics(new AABB(Vec2.ZERO, new Vec2(8, 8)));
-      
+        // player.setGroup(PhysicsGroups.PLAYER);
         this.initCurrLabel();
         // Give the player a healthbar
         let healthbar = new HealthbarHUD(this, player, this.gameMenu, {size: player.size.clone().scaled(2, 1/2), offset: player.size.clone().scaled(0, -1/2)});
@@ -319,7 +342,7 @@ export default class LevelScene extends HW4Scene {
     }
     public updateLabel(){
         this.nextLabels= <Array<Label>>this.getSceneGraph().getNodesAt(this.player.position)
-        this.currLabels.forEach(label=>this.updateColor(label))
+        this.currLabels.forEach(label=>{this.updateColor(label)})
         this.nextLabels.forEach(label=>this.updateColor(label))
         this.currLabels = this.nextLabels;
     }

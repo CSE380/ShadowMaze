@@ -2,9 +2,9 @@ import Spritesheet from "../../Wolfie2D/DataTypes/Spritesheet";
 import Vec2 from "../../Wolfie2D/DataTypes/Vec2";
 import AnimatedSprite from "../../Wolfie2D/Nodes/Sprites/AnimatedSprite"
 import NavigationPath from "../../Wolfie2D/Pathfinding/NavigationPath";
-import { BattlerEvent, HudEvent } from "../Events";
+import { BattlerEvent, HudEvent } from "../ProjectEvents";
 import Inventory from "../GameSystems/ItemSystem/Inventory";
-import HW4Scene from "../Scenes/HW4Scene";
+import HW4Scene from "../Scenes/abstractScene";
 import BasicTargetable from "../GameSystems/Targeting/BasicTargetable";
 import BasicTargeting from "../GameSystems/Targeting/BasicTargeting";
 
@@ -20,8 +20,8 @@ export default class NPCActor extends AnimatedSprite implements Battler, Targeti
     /** Override the type of the scene to be the HW4 scene */
     protected scene: HW4Scene
 
-    // An invincible timer for our NPCs
-    protected invincibleTimer: Timer;
+    // An shielding timer for our NPCs
+    protected shieldingTimer: Timer;
 
     // The key of the Navmesh to use to build paths for this NPCActor
     protected _navkey: string;
@@ -36,7 +36,7 @@ export default class NPCActor extends AnimatedSprite implements Battler, Targeti
         this._navkey = "navkey";
         this._battler = new BasicBattler(this);
         this._targeting = new BasicTargeting(this);
-        this.invincibleTimer = new Timer(1000);
+        this.shieldingTimer = new Timer(1000);
 
         this.receiver.subscribe("use-hpack");
     }

@@ -7,8 +7,8 @@ import Finder from "../../../GameSystems/Searching/Finder";
 import { TargetableEntity } from "../../../GameSystems/Targeting/TargetableEntity";
 import BasicFinder from "../../../GameSystems/Searching/BasicFinder";
 import NavigationPath from "../../../../Wolfie2D/Pathfinding/NavigationPath";
-import { ItemEvent } from "../../../Events";
-import { HudEvent } from "../../../Events";
+import { ItemEvent } from "../../../ProjectEvents";
+import { HudEvent } from "../../../ProjectEvents";
 /**
  * An abstract GoapAction for an NPC. All NPC actions consist of doing three things:
  * 
