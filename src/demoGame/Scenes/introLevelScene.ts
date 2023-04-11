@@ -31,7 +31,7 @@ import LaserGun from "../GameSystems/ItemSystem/Items/LaserGun";
 import SelectLevelMenuScene from "./SelectLevelMenuScene";
 import HelpScene from "./HelpScene";
 import StartScene from "./StartScene";
-import HW4Scene from "./abstractScene";
+import HW4Scene from "./AbstractScene";
 import ControlScene from "./ControlScene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import { UIElementType } from "../../Wolfie2D/Nodes/UIElements/UIElementTypes";

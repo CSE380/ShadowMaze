@@ -26,7 +26,7 @@ import { EaseFunctionType } from "../../Wolfie2D/Utils/EaseFunctions";
 import Timer from "../../Wolfie2D/Timing/Timer";
 import Input from "../../Wolfie2D/Input/Input";
 import PlayerActor from "../Actors/PlayerActor";
-export default abstract class HW4Scene extends Scene {
+export default abstract class ProjectScene extends Scene {
     protected mainMenuLayerName = "gameMenu";
     protected backgroundImageKey: "backgroundImage";
     protected backgroundImage: Sprite;
@@ -145,11 +145,11 @@ export default abstract class HW4Scene extends Scene {
     }
     protected addControlTextLayer(option: Record<string, any>) {
         let position = option.position;
-        let yInitPoistion = position.y - 400;
+        let yInitPosition = position.y - 400;
         for (let text of controlTextArray) {
-            yInitPoistion += option.margin
+            yInitPosition += option.margin
             let textOption = {
-                position: new Vec2(position.x - 150, yInitPoistion),
+                position: new Vec2(position.x - 150, yInitPosition),
                 text: "• " + text,
                 align: true,
                 layerName: option.layerName,
@@ -173,12 +173,12 @@ export default abstract class HW4Scene extends Scene {
     }
     protected addHelpTextLayer(option: Record<string, any>) {
         let position = option.position;
-        let yInitPoistion = position.y - 400;
+        let yInitPosition = position.y - 400;
         const newText = helpTextArray;
         for (let text of newText) {
-            yInitPoistion += option.margin
+            yInitPosition += option.margin
             let textOption = {
-                position: new Vec2(position.x - 320, yInitPoistion),
+                position: new Vec2(position.x - 320, yInitPosition),
                 text: text,
                 align: "left",
                 backgroundColor:Color.TRANSPARENT,

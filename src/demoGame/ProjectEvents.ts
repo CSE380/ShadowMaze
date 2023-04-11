@@ -19,7 +19,7 @@ export enum ItemEvent {
 
 export enum HudEvent {
     HEALTH_CHANGE = "HEALTH_CHANGE",
-    USE_HPACK="USE_HPACK"
+    USE_HPACK = "USE_HPACK"
 }
 
 // export enum PlayerEvent {
@@ -34,6 +34,5 @@ export const PlayerEvents = {
     LEVEL_START: "LEVEL_START",
     LEVEL_END: "LEVEL_END",
     PLAYER_ENTERED_LEVEL_END: "PLAYER_ENTERED_LEVEL_END",
-    
     
 } as const;

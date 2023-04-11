@@ -13,7 +13,7 @@ import Button from "../../Wolfie2D/Nodes/UIElements/Button";
 import MainMenu from "./MainMenuScene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import { controlTextArray } from "../Text";
-import HW4Scene from "./abstractScene";
+import HW4Scene from "./AbstractScene";
 /* #################### CLASS DEFINITION #################### */
 
 // Welcome to Wolfie2D!

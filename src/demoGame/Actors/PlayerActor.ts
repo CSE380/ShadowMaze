@@ -8,7 +8,7 @@ import HW4Item from "../GameSystems/ItemSystem/Item";
 import BasicTargetable from "../GameSystems/Targeting/BasicTargetable";
 import { TargetableEntity } from "../GameSystems/Targeting/TargetableEntity";
 import { TargetingEntity } from "../GameSystems/Targeting/TargetingEntity";
-import HW4Scene from "../Scenes/abstractScene";
+import HW4Scene from "../Scenes/AbstractScene";
 
 
 export default class PlayerActor extends AnimatedSprite implements Battler {

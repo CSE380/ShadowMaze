@@ -1,5 +1,5 @@
 import GameEvent from "../../../../Wolfie2D/Events/GameEvent";
-import { PlayerEvent } from "../../../ProjectEvents";
+import { PlayerEvents } from "../../../ProjectEvents";
 import PlayerState from "./PlayerState";
 
 /**
@@ -13,7 +13,7 @@ export default class Dead extends PlayerState {
      * that the player is officially dead.
      */
     onEnter(options: Record<string, any>): void {
-        this.emitter.fireEvent(PlayerEvent.PLAYER_KILLED);
+        //this.emitter.fireEvent(PlayerEvents.PLAYER_KILLED);
     }
 
     /**
