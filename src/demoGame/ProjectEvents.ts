@@ -34,6 +34,6 @@ export const PlayerEvents = {
     LEVEL_START: "LEVEL_START",
     LEVEL_END: "LEVEL_END",
     PLAYER_ENTERED_LEVEL_END: "PLAYER_ENTERED_LEVEL_END",
-
+    
     
 } as const;

@@ -40,12 +40,14 @@ export default class StartScene extends HW4Scene {
         let textOption = {
             position: new Vec2(center.x, center.y - 400),
             text: "Controls",
+            backgroundColor:Color.TRANSPARENT,
         }
         this.addText(textOption);
         let controlTextOption = {
             position: center,
             text: controlTextArray,
             margin:100,
+            backgroundColor:Color.TRANSPARENT,
         }
         this.addControlTextLayer(controlTextOption);
         this.addBackButon(center);

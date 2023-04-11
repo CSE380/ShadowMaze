@@ -3,7 +3,7 @@ import Color from "../../Utils/Color";
 import UIElement from "../UIElement";
 
 /** A basic text-containing label */
-export default class Label extends UIElement{
+export default class Label extends UIElement {
 	/** The color of the text of this UIElement */
 	textColor: Color;
 	/** The value of the text of this UIElement */
@@ -20,7 +20,7 @@ export default class Label extends UIElement{
 	/** A flag for if the width of the text has been measured on the canvas for auto width assignment */
 	protected sizeAssigned: boolean;
 
-	constructor(position: Vec2, text: string){
+	constructor(position: Vec2, text: string) {
 		super(position);
 		this.text = text;
 		this.textColor = new Color(0, 0, 0, 1);
@@ -75,8 +75,11 @@ export default class Label extends UIElement{
 	setVAlign(align: string): void {
 		this.vAlign = align;
 	}
-	setFontsize(size:number):void{
+	setFontsize(size: number): void {
 		this.fontSize = size;
+	}
+	setFont(font: string): void {
+		this.font = font;
 	}
 	/**
 	 * Calculate the offset of the text - this is used for rendering text with different alignments
@@ -89,21 +92,21 @@ export default class Label extends UIElement{
 		let offset = new Vec2(0, 0);
 
 		let hDiff = this.size.x - textWidth;
-		if(this.hAlign === HAlign.CENTER){
-			offset.x = hDiff/2;
-		} else if (this.hAlign === HAlign.RIGHT){
+		if (this.hAlign === HAlign.CENTER) {
+			offset.x = hDiff / 2;
+		} else if (this.hAlign === HAlign.RIGHT) {
 			offset.x = hDiff;
 		}
 
-		if(this.vAlign === VAlign.TOP){
+		if (this.vAlign === VAlign.TOP) {
 			ctx.textBaseline = "top";
 			offset.y = 0;
-		} else if (this.vAlign === VAlign.BOTTOM){
+		} else if (this.vAlign === VAlign.BOTTOM) {
 			ctx.textBaseline = "bottom";
 			offset.y = this.size.y;
 		} else {
 			ctx.textBaseline = "middle";
-			offset.y = this.size.y/2;
+			offset.y = this.size.y / 2;
 		}
 
 		return offset;
@@ -121,7 +124,7 @@ export default class Label extends UIElement{
 	protected autoSize(ctx: CanvasRenderingContext2D): void {
 		let width = this.calculateTextWidth(ctx);
 		let height = this.fontSize;
-		this.size.set(width + this.padding.x*2, height + this.padding.y*2);
+		this.size.set(width + this.padding.x * 2, height + this.padding.y * 2);
 		this.sizeAssigned = true;
 	}
 
@@ -130,7 +133,7 @@ export default class Label extends UIElement{
 	 * @param ctx The rendering context
 	 */
 	handleInitialSizing(ctx: CanvasRenderingContext2D): void {
-		if(!this.sizeAssigned){
+		if (!this.sizeAssigned) {
 			this.autoSize(ctx);
 		}
 	}

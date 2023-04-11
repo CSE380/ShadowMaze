@@ -70,7 +70,7 @@ export default class LevelScene extends HW4Scene {
     private helpTextLayer = "helpTextLayer";
     private layerNames = ["gameMenu", "pauseButtonLayer","emptyMenuLayer", "pauseMenuLayer", "controlTextLayer","helpTextLayer"];
     private bases: BattlerBase[];
-    protected player: PlayerActor;
+    
     private healthpacks: Array<Healthpack>;
     private laserguns: Array<LaserGun>;
     private ButtonSelection;
@@ -105,7 +105,7 @@ export default class LevelScene extends HW4Scene {
         this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince_v2.json");
 
         // Load the tilemap
-        this.load.tilemap("level", "shadowMaze_assets/tilemaps/introLevel.json");
+        this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
 
 
     }
@@ -131,6 +131,8 @@ export default class LevelScene extends HW4Scene {
         this.initializePlayer();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
+        // this.addLevelEndLabel();
+        // this.addLevelEndLabel();
         // this.addLevelEndLabel();
         // this.initControlTextLayer();
         // this.initHelpTextLayer();
@@ -159,9 +161,9 @@ export default class LevelScene extends HW4Scene {
             text: pauseSign,
             layerName:this.pauseButtonLayer,
             buttName:this.ButtonSelection.PAUSE, 
+            backgroundColor: Color.TRANSPARENT,
         }
         this.addButtons(buttonOption);
-        
         let emptyMenuOption = {
             position: this.center,
             text: "",
@@ -202,7 +204,7 @@ export default class LevelScene extends HW4Scene {
   
 
     public handleEvent(event: GameEvent): void {
-        console.log("receive type")
+        // console.log("receive type")
         console.log(event.type)
         switch (event.type) {
             case this.ButtonSelection.PAUSE: {
@@ -220,11 +222,13 @@ export default class LevelScene extends HW4Scene {
                 break;
             }
             case MainMenuButtonEvent.Controls: {
-                // this.showControlText();
+                this.viewport.setZoomLevel(1);
+                this.sceneManager.changeToScene(ControlScene);
                 break;
             }
             case MainMenuButtonEvent.Help: {
-                // this.sceneManager.changeToScene(HelpScene);
+                this.viewport.setZoomLevel(1);
+                this.sceneManager.changeToScene(HelpScene);
                 break;
             }
             case MainMenuButtonEvent.Exit:{
@@ -233,8 +237,18 @@ export default class LevelScene extends HW4Scene {
                 break;
             }
             case PlayerEvents.PLAYER_ENTERED_LEVEL_END:{
-                this.viewport.setZoomLevel(1);
-                this.sceneManager.changeToScene(SelectLevelMenuScene);
+                console.log("levelend")
+                this.handleEnteredLevelEnd();
+                // this.viewport.setZoomLevel(1);
+                // this.sceneManager.changeToScene(SelectLevelMenuScene);
+            }
+            case PlayerEvents.LEVEL_END:{
+              
+                setTimeout(()=>{
+                    this.viewport.setZoomLevel(1);
+                    this.sceneManager.changeToScene(SelectLevelMenuScene);
+                },2000)
+               
             }
         }
     }
@@ -330,18 +344,7 @@ export default class LevelScene extends HW4Scene {
         this.nextLabels.forEach(label=>this.updateColor(label))
         this.currLabels = this.nextLabels;
     }
-    public isLevelEnd(){
-        const label = this.levelEndArea;
-        // console.log(this.player.position.x)
-        // // console.log(this.player.position.y)
-        // console.log(label.position.x)
-        // console.log(label.position.y)
-        // console.log(label.backgroundColor == this.levelEndColor)
-        if(Math.abs(label.position.x-this.player.position.x)<=3&&(Math.abs(label.position.y-this.player.position.y)<=3)){
-           console.log("fire")
-            this.emitter.fireEvent(PlayerEvents.PLAYER_ENTERED_LEVEL_END)
-        }
-    }
+  
     public checkCollison(){
         
     }

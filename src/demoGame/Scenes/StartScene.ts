@@ -42,6 +42,8 @@ export default class StartScene extends HW4Scene  {
             text: "Shadow Maze",
             size:new Vec2(400, 100),
             fontSize:60,
+            backgroundColor:Color.TRANSPARENT,
+            font:"PixelSimple",
         }
         this.addText(textOption);
         let buttonOption = {

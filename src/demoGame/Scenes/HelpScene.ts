@@ -39,10 +39,12 @@ export default class StartScene extends HW4Scene {
         let textOption = {
             position: new Vec2(center.x, center.y - 400),
             text: "Helps",
+            backgroundColor:Color.TRANSPARENT,
         }
         let helptextOption = {
             position: center,
             margin:50,
+            backgroundColor:Color.TRANSPARENT,
         }
         this.addText(textOption);
         this.addHelpTextLayer(helptextOption);

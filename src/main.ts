@@ -44,6 +44,7 @@ import SelectLevelMenuScene from "./demoGame/Scenes/SelectLevelMenuScene";
     game.start(introLevelScene, {});
     // game.start(HelpScene, {});
     // game.start(ControlScene,{});
+    // game.start(StartScene,{});
 })();
 
 function runTests(){};
