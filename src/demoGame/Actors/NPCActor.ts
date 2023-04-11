@@ -4,7 +4,7 @@ import AnimatedSprite from "../../Wolfie2D/Nodes/Sprites/AnimatedSprite"
 import NavigationPath from "../../Wolfie2D/Pathfinding/NavigationPath";
 import { BattlerEvent, HudEvent } from "../ProjectEvents";
 import Inventory from "../GameSystems/ItemSystem/Inventory";
-import HW4Scene from "../Scenes/abstractScene";
+import HW4Scene from "../Scenes/AbstractScene";
 import BasicTargetable from "../GameSystems/Targeting/BasicTargetable";
 import BasicTargeting from "../GameSystems/Targeting/BasicTargeting";
 

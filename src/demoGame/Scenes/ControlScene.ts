@@ -13,12 +13,12 @@ import Button from "../../Wolfie2D/Nodes/UIElements/Button";
 import MainMenu from "./MainMenuScene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import { controlTextArray } from "../Text";
-import HW4Scene from "./abstractScene";
+import HW4Scene from "./AbstractScene";
 /* #################### CLASS DEFINITION #################### */
 
 // Welcome to Wolfie2D!
 // This is a simple sample scene so something displays when you run the game.
-export default class StartScene extends HW4Scene {
+export default class ControlScene extends HW4Scene {
     /* ########## MEMBER DEFINITIONS ##########*/
     loadScene(): void {
         // this.load.tilemap("map", "../dist/shadowMaze_assets/tilemaps/test2.json");

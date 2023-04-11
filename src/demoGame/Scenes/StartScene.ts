@@ -5,7 +5,7 @@ import Color from "../../Wolfie2D/Utils/Color";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
 import { StartMenuButtonEvent } from "../CustomizedButton";
 import MainMenu from "./MainMenuScene";
-import HW4Scene from "./abstractScene";
+import HW4Scene from "./AbstractScene";
 /* #################### CLASS DEFINITION #################### */
 
 // Welcome to Wolfie2D!

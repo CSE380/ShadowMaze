@@ -5,12 +5,12 @@ import Color from "../../Wolfie2D/Utils/Color";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
 import { BackButtonEvent } from "../CustomizedButton";
 import MainMenu from "./MainMenuScene";
-import HW4Scene from "./abstractScene";
+import HW4Scene from "./AbstractScene";
 /* #################### CLASS DEFINITION #################### */
 
 // Welcome to Wolfie2D!
 // This is a simple sample scene so something displays when you run the game.
-export default class StartScene extends HW4Scene {
+export default class HelpScene extends HW4Scene {
     /* ########## MEMBER DEFINITIONS ##########*/
     // private mainMenuLayerName: string = "startScene";
     loadScene(): void {
@@ -46,8 +46,8 @@ export default class StartScene extends HW4Scene {
    
   
     public handleEvent(event: GameEvent): void {
-        console.log(event.type)
         super.handleEvent(event);
+        console.log(event.type);
         switch (event.type) {
             case BackButtonEvent.BACK: {
                 this.sceneManager.changeToScene(MainMenu);
