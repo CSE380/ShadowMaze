@@ -31,7 +31,7 @@ import LaserGun from "../GameSystems/ItemSystem/Items/LaserGun";
 import SelectLevelMenuScene from "./SelectLevelMenuScene";
 import HelpScene from "./HelpScene";
 import StartScene from "./StartScene";
-import HW4Scene from "./AbstractScene";
+import ProjectScene from "./AbstractScene";
 import ControlScene from "./ControlScene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import { UIElementType } from "../../Wolfie2D/Nodes/UIElements/UIElementTypes";
@@ -41,13 +41,15 @@ import { controlTextArray,helpTextArray } from "../Text";
 import { layerNameArray } from "../LayerName";
 import { PhysicsGroups } from "../PhysicsGroups";
 import { PlayerEvents } from "../ProjectEvents";
+
 enum PauseMenuState {
     Hidden,
     Visible,
     ControlsText,
     HelpText,
-  }
-export default class LevelScene extends HW4Scene {
+}
+
+export default class LevelScene extends ProjectScene {
 
     /** GameSystems in the HW4 Scene */
     private inventoryHud: InventoryHUD;
@@ -102,7 +104,7 @@ export default class LevelScene extends HW4Scene {
      */
     public override loadScene() {
         // Load the player and enemy spritesheets
-        this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince_v2.json");
+        this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince.json");
 
         // Load the tilemap
         this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
@@ -295,6 +297,7 @@ export default class LevelScene extends HW4Scene {
 
         player.health = 10;
         player.maxHealth = 10;
+        player.scale = new Vec2(2, 2);
         // Give the player physics
         player.addPhysics(new AABB(Vec2.ZERO, new Vec2(8, 8)));
         // player.setGroup(PhysicsGroups.PLAYER);
