@@ -18,7 +18,7 @@ import HW4Scene from "./AbstractScene";
 
 // Welcome to Wolfie2D!
 // This is a simple sample scene so something displays when you run the game.
-export default class StartScene extends HW4Scene {
+export default class ControlScene extends HW4Scene {
     /* ########## MEMBER DEFINITIONS ##########*/
     loadScene(): void {
         // this.load.tilemap("map", "../dist/shadowMaze_assets/tilemaps/test2.json");

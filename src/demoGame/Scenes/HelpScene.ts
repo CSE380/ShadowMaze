@@ -10,7 +10,7 @@ import HW4Scene from "./AbstractScene";
 
 // Welcome to Wolfie2D!
 // This is a simple sample scene so something displays when you run the game.
-export default class StartScene extends HW4Scene {
+export default class HelpScene extends HW4Scene {
     /* ########## MEMBER DEFINITIONS ##########*/
     // private mainMenuLayerName: string = "startScene";
     loadScene(): void {
@@ -46,8 +46,8 @@ export default class StartScene extends HW4Scene {
    
   
     public handleEvent(event: GameEvent): void {
-        console.log(event.type)
         super.handleEvent(event);
+        console.log(event.type);
         switch (event.type) {
             case BackButtonEvent.BACK: {
                 this.sceneManager.changeToScene(MainMenu);

@@ -74,7 +74,6 @@ export default class LevelScene extends ProjectScene {
     private bases: BattlerBase[];
     
     private healthpacks: Array<Healthpack>;
-    private laserguns: Array<LaserGun>;
     private ButtonSelection;
     // The wall layer of the tilemap
     private walls: OrthogonalTilemap;
@@ -89,7 +88,6 @@ export default class LevelScene extends ProjectScene {
         this.battlers = new Array<Battler & Actor>();
         this.healthbars = new Map<number, HealthbarHUD>();
         this.labelSize = 32;
-        this.laserguns = new Array<LaserGun>();
         this.healthpacks = new Array<Healthpack>();
         this.ButtonSelection = MainMenuButtonEvent;
         this.isPauseMenuHidden = true;
@@ -117,8 +115,9 @@ export default class LevelScene extends ProjectScene {
     public override startScene() {
         // Add in the tilemap
         let tilemapLayers = this.add.tilemap("level");
-        console.log(tilemapLayers)
+        // console.log(tilemapLayers)
         // Get the wall layer
+        // this.init()
         this.walls = <OrthogonalTilemap>tilemapLayers[1].getItems()[0];
         this.wallSize = this.walls.size.x;
         // Set the viewport bounds to the tilemap
@@ -127,7 +126,7 @@ export default class LevelScene extends ProjectScene {
         this.viewport.setZoomLevel(2);
         this.initLayers();
         // create screen first 
-        this.initBlackScreen();
+        // this.initBlackScreen();
         this.center = this.viewport.getHalfSize();
         // this.addBlackLabel(0, 100);
         this.initializePlayer();

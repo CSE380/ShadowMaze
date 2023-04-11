@@ -26,6 +26,7 @@ import { EaseFunctionType } from "../../Wolfie2D/Utils/EaseFunctions";
 import Timer from "../../Wolfie2D/Timing/Timer";
 import Input from "../../Wolfie2D/Input/Input";
 import PlayerActor from "../Actors/PlayerActor";
+import Line from "../../Wolfie2D/Nodes/Graphics/Line";
 export default abstract class ProjectScene extends Scene {
     protected mainMenuLayerName = "gameMenu";
     protected backgroundImageKey: "backgroundImage";
@@ -42,6 +43,8 @@ export default abstract class ProjectScene extends Scene {
     protected player: PlayerActor;
     protected isLevelEndEnetered: boolean;
     protected topMostLayer: "topMostLayer";
+    protected laserGuns: Array<LaserGun>;
+
     // Level end transition timer and graphic
     protected levelTransitionTimer: Timer;
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
@@ -57,14 +60,20 @@ export default abstract class ProjectScene extends Scene {
         this.initSubscribe();
         this.levelTransitionTimer = new Timer(500);
         this.addLayer(this.topMostLayer,10);
+        this.laserGuns = new Array<LaserGun>();
         // this.levelEndTimer = new Timer(3000, () => {
         //     this.levelTransitionScreen.tweens.play("fadeIn");
         // });
+        console.log("?")
         this.levelEndTimer = new Timer(1000)
         this.isLevelEndEnetered = false;
+        this.loadScene();
     }
     public loadScene(): void {
-
+        this.load.object("laserguns", "shadowMaze_assets/data/items/laserguns.json");
+        this.load.image("laserGun", "  shadowMaze_assets/sprites/laserGun.png");
+        this.initLaserGun();
+        console.log("loaded")
     }
     protected initSubscribe() {
         this.receiver.subscribe(PlayerEvents.PLAYER_ENTERED_LEVEL_END)
@@ -159,8 +168,18 @@ export default abstract class ProjectScene extends Scene {
             this.addText(textOption);
         }
     }
-    protected initLaserLight(){
-        
+    protected initLaserGun(){
+      
+        let laserguns = this.load.getObject("laserguns");
+        console.log(laserguns);
+
+        this.laserGuns = new Array<LaserGun>(laserguns.items.length);
+        for (let i = 0; i < laserguns.items.length; i++) {
+            let sprite = this.add.sprite("laserGun", this.mainMenuLayerName);
+            let line = <Line>this.add.graphic(GraphicType.LINE,  this.mainMenuLayerName, {start: Vec2.ZERO, end: Vec2.ZERO});
+            this.laserGuns[i] = LaserGun.create(sprite, line);
+            this.laserGuns[i].position.set(laserguns.items[i][0], laserguns.items[i][1]);
+        }
     }
     protected addBackButon(position: Vec2) {
         const leftArrow = '\u2190';
