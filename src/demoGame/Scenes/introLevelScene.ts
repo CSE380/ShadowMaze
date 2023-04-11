@@ -190,9 +190,9 @@ export default class LevelScene extends HW4Scene {
                 text: buttonName,
                 layerName :this.pauseMenuLayer,
                 buttonName: buttonName,
-                backgroundColor:new Color(0,0,0,2),
+                backgroundColor:Color.PURPLE,
                 size:new Vec2(300,50),
-                textColor:Color.PURPLE,
+                textColor:Color.WHITE,
             }
             this.addButtons( buttonOption1);
             positionY = positionY + 40;
@@ -208,6 +208,8 @@ export default class LevelScene extends HW4Scene {
         console.log(event.type)
         switch (event.type) {
             case this.ButtonSelection.PAUSE: {
+                this.isPauseMenuHidden = !this.isPauseMenuHidden;
+               
                 // this.sceneManager.changeToScene(MainMenu);
                 this.showPauseMenu(this.isPauseMenuHidden);
                 break;
@@ -257,7 +259,7 @@ export default class LevelScene extends HW4Scene {
             this.handleEvent(this.receiver.getNextEvent());
         }
         if(Input.isKeyJustPressed("escape")){
-            this.isPauseMenuHidden = !this.isPauseMenuHidden;
+           
             this.emitter.fireEvent(this.ButtonSelection.PAUSE)
         }
         this.updateLabel();
