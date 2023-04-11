@@ -346,10 +346,6 @@ export default class LevelScene extends HW4Scene {
         this.nextLabels.forEach(label=>this.updateColor(label))
         this.currLabels = this.nextLabels;
     }
-  
-    public checkCollison(){
-        
-    }
     public updateColor(label:Label){
         if(label.backgroundColor){
             if(label.backgroundColor.isEqual(Color.BLACK)){

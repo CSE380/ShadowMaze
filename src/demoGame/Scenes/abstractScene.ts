@@ -159,6 +159,9 @@ export default abstract class HW4Scene extends Scene {
             this.addText(textOption);
         }
     }
+    protected initLaserLight(){
+        
+    }
     protected addBackButon(position: Vec2) {
         const leftArrow = '\u2190';
         let buttonOption = {
@@ -193,17 +196,12 @@ export default abstract class HW4Scene extends Scene {
     }
     public isLevelEnd() {
         const label = this.levelEndArea;
-        // console.log(this.player.position.x)
-        // // console.log(this.player.position.y)
-        // console.log(label.position.x)
-        // console.log(label.position.y)
-        // console.log(this.levelEndColor)
         if (Math.abs(label.position.x - this.player.position.x) <= 3 && (Math.abs(label.position.y - this.player.position.y) <= 3)) {
             if(!this.isLevelEndEnetered)
             this.emitter.fireEvent(PlayerEvents.PLAYER_ENTERED_LEVEL_END)
         }
     }
-    public handleEvent(event: GameEvent): void {
+    protected handleEvent(event: GameEvent): void {
         console.log(event.type)
         switch (event.type) {
             case BackButtonEvent.BACK: {

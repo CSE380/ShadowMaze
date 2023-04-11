@@ -1,19 +1,10 @@
 /* #################### IMPORTS #################### */
 // Import from Wolfie2D or your own files here
 import Vec2 from "../../Wolfie2D/DataTypes/Vec2";
-import { UIElementType } from "../../Wolfie2D/Nodes/UIElements/UIElementTypes";
-import Layer from "../../Wolfie2D/Scene/Layer";
-import Scene from "../../Wolfie2D/Scene/Scene";
 import Color from "../../Wolfie2D/Utils/Color";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
-import AstarDemoScene from "./AstarDemoScene";
 import { BackButtonEvent } from "../CustomizedButton";
-import SelectLevelMenuScene from "./SelectLevelMenuScene";
-import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
-import Button from "../../Wolfie2D/Nodes/UIElements/Button";
 import MainMenu from "./MainMenuScene";
-import Label from "../../Wolfie2D/Nodes/UIElements/Label";
-import { helpTextArray } from "../Text";
 import HW4Scene from "./abstractScene";
 /* #################### CLASS DEFINITION #################### */
 
@@ -53,13 +44,10 @@ export default class StartScene extends HW4Scene {
         this.addBackButon(center);
     }
    
-    public updateScene() {
-        while (this.receiver.hasNextEvent()) {
-            this.handleEvent(this.receiver.getNextEvent());
-        }
-    }
+  
     public handleEvent(event: GameEvent): void {
         console.log(event.type)
+        super.handleEvent(event);
         switch (event.type) {
             case BackButtonEvent.BACK: {
                 this.sceneManager.changeToScene(MainMenu);

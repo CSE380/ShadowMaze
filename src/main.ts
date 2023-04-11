@@ -2,7 +2,6 @@ import Game from "./Wolfie2D/Loop/Game";
 import MainMenu from "./demoGame/Scenes/MainMenuScene";
 import { PlayerInput } from "./demoGame/AI/Player/PlayerController";
 import default_scene from "./default_scene";
-import AStarDemoScene from "./demoGame/Scenes/AstarDemoScene";
 // import MainHW4Scene from "./demoGame/Scenes/MainHW4Scene";
 import introLevelScene from "./demoGame/Scenes/introLevelScene";
 import StartScene from "./demoGame/Scenes/StartScene";
@@ -42,9 +41,9 @@ import SelectLevelMenuScene from "./demoGame/Scenes/SelectLevelMenuScene";
     const game = new Game(options);
     // Start our game
     // game.start(introLevelScene, {});
-    // game.start(HelpScene, {});
+    game.start(HelpScene, {});
     // game.start(ControlScene,{});
-    game.start(StartScene,{});
+    // game.start(StartScene,{});
 })();
 
 function runTests(){};

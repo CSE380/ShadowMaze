@@ -6,7 +6,6 @@ import Layer from "../../Wolfie2D/Scene/Layer";
 import Scene from "../../Wolfie2D/Scene/Scene";
 import Color from "../../Wolfie2D/Utils/Color";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
-import AstarDemoScene from "./AstarDemoScene";
 import { BackButtonEvent } from "../CustomizedButton";
 import SelectLevelMenuScene from "./SelectLevelMenuScene";
 import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
@@ -52,21 +51,5 @@ export default class StartScene extends HW4Scene {
         }
         this.addControlTextLayer(controlTextOption);
         this.addBackButon(center);
-    }
-    public updateScene() {
-        while (this.receiver.hasNextEvent()) {
-            this.handleEvent(this.receiver.getNextEvent());
-        }
-    }
-    
-
-    public handleEvent(event: GameEvent): void {
-        console.log(event.type)
-        switch (event.type) {
-            case BackButtonEvent.BACK: {
-                this.sceneManager.changeToScene(MainMenu);
-                break;
-            }
-        }
     }
 }

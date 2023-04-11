@@ -4,7 +4,6 @@ import Layer from "../../Wolfie2D/Scene/Layer";
 import Scene from "../../Wolfie2D/Scene/Scene";
 import Color from "../../Wolfie2D/Utils/Color";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
-import AstarDemoScene from "./AstarDemoScene";
 import {  SelectMenuButtonEvent } from "../CustomizedButton";
 import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
 import LevelScene from "./introLevelScene";
@@ -69,7 +68,7 @@ export default class MainMenu extends Scene {
                 break;
             }
             case SelectMenuButtonEvent.LEVEL_2: {
-                this.sceneManager.changeToScene(AstarDemoScene);
+                // this.sceneManager.changeToScene(AstarDemoScene);
                 break;
             }
             case SelectMenuButtonEvent.LEVEL_6:{
