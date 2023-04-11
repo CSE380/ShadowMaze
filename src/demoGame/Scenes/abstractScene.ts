@@ -26,6 +26,7 @@ import { EaseFunctionType } from "../../Wolfie2D/Utils/EaseFunctions";
 import Timer from "../../Wolfie2D/Timing/Timer";
 import Input from "../../Wolfie2D/Input/Input";
 import PlayerActor from "../Actors/PlayerActor";
+import Line from "../../Wolfie2D/Nodes/Graphics/Line";
 export default abstract class ProjectScene extends Scene {
     protected mainMenuLayerName = "gameMenu";
     protected backgroundImageKey: "backgroundImage";

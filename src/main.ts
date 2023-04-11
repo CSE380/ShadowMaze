@@ -3,7 +3,7 @@ import MainMenu from "./demoGame/Scenes/MainMenuScene";
 import { PlayerInput } from "./demoGame/AI/Player/PlayerController";
 import default_scene from "./default_scene";
 // import MainHW4Scene from "./demoGame/Scenes/MainHW4Scene";
-import introLevelScene from "./demoGame/Scenes/introLevelScene";
+// import introLevelScene from "./demoGame/Scenes/introLevelScene";
 import StartScene from "./demoGame/Scenes/StartScene";
 import ControlScene from "./demoGame/Scenes/ControlScene";
 import HelpScene from "./demoGame/Scenes/HelpScene";
