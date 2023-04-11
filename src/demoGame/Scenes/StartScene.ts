@@ -43,7 +43,7 @@ export default class StartScene extends HW4Scene  {
             size:new Vec2(400, 100),
             fontSize:60,
             backgroundColor:Color.TRANSPARENT,
-            font:"PixelSimple",
+            font:"Apple Chancery",
         }
         this.addText(textOption);
         let buttonOption = {

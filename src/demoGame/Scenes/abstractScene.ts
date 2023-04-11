@@ -77,12 +77,9 @@ export default abstract class HW4Scene extends Scene {
             newTextLabel.size.set(300, 100);
         newTextLabel.borderWidth = 2;
         newTextLabel.setTextColor(option.textColor || Color.WHITE)
-        newTextLabel.setFontsize(option.fontSize || 28);
-        newTextLabel.setBackgroundColor(option.backgroundColor || Color.BLACK)
-        console.log(option)
         newTextLabel.setFont(option.font|| "Arial");
-        console.log(newTextLabel.font);
-        newTextLabel.setFont(option.backgroundColor || Color.BLACK)
+        newTextLabel.setFontSize(option.fontSize || 28);
+        newTextLabel.setBackgroundColor(option.backgroundColor || Color.BLACK)
         if (option.align)
             newTextLabel.setHAlign(option.align)
     }
@@ -143,7 +140,7 @@ export default abstract class HW4Scene extends Scene {
         newButton.setBackgroundColor(option.backgroundColor || Color.BLACK)
         newButton.setTextColor(option.textColor || Color.WHITE)
         newButton.onClickEventId = option.buttonName;
-        newButton.setFontsize(50);
+        newButton.setFontSize(50);
         this.receiver.subscribe(option.buttonName);
     }
     protected addControlTextLayer(option: Record<string, any>) {
@@ -182,6 +179,7 @@ export default abstract class HW4Scene extends Scene {
                 text: text,
                 align: "left",
                 backgroundColor:Color.TRANSPARENT,
+                fontSize:option.fontSize,
             }
             this.addText(textOption);
         }

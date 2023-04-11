@@ -86,7 +86,7 @@ export default class LevelScene extends HW4Scene {
 
         this.battlers = new Array<Battler & Actor>();
         this.healthbars = new Map<number, HealthbarHUD>();
-        this.labelSize = 64;
+        this.labelSize = 32;
         this.laserguns = new Array<LaserGun>();
         this.healthpacks = new Array<Healthpack>();
         this.ButtonSelection = MainMenuButtonEvent;

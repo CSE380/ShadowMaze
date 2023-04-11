@@ -75,7 +75,7 @@ export default class Label extends UIElement {
 	setVAlign(align: string): void {
 		this.vAlign = align;
 	}
-	setFontsize(size: number): void {
+	setFontSize(size: number): void {
 		this.fontSize = size;
 	}
 	setFont(font: string): void {

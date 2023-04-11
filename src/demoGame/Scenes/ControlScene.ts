@@ -38,9 +38,10 @@ export default class StartScene extends HW4Scene {
         let center = this.viewport.getCenter();
         this.backgroundImage.position.set(center.x, center.y);
         let textOption = {
-            position: new Vec2(center.x, center.y - 400),
+            position: new Vec2(center.x, center.y - 450),
             text: "Controls",
             backgroundColor:Color.TRANSPARENT,
+            fontSize:50,
         }
         this.addText(textOption);
         let controlTextOption = {
