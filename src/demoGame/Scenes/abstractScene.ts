@@ -1,7 +1,7 @@
 import Vec2 from "../../Wolfie2D/DataTypes/Vec2";
 import Scene from "../../Wolfie2D/Scene/Scene";
 import OrthogonalTilemap from "../../Wolfie2D/Nodes/Tilemaps/OrthogonalTilemap";
-import LaserGun from "../GameSystems/ItemSystem/Items/LaserGun";
+import gameItems from "../GameSystems/ItemSystem/Items/LaserGuns";
 import Healthpack from "../GameSystems/ItemSystem/Items/Healthpack";
 import Battler from "../GameSystems/BattleSystem/Battler";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
@@ -35,12 +35,11 @@ import {MainMenuButtonEvent } from "../CustomizedButton";
 import AABB from "../../Wolfie2D/DataTypes/Shapes/AABB";
 import PlayerAI from "../AI/Player/PlayerAI";
 export default abstract class ProjectScene extends Scene {
-    protected currLabels : Array<Label>;
-    protected nextLabels : Array<Label>;
+ 
     protected wallSize: number;
-    protected mainMenuLayerName = "gameMenu";
-    protected backgroundImageKey: "backgroundImage";
+   
     protected backgroundImage: Sprite;
+    //Level end
     protected center: Vec2;
     protected levelEndArea: Rect;
     protected levelEndLabel: Label;
@@ -50,11 +49,24 @@ export default abstract class ProjectScene extends Scene {
     protected levelEndColor = new Color(255, 0, 0, 0.5);
     protected levelEndTimer: Timer;
     protected levelTransitionScreen: Rect;
-    protected player: PlayerActor;
     protected isLevelEndEnetered: boolean;
-    protected topMostLayer: "topMostLayer";
-    protected laserGuns: Array<LaserGun>;
+    //player 
+    protected player: PlayerActor;
+    protected laserGuns: Array<gameItems>;
     private lasers: Array<Graphic>;
+    protected door:Sprite
+
+    //items to game 
+    protected gameItemsArray = ["laserGuns","door","healthPacks"];
+    protected gameItemsMap=new Map<string,Array<gameItems>>();
+    protected laserGunsKey="laserGuns";
+    protected lightShape:AABB;
+    protected lightDuration :boolean;
+    //ui display
+    protected currLabels : Array<Label>;
+    protected nextLabels : Array<Label>;
+    protected mainMenuLayerName = "gameMenu";
+    protected backgroundImageKey: "backgroundImage";
     protected gameMenu= "gameMenu";
     protected pauseButtonLayer= "pauseButtonLayer";
     protected pauseMenuLayer= "pauseMenuLayer";
@@ -62,11 +74,14 @@ export default abstract class ProjectScene extends Scene {
     protected controlTextLayer= "controlTextLayer";
     protected helpTextLayer = "helpTextLayer";
     protected layerNames = ["gameMenu", "pauseButtonLayer","emptyMenuLayer", "pauseMenuLayer", "controlTextLayer","helpTextLayer"];
+    protected topMostLayer: "topMostLayer";
+    //
     protected labelSize: number;
     protected isPauseMenuHidden:boolean;
     protected ButtonSelection;
-    protected lightShape:AABB;
-    protected lightDuration :boolean;
+    // relative path to the assets
+    protected pathToItems=`shadowMaze_assets/data/items/`;
+    protected pathToSprite=`shadowMaze_assets/sprites/`;
     // Level end transition timer and graphic
     protected levelTransitionTimer: Timer;
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
@@ -88,36 +103,72 @@ export default abstract class ProjectScene extends Scene {
         this.center = this.getViewport().getCenter();
         this.initSubscribe();
         this.levelTransitionTimer = new Timer(500);
-        this.addLayer(this.topMostLayer,10);
-        this.laserGuns = new Array<LaserGun>();
-        // this.levelEndTimer = new Timer(3000, () => {
-        //     this.levelTransitionScreen.tweens.play("fadeIn");
-        // });
         this.levelEndTimer = new Timer(1000)
         this.isLevelEndEnetered = false;
         this.loadScene();
     }
-    protected initObjectPools(): void {
-        // Init bubble object pool
+    // protected initObjectPools(): void {
+    //     // Init bubble object pool
        
     
-        // Init the object pool of lasers
-        this.lasers = new Array(4);
-        for (let i = 0; i < this.lasers.length; i++) {
-          this.lasers[i] = this.add.graphic(GraphicType.RECT, this.mainMenuLayerName, {
-            position: Vec2.ZERO,
-            size: Vec2.ZERO,
-          });
-          this.lasers[i].useCustomShader(LaserShaderType.KEY);
-          this.lasers[i].color = Color.RED;
-          this.lasers[i].visible = false;
-          this.lasers[i].addAI(LaserBehavior, { src: Vec2.ZERO, dst: Vec2.ZERO });
+    //     // Init the object pool of lasers
+    //     this.lasers = new Array(4);
+    //     for (let i = 0; i < this.lasers.length; i++) {
+    //       this.lasers[i] = this.add.graphic(GraphicType.RECT, this.mainMenuLayerName, {
+    //         position: Vec2.ZERO,
+    //         size: Vec2.ZERO,
+    //       });
+    //       this.lasers[i].useCustomShader(LaserShaderType.KEY);
+    //       this.lasers[i].color = Color.RED;
+    //       this.lasers[i].visible = false;
+    //       this.lasers[i].addAI(LaserBehavior, { src: Vec2.ZERO, dst: Vec2.ZERO });
+    //     }
+    //   }
+    protected loadGameItems(key:string){
+        this.load.object(key,`${this.pathToItems}${key}.json`);
+        this.load.image(key,`${this.pathToSprite}${key}.png`);
+       
+    }
+    protected loadAllGameItems(){
+        for(let key of this.gameItemsArray){
+            // console.log(key)
+            this.loadGameItems(key);
         }
-      }
+    }
+    protected initAllGameItems(){
+        for(let key of this.gameItemsArray){
+            let gameItem = this.load.getObject(key);
+            console.log(this.load.getObject(key))
+            const items = new Array<gameItems>(gameItem.position.length);
+            for (let i = 0; i < items.length; i++) {
+                let sprite = this.add.sprite(key, this.mainMenuLayerName);
+                let line = <Line>this.add.graphic(GraphicType.LINE,  this.mainMenuLayerName, {start: Vec2.ZERO, end: Vec2.ZERO});
+                items[i] = gameItems.create(sprite, line);
+                items[i].position.set(gameItem.position[i][0], gameItem.position[i][1]);
+            }
+            this.gameItemsMap.set(key, items );
+        }
+    }
+    // protected initLaserGun(key:string){
+    //     let gameItem = this.load.getObject(key);
+    //     this.laserGuns = new Array<gameItems>(gameItem.items.length);
+    //     for (let i = 0; i < gameItem.items.length; i++) {
+    //         let sprite = this.add.sprite(this.laserGunsKey, this.mainMenuLayerName);
+    //         let line = <Line>this.add.graphic(GraphicType.LINE,  this.mainMenuLayerName, {start: Vec2.ZERO, end: Vec2.ZERO});
+    //         this.laserGuns[i] = gameItems.create(sprite, line);
+            
+    //         this.laserGuns[i].position.set(gameItem.position[i][0], gameItem.position[i][1]);
+    //     }
+    // }
     public loadScene(): void {
-        this.load.object("laserguns", "shadowMaze_assets/data/items/laserguns.json");
-        this.load.image("laserGun", "  shadowMaze_assets/sprites/laserGun.png");
-        console.log("load successfully")
+       this.loadAllGameItems();
+        // this.loadGameItems(this.laserGunsKey);
+        this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince.json");
+        // Load the tilemap
+        this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
+        // this.load.object("door", "shadowMaze_assets/data/items/door.json");
+        // this.load.image("door", "shadowMaze_assets/sprites/door.png");
+       
         // this.initLaserGun();
         // console.log("loaded")
         // this.load.shader(
@@ -230,20 +281,8 @@ export default abstract class ProjectScene extends Scene {
             this.addText(textOption);
         }
     }
-    protected initLaserGun(){
-      
-        let laserguns = this.load.getObject("laserguns");
-
-        this.laserGuns = new Array<LaserGun>(laserguns.items.length);
-        console.log(laserguns.items)
-        for (let i = 0; i < laserguns.items.length; i++) {
-            let sprite = this.add.sprite("laserGun", this.mainMenuLayerName);
-            let line = <Line>this.add.graphic(GraphicType.LINE,  this.mainMenuLayerName, {start: Vec2.ZERO, end: Vec2.ZERO});
-            this.laserGuns[i] = LaserGun.create(sprite, line);
-            
-            this.laserGuns[i].position.set(laserguns.items[i][0], laserguns.items[i][1]);
-        }
-    }
+   
+   
     protected addBackButon(position: Vec2) {
         const leftArrow = '\u2190';
         let buttonOption = {
@@ -274,6 +313,12 @@ export default abstract class ProjectScene extends Scene {
             const gameEvent = this.receiver.getNextEvent()
             this.handleEvent(gameEvent);
         }
+        if(Input.isKeyJustPressed("escape")){
+            this.emitter.fireEvent(this.ButtonSelection.PAUSE)
+        }
+        this.updateLabel();
+        this.isLevelEnd();
+        // this.isPlayerAtItems();
     }
     public isLevelEnd() {
         const label = this.levelEndArea;
@@ -362,6 +407,7 @@ export default abstract class ProjectScene extends Scene {
         // this.getLayer(this.pauseButtonLayerName).setDepth(1);
         // this.getLayer(this.emptyMenuLayerName).setDepth(2);
         // this.getLayer(this.pauseMenuLayerName).setDepth(3);
+        this.addLayer(this.topMostLayer,10);
         this.getLayer(this.emptyMenuLayer).setHidden(this.isPauseMenuHidden);
         this.getLayer(this.pauseMenuLayer).setHidden(this.isPauseMenuHidden);
     }   

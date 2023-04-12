@@ -27,7 +27,7 @@ import InventoryHUD from "../GameSystems/HUD/InventoryHUD";
 import Inventory from "../GameSystems/ItemSystem/Inventory";
 import Item from "../GameSystems/ItemSystem/Item";
 import Healthpack from "../GameSystems/ItemSystem/Items/Healthpack";
-import LaserGun from "../GameSystems/ItemSystem/Items/LaserGun";
+import LaserGun from "../GameSystems/ItemSystem/Items/LaserGuns";
 import SelectLevelMenuScene from "./SelectLevelMenuScene";
 import HelpScene from "./HelpScene";
 import StartScene from "./StartScene";
@@ -65,18 +65,15 @@ export default class LevelScene extends ProjectScene {
     /**
      * @see Scene.update()
      */
-    public override loadScene() {
-        // Load the player and enemy spritesheets
-        this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince.json");
+    // public override loadScene() {
+    //     // Load the player and enemy spritesheets
+       
+    //     //laser gun
+    //     this.load.object("laserguns", "shadowMaze_assets/data/items/laserguns.json");
+    //     this.load.image("laserGun", "  shadowMaze_assets/sprites/laserGun.png");
+    //     console.log("load successfully")
 
-        // Load the tilemap
-        this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
-        //laser gun
-        this.load.object("laserguns", "shadowMaze_assets/data/items/laserguns.json");
-        this.load.image("laserGun", "  shadowMaze_assets/sprites/laserGun.png");
-        console.log("load successfully")
-
-    }
+    // }
     /**
      * @see Scene.startScene
      */
@@ -94,13 +91,15 @@ export default class LevelScene extends ProjectScene {
         this.viewport.setZoomLevel(2);
         this.initLayers();
         // create screen first 
-        this.initBlackScreen();
+        // this.initBlackScreen();
         this.center = this.viewport.getHalfSize();
         // this.addBlackLabel(0, 100);
         this.initializePlayer();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
-        this.initLaserGun();
+        this.initAllGameItems()
+
+        // this.initLaserGun();
         // this.addLevelEndLabel();
         // this.addLevelEndLabel();
         // this.addLevelEndLabel();
@@ -164,17 +163,12 @@ export default class LevelScene extends ProjectScene {
             }
         }
     }
-    public override updateScene(){
-        while (this.receiver.hasNextEvent()) {
-            this.handleEvent(this.receiver.getNextEvent());
-        }
-        if(Input.isKeyJustPressed("escape")){
-            this.emitter.fireEvent(this.ButtonSelection.PAUSE)
-        }
-        this.updateLabel();
-        this.isLevelEnd();
-        this.isPlayerAtItems();
-    }
+    // public override updateScene(){
+    //     while (this.receiver.hasNextEvent()) {
+    //         this.handleEvent(this.receiver.getNextEvent());
+    //     }
+        
+    // }
    
     /** Initializes the layers in the scene */
    
