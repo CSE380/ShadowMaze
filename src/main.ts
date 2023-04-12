@@ -3,7 +3,7 @@ import MainMenu from "./demoGame/Scenes/MainMenuScene";
 import { PlayerInput } from "./demoGame/AI/Player/PlayerController";
 import default_scene from "./default_scene";
 // import MainHW4Scene from "./demoGame/Scenes/MainHW4Scene";
-// import introLevelScene from "./demoGame/Scenes/introLevelScene";
+import IntroLevelScene from "./demoGame/Scenes/IntroLevelScene";
 import StartScene from "./demoGame/Scenes/StartScene";
 import ControlScene from "./demoGame/Scenes/ControlScene";
 import HelpScene from "./demoGame/Scenes/HelpScene";
@@ -34,30 +34,31 @@ import RegistryManager from "./Wolfie2D/Registry/RegistryManager";
             { name: "slot1", keys: ["1"] },
             { name: "slot2", keys: ["2"] },
         ],
-        useWebGL: true,                        // Tell the game we want to use webgl
-        showDebug: false                      // Whether to show debug messages. You can change this to true if you want
+        // useWebGL: true,   
+        useWebGL: false,                  // Tell the game we want to use webgl
+        showDebug: false,                    // Whether to show debug messages. You can change this to true if you want
     }
 
     // Set up custom registries
-    RegistryManager.shaders.registerAndPreloadItem(
-        BubbleShaderType.KEY,   // The key of the shader program
-        BubbleShaderType,           // The constructor of the shader program
-        BubbleShaderType.VSHADER,   // The path to the vertex shader
-        BubbleShaderType.FSHADER);  // the path to the fragment shader*/
+    // RegistryManager.shaders.registerAndPreloadItem(
+    //     BubbleShaderType.KEY,   // The key of the shader program
+    //     BubbleShaderType,           // The constructor of the shader program
+    //     BubbleShaderType.VSHADER,   // The path to the vertex shader
+    //     BubbleShaderType.FSHADER);  // the path to the fragment shader*/
 
-    RegistryManager.shaders.registerAndPreloadItem(
-        LaserShaderType.KEY,
-        LaserShaderType,
-        LaserShaderType.VSHADER,
-        LaserShaderType.FSHADER
-    );
+    // RegistryManager.shaders.registerAndPreloadItem(
+    //     LaserShaderType.KEY,
+    //     LaserShaderType,
+    //     LaserShaderType.VSHADER,
+    //     LaserShaderType.FSHADER
+    // );
     // Create a game with the options specified
     const game = new Game(options);
     // Start our game
-    // game.start(introLevelScene, {});
-    game.start(HelpScene, {});
+    game.start(IntroLevelScene, {});
+    // game.start(HelpScene, {});
     // game.start(ControlScene,{});
-    game.start(StartScene, {});
+    // game.start(StartScene, {});
 })();
 
 function runTests() { };

@@ -31,7 +31,13 @@ import BubbleShaderType from "../Shaders/BubbleShaderType";
 import LaserShaderType from "../Shaders/LaserShaderType";
 import Graphic from "../../Wolfie2D/Nodes/Graphic";
 import LaserBehavior from "../AI/LaserBehavior";
+import {MainMenuButtonEvent } from "../CustomizedButton";
+import AABB from "../../Wolfie2D/DataTypes/Shapes/AABB";
+import PlayerAI from "../AI/Player/PlayerAI";
 export default abstract class ProjectScene extends Scene {
+    protected currLabels : Array<Label>;
+    protected nextLabels : Array<Label>;
+    protected wallSize: number;
     protected mainMenuLayerName = "gameMenu";
     protected backgroundImageKey: "backgroundImage";
     protected backgroundImage: Sprite;
@@ -49,6 +55,17 @@ export default abstract class ProjectScene extends Scene {
     protected topMostLayer: "topMostLayer";
     protected laserGuns: Array<LaserGun>;
     private lasers: Array<Graphic>;
+    protected gameMenu= "gameMenu";
+    protected pauseButtonLayer= "pauseButtonLayer";
+    protected pauseMenuLayer= "pauseMenuLayer";
+    protected emptyMenuLayer= "emptyMenuLayer";
+    protected controlTextLayer= "controlTextLayer";
+    protected helpTextLayer = "helpTextLayer";
+    protected layerNames = ["gameMenu", "pauseButtonLayer","emptyMenuLayer", "pauseMenuLayer", "controlTextLayer","helpTextLayer"];
+    protected labelSize: number;
+    protected isPauseMenuHidden:boolean;
+    protected ButtonSelection;
+
     // Level end transition timer and graphic
     protected levelTransitionTimer: Timer;
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
@@ -57,6 +74,13 @@ export default abstract class ProjectScene extends Scene {
                 // groupNames: [PhysicsGroups.PLAYER],
             }
         });
+        this.ButtonSelection = 
+        this.labelSize = 32;
+        this.isPauseMenuHidden = true;
+        this.ButtonSelection = MainMenuButtonEvent;
+        for (const layerName of this.layerNames) {
+            this[layerName] = layerName;
+        }
         this.init();
     }
     protected init() {
@@ -68,7 +92,6 @@ export default abstract class ProjectScene extends Scene {
         // this.levelEndTimer = new Timer(3000, () => {
         //     this.levelTransitionScreen.tweens.play("fadeIn");
         // });
-        console.log("?")
         this.levelEndTimer = new Timer(1000)
         this.isLevelEndEnetered = false;
         this.loadScene();
@@ -91,21 +114,21 @@ export default abstract class ProjectScene extends Scene {
         }
       }
     public loadScene(): void {
-        this.load.object("laserguns", "shadowMaze_assets/data/items/laserguns.json");
-        this.load.image("laserGun", "  shadowMaze_assets/sprites/laserGun.png");
+        // this.load.object("laserguns", "shadowMaze_assets/data/items/laserguns.json");
+        // this.load.image("laserGun", "  shadowMaze_assets/sprites/laserGun.png");
         // this.initLaserGun();
         // console.log("loaded")
-        this.load.shader(
-            BubbleShaderType.KEY,
-            BubbleShaderType.VSHADER,
-            BubbleShaderType.FSHADER
-          );
-          // Load in the shader for laser.
-          this.load.shader(
-            LaserShaderType.KEY,
-            LaserShaderType.VSHADER,
-            LaserShaderType.FSHADER
-          );
+        // this.load.shader(
+        //     BubbleShaderType.KEY,
+        //     BubbleShaderType.VSHADER,
+        //     BubbleShaderType.FSHADER
+        //   );
+        //   // Load in the shader for laser.
+        //   this.load.shader(
+        //     LaserShaderType.KEY,
+        //     LaserShaderType.VSHADER,
+        //     LaserShaderType.FSHADER
+        //   );
     }
     protected initSubscribe() {
         this.receiver.subscribe(PlayerEvents.PLAYER_ENTERED_LEVEL_END)
@@ -271,6 +294,151 @@ export default abstract class ProjectScene extends Scene {
             // }
         }
     }
+    public initCurrLabel(){
+        this.currLabels = <Array<Label>> this.getSceneGraph().getNodesAt(this.player.position)
+        this.currLabels.forEach(label=>{this.updateColor(label)})
+    }
+    public increaseVision(){
+        this.labelSize = this.labelSize*2;
+    }
+    public initBlackScreen() {
+        const len = this.wallSize / this.labelSize ;
+        for (let i = 0; i <= len; i++) {
+            for (let j = 0; j <= len; j++) {
+                const x = i * this.labelSize;
+                const y = j * this.labelSize + this.labelSize / 2;
+                const options = {
+                    position: new Vec2(x, y),
+                    text: "",
+                }
+                this.addBlackLabel(options);
+            }
+        }
+    }
+    public addBlackLabel(options:Record<string, any>) {
+        const label = <Label>this.add.uiElement(UIElementType.LABEL, this.gameMenu, options);
+        label.size.set(this.labelSize *2, this.labelSize *2);
+        label.borderWidth = 0;
+        label.borderRadius = 0;
+        label.borderColor = Color.TRANSPARENT;
+        label.backgroundColor = Color.BLACK;
+    }
+    public updateLabel(){
+        this.nextLabels= <Array<Label>>this.getSceneGraph().getNodesAt(this.player.position)
+        this.currLabels.forEach(label=>{this.updateColor(label)})
+        this.nextLabels.forEach(label=>this.updateColor(label))
+        this.currLabels = this.nextLabels;
+    }
+    public updateColor(label:Label){
+        if(label.backgroundColor){
+            if(label.backgroundColor.isEqual(Color.BLACK)){
+                label.backgroundColor=Color.TRANSPARENT;
+            }
+            else if (label.backgroundColor.isEqual(Color.TRANSPARENT)){
+                label.backgroundColor = Color.BLACK;
+            }
+        }
+    }
+    protected initLayers(): void {
+        for(let i = 0;i<this.layerNames.length;i++){
+            const layerName = this.layerNames[i];
+            this.addLayer(this[layerName],i);
+        }
+        // this.getLayer(this.pauseButtonLayerName).setDepth(1);
+        // this.getLayer(this.emptyMenuLayerName).setDepth(2);
+        // this.getLayer(this.pauseMenuLayerName).setDepth(3);
+        this.getLayer(this.emptyMenuLayer).setHidden(this.isPauseMenuHidden);
+        this.getLayer(this.pauseMenuLayer).setHidden(this.isPauseMenuHidden);
+    }   
+    protected showPauseMenu(flag:boolean):void{
+        this.getLayer(this.emptyMenuLayer).setHidden(flag);
+        this.getLayer(this.pauseMenuLayer).setHidden(flag);
+    }
+   
+      
+    /**
+     * Initializes the player in the scene
+     */
+    protected initializePlayer(): void {
+        let player = this.add.animatedSprite(PlayerActor, "prince", this.gameMenu);
+        this.player = player
+        player.position.set(this.playerInitPosition.x,this.playerInitPosition.y);
+        player.battleGroup = 2;
 
+        player.health = 10;
+        player.maxHealth = 10;
+        player.scale = new Vec2(2, 2);
+        // Give the player physics
+        player.addPhysics(new AABB(Vec2.ZERO, new Vec2(8, 8)));
+        // player.setGroup(PhysicsGroups.PLAYER);
+        this.initCurrLabel();
+        // Give the player a healthbar
 
+        // Give the player PlayerAI
+        player.addAI(PlayerAI);
+
+        // Start the player in the "IDLE" animation
+        player.animation.play("IDLE");
+        this.viewport.follow(player);
+    }
+    public initControlTextLayer(){
+        let controlTextOption = {
+            position: this.viewport.getCenter(),
+            margin:40,
+            layerName:this.controlTextLayer
+        }
+        this.addControlTextLayer(controlTextOption)
+    }
+    public initHelpTextLayer(){
+        let helpTextOption = {
+            position:new Vec2(450, 450),
+            margin:40,
+            layerName:this.helpTextLayer,
+        }
+        this.addHelpTextLayer(helpTextOption)
+    }
+    public initPauseMenuLayer(){
+        const pauseSign = "\u23F8";
+        let buttonOption = {
+            position: new Vec2(475, 10),
+            text: pauseSign,
+            layerName:this.pauseButtonLayer,
+            buttName:this.ButtonSelection.PAUSE, 
+            backgroundColor: Color.TRANSPARENT,
+        }
+        this.addButtons(buttonOption);
+        let emptyMenuOption = {
+            position: this.center,
+            text: "",
+            size:new Vec2(300, 450),
+            layerName:this.emptyMenuLayer,
+            backgroundColor:Color.WHITE,
+        }
+        this.addText(emptyMenuOption);
+        let pauseTextOption = {
+            position: new Vec2(this.center.x, this.center.y-100),
+            text: "Paused",
+            size:new Vec2(100, 30),
+            layerName:this.pauseMenuLayer,
+            backgroundColor:Color.WHITE,
+            textColor:Color.BLACK,
+        }
+        this.addText(pauseTextOption);
+        let positionY=this.center.y - 60;
+        for(let buttonName in this.ButtonSelection){
+            if(buttonName == "Select_levels") 
+                buttonName = "Select levels"   
+            let buttonOption1= {
+                position: new Vec2(this.center.x, positionY),
+                text: buttonName,
+                layerName :this.pauseMenuLayer,
+                buttonName: buttonName,
+                backgroundColor:Color.PURPLE,
+                size:new Vec2(300,50),
+                textColor:Color.WHITE,
+            }
+            this.addButtons( buttonOption1);
+            positionY = positionY + 40;
+        }
+    }
 }
