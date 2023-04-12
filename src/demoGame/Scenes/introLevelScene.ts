@@ -91,14 +91,15 @@ export default class LevelScene extends ProjectScene {
         this.viewport.setZoomLevel(2);
         this.initLayers();
         // create screen first 
-        // this.initBlackScreen();
+        this.initBlackScreen();
         this.center = this.viewport.getHalfSize();
         // this.addBlackLabel(0, 100);
         this.initializePlayer();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
         this.initAllGameItems()
-
+        console.log()
+        this.isPlayerAtItems();
         // this.initLaserGun();
         // this.addLevelEndLabel();
         // this.addLevelEndLabel();
@@ -162,6 +163,7 @@ export default class LevelScene extends ProjectScene {
                
             }
         }
+        this.handleGameItemsEvent(event);
     }
     // public override updateScene(){
     //     while (this.receiver.hasNextEvent()) {
