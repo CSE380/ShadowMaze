@@ -34,6 +34,7 @@ import LaserBehavior from "../AI/LaserBehavior";
 import {MainMenuButtonEvent } from "../CustomizedButton";
 import AABB from "../../Wolfie2D/DataTypes/Shapes/AABB";
 import PlayerAI from "../AI/Player/PlayerAI";
+import { gameItemsArray } from "../gameItems";
 export default abstract class ProjectScene extends Scene {
  
     protected wallSize: number;
@@ -57,7 +58,7 @@ export default abstract class ProjectScene extends Scene {
     protected door:Sprite
 
     //items to game 
-    protected gameItemsArray = ["laserGuns","door","healthPacks"];
+    protected gameItemsArray =gameItemsArray;
     protected gameItemsMap=new Map<string,Array<gameItems>>();
     protected laserGunsKey="laserGuns";
     protected lightShape:AABB;
