@@ -34,7 +34,7 @@ import LaserBehavior from "../AI/LaserBehavior";
 import { MainMenuButtonEvent } from "../CustomizedButton";
 import AABB from "../../Wolfie2D/DataTypes/Shapes/AABB";
 import PlayerAI from "../AI/Player/PlayerAI";
-import { gameItemsArray,GameItems } from "../gameItems";
+import { GameItemsArray,GameItems } from "../GameItemsArray";
 export default abstract class ProjectScene extends Scene {
 
     protected wallSize: number;
@@ -58,7 +58,7 @@ export default abstract class ProjectScene extends Scene {
     protected door: Sprite
 
     //items to game 
-    protected gameItemsArray = gameItemsArray;
+    protected gameItemsArray = GameItemsArray;
     protected gameItemsMap = new Map<string, Array<gameItems>>();
     protected laserGunsKey = "laserGuns";
     protected lightShape: AABB;
@@ -135,6 +135,9 @@ export default abstract class ProjectScene extends Scene {
             // console.log(key)
             this.loadGameItems(key);
         }
+        // for (const key of Object.keys(GameItems)) {
+        //     console.log(GameItems[key]);
+        // }
     }
     protected initAllGameItems() {
         for (let key of this.gameItemsArray) {
@@ -195,7 +198,7 @@ export default abstract class ProjectScene extends Scene {
         this.initgameItemEventSubscribe();
     }
     protected initgameItemEventSubscribe() {
-        for (let gameItemKey of gameItemsArray) {
+        for (let gameItemKey of GameItemsArray) {
             this.receiver.subscribe(gameItemKey);
         }
     }
