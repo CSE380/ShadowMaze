@@ -27,6 +27,10 @@ import Timer from "../../Wolfie2D/Timing/Timer";
 import Input from "../../Wolfie2D/Input/Input";
 import PlayerActor from "../Actors/PlayerActor";
 import Line from "../../Wolfie2D/Nodes/Graphics/Line";
+import BubbleShaderType from "../Shaders/BubbleShaderType";
+import LaserShaderType from "../Shaders/LaserShaderType";
+import Graphic from "../../Wolfie2D/Nodes/Graphic";
+import LaserBehavior from "../AI/LaserBehavior";
 export default abstract class ProjectScene extends Scene {
     protected mainMenuLayerName = "gameMenu";
     protected backgroundImageKey: "backgroundImage";
@@ -44,7 +48,7 @@ export default abstract class ProjectScene extends Scene {
     protected isLevelEndEnetered: boolean;
     protected topMostLayer: "topMostLayer";
     protected laserGuns: Array<LaserGun>;
-
+    private lasers: Array<Graphic>;
     // Level end transition timer and graphic
     protected levelTransitionTimer: Timer;
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
@@ -69,11 +73,39 @@ export default abstract class ProjectScene extends Scene {
         this.isLevelEndEnetered = false;
         this.loadScene();
     }
+    protected initObjectPools(): void {
+        // Init bubble object pool
+       
+    
+        // Init the object pool of lasers
+        this.lasers = new Array(4);
+        for (let i = 0; i < this.lasers.length; i++) {
+          this.lasers[i] = this.add.graphic(GraphicType.RECT, this.mainMenuLayerName, {
+            position: Vec2.ZERO,
+            size: Vec2.ZERO,
+          });
+          this.lasers[i].useCustomShader(LaserShaderType.KEY);
+          this.lasers[i].color = Color.RED;
+          this.lasers[i].visible = false;
+          this.lasers[i].addAI(LaserBehavior, { src: Vec2.ZERO, dst: Vec2.ZERO });
+        }
+      }
     public loadScene(): void {
         this.load.object("laserguns", "shadowMaze_assets/data/items/laserguns.json");
         this.load.image("laserGun", "  shadowMaze_assets/sprites/laserGun.png");
-        this.initLaserGun();
-        console.log("loaded")
+        // this.initLaserGun();
+        // console.log("loaded")
+        this.load.shader(
+            BubbleShaderType.KEY,
+            BubbleShaderType.VSHADER,
+            BubbleShaderType.FSHADER
+          );
+          // Load in the shader for laser.
+          this.load.shader(
+            LaserShaderType.KEY,
+            LaserShaderType.VSHADER,
+            LaserShaderType.FSHADER
+          );
     }
     protected initSubscribe() {
         this.receiver.subscribe(PlayerEvents.PLAYER_ENTERED_LEVEL_END)
