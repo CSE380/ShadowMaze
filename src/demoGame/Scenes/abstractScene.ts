@@ -65,7 +65,8 @@ export default abstract class ProjectScene extends Scene {
     protected labelSize: number;
     protected isPauseMenuHidden:boolean;
     protected ButtonSelection;
-
+    protected lightShape:AABB;
+    protected lightDuration :boolean;
     // Level end transition timer and graphic
     protected levelTransitionTimer: Timer;
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
@@ -74,8 +75,8 @@ export default abstract class ProjectScene extends Scene {
                 // groupNames: [PhysicsGroups.PLAYER],
             }
         });
-        this.ButtonSelection = 
-        this.labelSize = 32;
+        this.labelSize = 24;
+      
         this.isPauseMenuHidden = true;
         this.ButtonSelection = MainMenuButtonEvent;
         for (const layerName of this.layerNames) {
@@ -114,8 +115,9 @@ export default abstract class ProjectScene extends Scene {
         }
       }
     public loadScene(): void {
-        // this.load.object("laserguns", "shadowMaze_assets/data/items/laserguns.json");
-        // this.load.image("laserGun", "  shadowMaze_assets/sprites/laserGun.png");
+        this.load.object("laserguns", "shadowMaze_assets/data/items/laserguns.json");
+        this.load.image("laserGun", "  shadowMaze_assets/sprites/laserGun.png");
+        console.log("load successfully")
         // this.initLaserGun();
         // console.log("loaded")
         // this.load.shader(
@@ -129,6 +131,11 @@ export default abstract class ProjectScene extends Scene {
         //     LaserShaderType.VSHADER,
         //     LaserShaderType.FSHADER
         //   );
+    }
+    protected buildLightShape(){
+        const lightDistance = 1*this.labelSize;
+        const centerToEdge = new Vec2(lightDistance,lightDistance);
+        this.lightShape =new AABB(this.player.position,centerToEdge);
     }
     protected initSubscribe() {
         this.receiver.subscribe(PlayerEvents.PLAYER_ENTERED_LEVEL_END)
@@ -226,13 +233,14 @@ export default abstract class ProjectScene extends Scene {
     protected initLaserGun(){
       
         let laserguns = this.load.getObject("laserguns");
-        console.log(laserguns);
 
         this.laserGuns = new Array<LaserGun>(laserguns.items.length);
+        console.log(laserguns.items)
         for (let i = 0; i < laserguns.items.length; i++) {
             let sprite = this.add.sprite("laserGun", this.mainMenuLayerName);
             let line = <Line>this.add.graphic(GraphicType.LINE,  this.mainMenuLayerName, {start: Vec2.ZERO, end: Vec2.ZERO});
             this.laserGuns[i] = LaserGun.create(sprite, line);
+            
             this.laserGuns[i].position.set(laserguns.items[i][0], laserguns.items[i][1]);
         }
     }
@@ -264,7 +272,6 @@ export default abstract class ProjectScene extends Scene {
     public updateScene() {
         while (this.receiver.hasNextEvent() ) {
             const gameEvent = this.receiver.getNextEvent()
-            console.log(gameEvent)
             this.handleEvent(gameEvent);
         }
     }
@@ -298,9 +305,7 @@ export default abstract class ProjectScene extends Scene {
         this.currLabels = <Array<Label>> this.getSceneGraph().getNodesAt(this.player.position)
         this.currLabels.forEach(label=>{this.updateColor(label)})
     }
-    public increaseVision(){
-        this.labelSize = this.labelSize*2;
-    }
+   
     public initBlackScreen() {
         const len = this.wallSize / this.labelSize ;
         for (let i = 0; i <= len; i++) {
@@ -324,10 +329,20 @@ export default abstract class ProjectScene extends Scene {
         label.backgroundColor = Color.BLACK;
     }
     public updateLabel(){
-        this.nextLabels= <Array<Label>>this.getSceneGraph().getNodesAt(this.player.position)
+        this.nextLabels= this.transparentLabels();
         this.currLabels.forEach(label=>{this.updateColor(label)})
         this.nextLabels.forEach(label=>this.updateColor(label))
         this.currLabels = this.nextLabels;
+    }
+    public transparentLabels(): Array<Label>{
+        let labels:Array<Label>
+        if(!this.lightDuration){
+            labels=<Array<Label>>this.getSceneGraph().getNodesAt(this.player.position);
+        }
+        else{
+            labels = <Array<Label>>this.getSceneGraph().getNodesInRegion(this.lightShape);
+        }
+        return labels;
     }
     public updateColor(label:Label){
         if(label.backgroundColor){
@@ -354,8 +369,23 @@ export default abstract class ProjectScene extends Scene {
         this.getLayer(this.emptyMenuLayer).setHidden(flag);
         this.getLayer(this.pauseMenuLayer).setHidden(flag);
     }
-   
+   protected isPlayerAtItems(){
+        this.laserGuns.forEach(laser=>{
+            if(laser.visible  && laser.position.distanceTo(this.player.position)<10){
+                console.log("got items");
+
+                laser.visible = false;
+                this.lightDuration = true;
+            }
+        })
+   }
+   protected pickLaser(){
+
+   }
+   protected displayVec2(position:Vec2){
+        console.log(position.x +"      "+position.y)
       
+   }
     /**
      * Initializes the player in the scene
      */
@@ -364,13 +394,13 @@ export default abstract class ProjectScene extends Scene {
         this.player = player
         player.position.set(this.playerInitPosition.x,this.playerInitPosition.y);
         player.battleGroup = 2;
-
         player.health = 10;
         player.maxHealth = 10;
         player.scale = new Vec2(2, 2);
         // Give the player physics
         player.addPhysics(new AABB(Vec2.ZERO, new Vec2(8, 8)));
         // player.setGroup(PhysicsGroups.PLAYER);
+        this.buildLightShape();
         this.initCurrLabel();
         // Give the player a healthbar
 
@@ -380,6 +410,7 @@ export default abstract class ProjectScene extends Scene {
         // Start the player in the "IDLE" animation
         player.animation.play("IDLE");
         this.viewport.follow(player);
+       
     }
     public initControlTextLayer(){
         let controlTextOption = {

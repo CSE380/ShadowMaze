@@ -154,7 +154,6 @@ export default class CanvasNodeFactory {
 			default:
 				throw `GraphicType '${type}' does not exist, or is registered incorrectly.`
 		}
-		console.log(instance)
 		// Add instance to scene
 		instance.setScene(this.scene);
 		instance.id = this.scene.generateId();

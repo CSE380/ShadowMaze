@@ -71,7 +71,10 @@ export default class LevelScene extends ProjectScene {
 
         // Load the tilemap
         this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
-
+        //laser gun
+        this.load.object("laserguns", "shadowMaze_assets/data/items/laserguns.json");
+        this.load.image("laserGun", "  shadowMaze_assets/sprites/laserGun.png");
+        console.log("load successfully")
 
     }
     /**
@@ -91,12 +94,13 @@ export default class LevelScene extends ProjectScene {
         this.viewport.setZoomLevel(2);
         this.initLayers();
         // create screen first 
-        // this.initBlackScreen();
+        this.initBlackScreen();
         this.center = this.viewport.getHalfSize();
         // this.addBlackLabel(0, 100);
         this.initializePlayer();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
+        this.initLaserGun();
         // this.addLevelEndLabel();
         // this.addLevelEndLabel();
         // this.addLevelEndLabel();
@@ -165,11 +169,11 @@ export default class LevelScene extends ProjectScene {
             this.handleEvent(this.receiver.getNextEvent());
         }
         if(Input.isKeyJustPressed("escape")){
-           
             this.emitter.fireEvent(this.ButtonSelection.PAUSE)
         }
         this.updateLabel();
         this.isLevelEnd();
+        this.isPlayerAtItems();
     }
    
     /** Initializes the layers in the scene */
