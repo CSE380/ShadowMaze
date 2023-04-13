@@ -18,10 +18,9 @@ export default abstract class Item implements Unique, TargetableEntity {
 
     protected sprite: Sprite;
     protected emitter: Emitter;
-
     protected _inventory: Inventory | null;
     protected _targetable: TargetableEntity;
-
+    protected itemName:string;
     protected constructor(sprite: Sprite){ 
         this.sprite = sprite;
         this.emitter = new Emitter();
@@ -43,7 +42,8 @@ export default abstract class Item implements Unique, TargetableEntity {
     public get relativePosition(): Vec2 { return this.sprite.relativePosition; }
 
     public get id(): number { return this.sprite.id; }
-
+    public get name():string {return this.itemName};
+    public set name(name:string){ this.itemName = name}
     public get position(): Vec2 { return this.sprite.position; }
 
     public get visible(): boolean { return this.sprite.visible; }

@@ -8,7 +8,8 @@ import Inventory from "../../GameSystems/ItemSystem/Inventory";
 import Item from "../../GameSystems/ItemSystem/Item";
 import PlayerController from "./PlayerController";
 import { Idle, Shielding, Moving, Dead, PlayerStateType, Attacking } from "./PlayerStates/PlayerState";
-
+import { PlayerEvents } from "../../ProjectEvents";
+import Input from "../../../Wolfie2D/Input/Input";
 /**
  * The AI that controls the player. The players AI has been configured as a Finite State Machine (FSM)
  * with 4 states; Idle, Moving, shielding, and Dead.
@@ -36,12 +37,14 @@ export default class PlayerAI extends StateMachineAI implements AI {
         
         // Initialize the players state to Idle
         this.initialize(PlayerStateType.IDLE);
+        this.receiver.subscribe(PlayerEvents.FIRING_LASER);
     }
 
     public activate(options: Record<string, any>): void { }
 
     public update(deltaT: number): void {
         super.update(deltaT);
+        // if(Input.isKeyJustPressed(""))
     }
 
     public destroy(): void {}
@@ -51,6 +54,9 @@ export default class PlayerAI extends StateMachineAI implements AI {
             case ItemEvent.LASERGUN_FIRED: {
                 this.handleLaserFiredEvent(event.data.get("actorId"), event.data.get("to"), event.data.get("from"));
                 break;
+            }
+            case PlayerEvents.FIRING_LASER:{
+                console.log("laser");
             }
             default: {
                 super.handleEvent(event);
