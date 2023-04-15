@@ -73,4 +73,7 @@ dist/*
 
 !dist/builtin
 
-!dist/shadowMaze_assets/
+!dist/shadowMaze_assets
+
+!dist/images
+dist/bundle.js
