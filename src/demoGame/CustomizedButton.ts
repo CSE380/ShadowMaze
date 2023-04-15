@@ -14,7 +14,9 @@ export enum SelectMenuButtonEvent {
     LEVEL_5 = "CRINGE",
     LEVEL_6 = "FINAL BOSS",
 }
-
+export enum PauseButtonEvent {
+    PAUSE = "PAUSE",
+}
 export enum StartMenuButtonEvent {
     START_GAME="Start Game",
 }
@@ -23,7 +25,5 @@ export enum BackButtonEvent {
     BACK="BACK",
 }
 
-export enum PauseButtonEvent {
-    PAUSE="PAUSE",
-}
+
 

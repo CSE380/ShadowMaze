@@ -13,6 +13,7 @@ import HelpScene from "./HelpScene";
 import StartScene from "./StartScene";
 import ControlScene from "./ControlScene";
 import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
+import { GameLayers } from "../GameLayers";
 export default class MainMenu extends Scene {
     private mainMenuLayerName:"mainMenu";
     // Layers, for multiple main menu screens
@@ -28,8 +29,8 @@ export default class MainMenu extends Scene {
 
     public startScene(){
         const center = this.viewport.getCenter();
-        this.mainMenu = this.addUILayer(this.mainMenuLayerName);
-        this.backgroundImage = this.add.sprite(this.backgroundImageKey,this.mainMenuLayerName);
+        this.mainMenu = this.addUILayer(  GameLayers.BASE);
+        this.backgroundImage = this.add.sprite(this.backgroundImageKey,  GameLayers.BASE);
         this.backgroundImage.position.set(center.x, center.y);
         // The main menu
         let positionY=center.y - 400;
@@ -48,7 +49,7 @@ export default class MainMenu extends Scene {
     }
     public addButtons(options:Record<string, any>){
        
-        const newButton = <Label>this.add.uiElement(UIElementType.BUTTON, this.mainMenuLayerName, options);
+        const newButton = <Label>this.add.uiElement(UIElementType.BUTTON,  GameLayers.BASE, options);
         
         newButton.size.set(300, 50);
         newButton.borderWidth = 2;
@@ -68,7 +69,6 @@ export default class MainMenu extends Scene {
         console.log(event.type)
         switch(event.type) {
             case MainMenuButtonEvent.Select_levels: {
-              
                 this.sceneManager.changeToScene(SelectLevelMenuScene);
                 break;
             }

@@ -7,21 +7,23 @@ import GameEvent from "../../Wolfie2D/Events/GameEvent";
 import {  SelectMenuButtonEvent } from "../CustomizedButton";
 import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
 import IntroLevelScene from "./IntroLevelScene";
+import { GameLayers } from "../GameLayers";
+import AbstractScene from "./AbstractScene";
 export default class MainMenu extends Scene {
     private mainMenuLayerName="mainMenu";
     private backgroundImageKey="backgroundImage";
     private mainMenu: Layer;
     private backgroundImage: Sprite;
+    private GameLayers =GameLayers;
     public loadScene(){
         this.load.image(this.backgroundImageKey, "shadowMaze_assets/images/mazeBackground.jpg");
-
     }
 
     public startScene(){
-        this.mainMenu = this.addUILayer(this.mainMenuLayerName);
-        console.log(this.mainMenuLayerName)
+        this.mainMenu = this.addUILayer(  this.GameLayers.BASE);
+        console.log(  this.GameLayers.BASE)
         const center = this.viewport.getCenter();
-        this.backgroundImage = this.add.sprite(this.backgroundImageKey, this.mainMenuLayerName);
+        this.backgroundImage = this.add.sprite(this.backgroundImageKey,   this.GameLayers.BASE);
         console.log(this.backgroundImage)
         this.backgroundImage.position.set(center.x, center.y);
         // The main menu
@@ -46,7 +48,7 @@ export default class MainMenu extends Scene {
             position:new Vec2(x,y),
             text:SelectMenuButtonEvent[buttonName],
         }
-        const newButton = this.add.uiElement(UIElementType.BUTTON, this.mainMenuLayerName, options);
+        const newButton = this.add.uiElement(UIElementType.BUTTON,   this.GameLayers.BASE, options);
         newButton.size.set(300, 50);
         newButton.borderWidth = 2;
         newButton.borderColor = Color.WHITE;

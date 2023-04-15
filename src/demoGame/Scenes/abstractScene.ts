@@ -31,28 +31,25 @@ import BubbleShaderType from "../Shaders/BubbleShaderType";
 import LaserShaderType from "../Shaders/LaserShaderType";
 import Graphic from "../../Wolfie2D/Nodes/Graphic";
 import LaserBehavior from "../AI/LaserBehavior";
-import { MainMenuButtonEvent } from "../CustomizedButton";
+import { MainMenuButtonEvent,PauseButtonEvent } from "../CustomizedButton";
 import AABB from "../../Wolfie2D/DataTypes/Shapes/AABB";
 import PlayerAI from "../AI/Player/PlayerAI";
 import { GameItemsArray, GameItems } from "../GameItemsArray";
 import { PlayerInput } from "../AI/Player/PlayerController";
 import LaserGun from "../GameSystems/ItemSystem/Items/LaserGuns";
-export const GAMELayers = {
-    PRIMARY: "PRIMARY",
-    BACKGROUND: "BACKGROUND",
-    // UIlayer: "UIlayer",
-    UIlayer: "gameMenu"
-} as const;
-const ACTIONTYPE = {
-    PICK: "PICK",
-    USE: "USE",
-}
-export default abstract class ProjectScene extends Scene {
+import { ACTIONTYPE } from "../ActionType";
+import { GameLayers } from "../GameLayers";
 
+
+
+export default abstract class ProjectScene extends Scene {
+    //button event
+    protected PauseButtonEvent = PauseButtonEvent;
     protected wallSize: number;
     protected emptyString = "";
     protected action = "action";
     protected backgroundImage: Sprite;
+    protected GameLayers= GameLayers;
     //Level end
     protected center: Vec2;
     protected levelEndArea: Rect;
@@ -69,6 +66,7 @@ export default abstract class ProjectScene extends Scene {
     protected laserGuns: Array<gameItems>;
     private lasers: Array<Graphic>;
     protected door: Sprite
+    protected backgroundImageKey:string;
     //ui
     // Health labels
     protected healthLabel: Label;
@@ -97,20 +95,10 @@ export default abstract class ProjectScene extends Scene {
     //ui display
     protected currLabels: Array<Label>;
     protected nextLabels: Array<Label>;
-    protected mainMenuLayerName = "gameMenu";
-    protected backgroundImageKey: "backgroundImage";
-    protected gameMenu = "gameMenu";
-    protected pauseButtonLayer = "pauseButtonLayer";
-    protected pauseMenuLayer = "pauseMenuLayer";
-    protected emptyMenuLayer = "emptyMenuLayer";
-    protected controlTextLayer = "controlTextLayer";
-    protected helpTextLayer = "helpTextLayer";
-    protected layerNames = ["gameMenu", "pauseButtonLayer", "emptyMenuLayer", "pauseMenuLayer", "controlTextLayer", "helpTextLayer"];
-    protected UIlayer: "UIlayer";
+   
     //
     protected labelSize: number;
     protected isPauseMenuHidden: boolean;
-    protected ButtonSelection;
     // relative path to the assets
     protected pathToItems = `shadowMaze_assets/data/items/`;
     protected pathToSprite = `shadowMaze_assets/sprites/`;
@@ -124,38 +112,22 @@ export default abstract class ProjectScene extends Scene {
         });
         this.labelSize = 24;
         this.isPauseMenuHidden = true;
-        this.ButtonSelection = MainMenuButtonEvent;
-        for (const layerName of this.layerNames) {
-            this[layerName] = layerName;
-        }
-        this.init();
+        // this.ButtonSelection = MainMenuButtonEvent;
+        // for (const layerName of this.layerNames) {
+        //     this[layerName] = layerName;
+        // }
+       
+        
     }
-    protected init() {
+    protected initLevelScene() {
         this.center = this.getViewport().getCenter();
         this.initSubscribe();
         this.levelTransitionTimer = new Timer(500);
         this.levelEndTimer = new Timer(1000)
         this.isLevelEndEnetered = false;
+        this.initLayers();
         this.initUI();
-        this.loadScene();
     }
-    // protected initObjectPools(): void {
-    //     // Init bubble object pool
-
-
-    //     // Init the object pool of lasers
-    //     this.lasers = new Array(4);
-    //     for (let i = 0; i < this.lasers.length; i++) {
-    //       this.lasers[i] = this.add.graphic(GraphicType.RECT, this.mainMenuLayerName, {
-    //         position: Vec2.ZERO,
-    //         size: Vec2.ZERO,
-    //       });
-    //       this.lasers[i].useCustomShader(LaserShaderType.KEY);
-    //       this.lasers[i].color = Color.RED;
-    //       this.lasers[i].visible = false;
-    //       this.lasers[i].addAI(LaserBehavior, { src: Vec2.ZERO, dst: Vec2.ZERO });
-    //     }
-    //   }
     protected loadGameItems(key: string) {
         this.load.object(key, `${this.pathToItems}${key}.json`);
         this.load.image(key, `${this.pathToSprite}${key}.png`);
@@ -184,8 +156,8 @@ export default abstract class ProjectScene extends Scene {
             // console.log(this.load.getObject(key))
             const items = new Array<gameItems>(gameItem.position.length);
             for (let i = 0; i < items.length; i++) {
-                let sprite = this.add.sprite(key, this.mainMenuLayerName);
-                let line = <Line>this.add.graphic(GraphicType.LINE, this.mainMenuLayerName, { start: Vec2.ZERO, end: Vec2.ZERO });
+                let sprite = this.add.sprite(key,  this.GameLayers.BASE);
+                let line = <Line>this.add.graphic(GraphicType.LINE,   this.GameLayers.BASE, { start: Vec2.ZERO, end: Vec2.ZERO });
                 items[i] = gameItems.create(sprite, line);
                 items[i].position.set(gameItem.position[i][0], gameItem.position[i][1]);
                 items[i].name = key;
@@ -194,39 +166,14 @@ export default abstract class ProjectScene extends Scene {
         }
         this.loadGameItems("inventorySlot");
     }
-    // protected initLaserGun(key:string){
-    //     let gameItem = this.load.getObject(key);
-    //     this.laserGuns = new Array<gameItems>(gameItem.items.length);
-    //     for (let i = 0; i < gameItem.items.length; i++) {
-    //         let sprite = this.add.sprite(this.laserGunsKey, this.mainMenuLayerName);
-    //         let line = <Line>this.add.graphic(GraphicType.LINE,  this.mainMenuLayerName, {start: Vec2.ZERO, end: Vec2.ZERO});
-    //         this.laserGuns[i] = gameItems.create(sprite, line);
-
-    //         this.laserGuns[i].position.set(gameItem.position[i][0], gameItem.position[i][1]);
-    //     }
-    // }
+   
     public loadScene(): void {
         this.loadAllGameItems();
         // this.loadGameItems(this.laserGunsKey);
         this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince.json");
         // Load the tilemap
         this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
-        // this.load.object("door", "shadowMaze_assets/data/items/door.json");
-        // this.load.image("door", "shadowMaze_assets/sprites/door.png");
 
-        // this.initLaserGun();
-        // console.log("loaded")
-        // this.load.shader(
-        //     BubbleShaderType.KEY,
-        //     BubbleShaderType.VSHADER,
-        //     BubbleShaderType.FSHADER
-        //   );
-        //   // Load in the shader for laser.
-        //   this.load.shader(
-        //     LaserShaderType.KEY,
-        //     LaserShaderType.VSHADER,
-        //     LaserShaderType.FSHADER
-        //   );
     }
     protected buildLightShape() {
         const lightDistance = 1 * this.labelSize;
@@ -238,6 +185,7 @@ export default abstract class ProjectScene extends Scene {
 
     protected initSubscribe() {
         this.receiver.subscribe(PlayerEvents.PLAYER_ENTERED_LEVEL_END)
+        this.receiver.subscribe(PauseButtonEvent.PAUSE);
         this.initgameItemEventSubscribe();
     }
     protected initgameItemEventSubscribe() {
@@ -248,14 +196,13 @@ export default abstract class ProjectScene extends Scene {
     protected initUI(): void {
         // UILayer stuff
         // this.addUILayer(GAMELayers.UIlayer);
-        console.log("!23")
-        this.initLayers();
+      
 
         // HP Label
         let healthTextOption = {
             position: this.healthTextLablePosition,
             text: "   HP    ",
-            layerName: GAMELayers.UIlayer,
+            layerName:  this.GameLayers.BASE,
             fontSize: 24,
             backgroundColor: Color.TRANSPARENT,
             size: new Vec2(300, 30),
@@ -265,7 +212,7 @@ export default abstract class ProjectScene extends Scene {
         let energyTextOption = {
             position: this.energyTextLablePosition,
             text: "         ENERGY",
-            layerName: GAMELayers.UIlayer,
+            layerName:  this.GameLayers.BASE,
             fontSize: 24,
             backgroundColor: Color.TRANSPARENT,
             size: new Vec2(300, 30),
@@ -274,7 +221,7 @@ export default abstract class ProjectScene extends Scene {
         // HealthBar label
         this.healthBar = <Label>this.add.uiElement(
             UIElementType.LABEL,
-            GAMELayers.UIlayer,
+             this.GameLayers.BASE,
             {
                 position: this.healthLabelPosition,
                 text: "",
@@ -285,7 +232,7 @@ export default abstract class ProjectScene extends Scene {
         this.healthBar.backgroundColor = Color.GREEN;
 
         //energyBar
-        this.energyBar = <Label>this.add.uiElement(UIElementType.LABEL, GAMELayers.UIlayer, {
+        this.energyBar = <Label>this.add.uiElement(UIElementType.LABEL,   this.GameLayers.BASE, {
             position: this.energyBarLabelPosition,
             text: "",
         });
@@ -295,7 +242,7 @@ export default abstract class ProjectScene extends Scene {
         // // HealthBar Border
         this.healthBarBg = <Label>this.add.uiElement(
             UIElementType.LABEL,
-            GAMELayers.UIlayer,
+            this.GameLayers.BASE,
             {
                 position: this.healthLabelPosition,
                 text: "",
@@ -307,7 +254,7 @@ export default abstract class ProjectScene extends Scene {
         // energy Border
         this.energyBarBg = <Label>this.add.uiElement(
             UIElementType.LABEL,
-            GAMELayers.UIlayer,
+             this.GameLayers.BASE,
             {
                 position: this.energyBarLabelPosition,
                 text: "",
@@ -317,7 +264,7 @@ export default abstract class ProjectScene extends Scene {
         this.energyBarBg.borderColor = Color.BLACK;
     }
     protected addLabel(option: Record<string, any>) {
-        const newTextLabel = <Label>this.add.uiElement(UIElementType.LABEL, option.layerName || this.mainMenuLayerName, option);
+        const newTextLabel = <Label>this.add.uiElement(UIElementType.LABEL, option.layerName ||   this.GameLayers.BASE, option);
         if (option.size)
             newTextLabel.size.set(option.size.x, option.size.y);
         else
@@ -338,7 +285,7 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected initializeLevelEnds() {
-        this.levelEndArea = <Rect>this.add.graphic(GraphicType.RECT, this.mainMenuLayerName, { position: this.levelEndPosition, size: this.levelEndHalfSize });
+        this.levelEndArea = <Rect>this.add.graphic(GraphicType.RECT,   this.GameLayers.BASE, { position: this.levelEndPosition, size: this.levelEndHalfSize });
         this.levelEndArea.addPhysics(undefined, undefined, false, true);
         // this.levelEndArea.setTrigger(PhysicsGroups.PLAYER, PlayerEvents.PLAYER_ENTERED_LEVEL_END, null);
         // this.levelEndArea.setTrigger(HW3PhysicsGroups.PLAYER, HW3Events.PLAYER_ENTERED_LEVEL_END, null);
@@ -346,7 +293,7 @@ export default abstract class ProjectScene extends Scene {
 
     }
     protected addLevelEndLabel() {
-        this.levelEndLabel = <Label>this.add.uiElement(UIElementType.LABEL, this.UIlayer, { position: new Vec2(500, 100), text: "Level Complete" });
+        this.levelEndLabel = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.UI, { position: new Vec2(500, 100), text: "Level Complete" });
         this.levelEndLabel.size.set(1500, 60);
         this.levelEndLabel.borderRadius = 0;
         this.levelEndLabel.backgroundColor = new Color(34, 32, 52);
@@ -370,7 +317,7 @@ export default abstract class ProjectScene extends Scene {
         });
     }
     protected addButtons(option: Record<string, any>) {
-        const newButton = <Label>this.add.uiElement(UIElementType.BUTTON, option.layerName || this.mainMenuLayerName, option);
+        const newButton = <Label>this.add.uiElement(UIElementType.BUTTON, option.layerName ||   this.GameLayers.BASE, option);
         newButton.size.set(50, 50);
         if (option.size) newButton.size.set(option.size.x, option.size.y);
         newButton.borderWidth = 0;
@@ -428,7 +375,7 @@ export default abstract class ProjectScene extends Scene {
             this.handleEvent(gameEvent);
         }
         if (Input.isKeyJustPressed("escape")) {
-            this.emitter.fireEvent(this.ButtonSelection.PAUSE)
+            this.emitter.fireEvent(PauseButtonEvent.PAUSE);
         }
         this.updateLabel();
         this.isLevelEnd();
@@ -497,8 +444,6 @@ export default abstract class ProjectScene extends Scene {
                     // gameItem.position.set(key[0],key[1]);
                     gameItem.position.set(256, 40);
                     postionEventMap.set(key, event.type);
-
-
                     return;
                 }
             }
@@ -528,7 +473,7 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     public addBlackLabel(options: Record<string, any>) {
-        const label = <Label>this.add.uiElement(UIElementType.LABEL, this.gameMenu, options);
+        const label = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.FOG_OF_WAR, options);
         label.size.set(this.labelSize * 2, this.labelSize * 2);
         label.borderWidth = 0;
         label.borderRadius = 0;
@@ -568,17 +513,14 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected initLayers(): void {
-
-        for (let i = 0; i < this.layerNames.length; i++) {
-            const layerName = this.layerNames[i];
-            this.addLayer(this[layerName], i);
+        let depth = 0;
+        for (const layer in GameLayers) {
+            this.addLayer(layer,depth);
+            depth++;
         }
-        // this.getLayer(this.pauseButtonLayerName).setDepth(1);
-        // this.getLayer(this.emptyMenuLayerName).setDepth(2);
-        // this.getLayer(this.pauseMenuLayerName).setDepth(3);
-        // this.addLayer(this.UIlayer, 10);
-        this.getLayer(this.emptyMenuLayer).setHidden(this.isPauseMenuHidden);
-        this.getLayer(this.pauseMenuLayer).setHidden(this.isPauseMenuHidden);
+        this.showPauseMenu(this.isPauseMenuHidden);
+        // this.getLayer(GameLayers.CONTAINER).setHidden(this.isPauseMenuHidden);
+        // this.getLayer(GameLayers.PAUSE_MENU).setHidden(this.isPauseMenuHidden);
     }
     protected handleHealthChange(currentHealth: number, maxHealth: number): void {
         let unit = this.healthBarBg.size.x / maxHealth;
@@ -600,25 +542,14 @@ export default abstract class ProjectScene extends Scene {
                     : Color.GREEN;
     }
     protected showPauseMenu(flag: boolean): void {
-        this.getLayer(this.emptyMenuLayer).setHidden(flag);
-        this.getLayer(this.pauseMenuLayer).setHidden(flag);
+        this.getLayer(GameLayers.CONTAINER).setHidden(flag);
+        this.getLayer(GameLayers.PAUSE_MENU).setHidden(flag);
     }
     protected isPlayerAtItems() {
-
-        // this.laserGuns.forEach(laser=>{
-        //     if(laser.visible  && laser.position.distanceTo(this.player.position)<10){
-        //         console.log("got items");
-
-        //         laser.visible = false;
-        //         this.lightDuration = true;
-        //     }
-        // })
         for (const gameItems of this.gameItemsMap.values()) {
-            // console.log(value);
             gameItems.forEach(gameItem => {
                 if (gameItem.visible && gameItem.position.distanceTo(this.player.position) < 10) {
                     // gameItem.visible = false;
-
                     this.emitter.fireEvent(gameItem.name, { action: ACTIONTYPE.PICK, gameItem: gameItem });
                 }
             })
@@ -626,13 +557,12 @@ export default abstract class ProjectScene extends Scene {
     }
     protected displayVec2(position: Vec2) {
         console.log(position.x + "      " + position.y)
-
     }
     /**
      * Initializes the player in the scene
      */
     protected initPlayer(): void {
-        let player = this.add.animatedSprite(PlayerActor, "prince", this.gameMenu);
+        let player = this.add.animatedSprite(PlayerActor, "prince",  this.GameLayers.BASE);
         this.player = player
         player.position.set(this.playerInitPosition.x, this.playerInitPosition.y);
         player.battleGroup = 2;
@@ -658,7 +588,7 @@ export default abstract class ProjectScene extends Scene {
         let controlTextOption = {
             position: this.viewport.getCenter(),
             margin: 40,
-            layerName: this.controlTextLayer
+            layerName:  GameLayers.PAUSE_MENU
         }
         this.addControlTextLayer(controlTextOption)
     }
@@ -666,25 +596,25 @@ export default abstract class ProjectScene extends Scene {
         let helpTextOption = {
             position: new Vec2(450, 450),
             margin: 40,
-            layerName: this.helpTextLayer,
+            layerName:  GameLayers.PAUSE_MENU
         }
         this.addHelpTextLayer(helpTextOption)
     }
     public initPauseMenuLayer() {
         const pauseSign = "\u23F8";
-        let buttonOption = {
+        let pauseSignbuttonOption = {
             position: new Vec2(475, 20),
             text: pauseSign,
-            layerName: this.pauseButtonLayer,
-            buttName: this.ButtonSelection.PAUSE,
+            layerName: GameLayers.UI,
+            buttName: "Pause",
             backgroundColor: Color.TRANSPARENT,
         }
-        this.addButtons(buttonOption);
+        this.addButtons(pauseSignbuttonOption);
         let emptyMenuOption = {
             position: this.center,
             text: "",
             size: new Vec2(300, 450),
-            layerName: this.emptyMenuLayer,
+            layerName:  GameLayers.CONTAINER,
             backgroundColor: Color.WHITE,
         }
         this.addLabel(emptyMenuOption);
@@ -692,19 +622,20 @@ export default abstract class ProjectScene extends Scene {
             position: new Vec2(this.center.x, this.center.y - 100),
             text: "Paused",
             size: new Vec2(100, 30),
-            layerName: this.pauseMenuLayer,
+            layerName: GameLayers.PAUSE_MENU,
             backgroundColor: Color.WHITE,
             textColor: Color.BLACK,
         }
         this.addLabel(pauseTextOption);
         let positionY = this.center.y - 60;
-        for (let buttonName in this.ButtonSelection) {
+        // console.log(this.getLayer())
+        for (let buttonName in MainMenuButtonEvent) {
             if (buttonName == "Select_levels")
                 buttonName = "Select levels"
             let buttonOption1 = {
                 position: new Vec2(this.center.x, positionY),
                 text: buttonName,
-                layerName: this.pauseMenuLayer,
+                layerName: GameLayers.PAUSE_MENU,
                 buttonName: buttonName,
                 backgroundColor: Color.PURPLE,
                 size: new Vec2(300, 50),

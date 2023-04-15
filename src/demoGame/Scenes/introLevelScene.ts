@@ -35,10 +35,9 @@ import ProjectScene from "./AbstractScene";
 import ControlScene from "./ControlScene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import { UIElementType } from "../../Wolfie2D/Nodes/UIElements/UIElementTypes";
-import { MainMenuButtonEvent } from "../CustomizedButton";
+import { MainMenuButtonEvent, PauseButtonEvent } from "../CustomizedButton";
 import Input from "../../Wolfie2D/Input/Input";
 import { controlTextArray, helpTextArray } from "../Text";
-import { layerNameArray } from "../LayerName";
 import { PhysicsGroups } from "../PhysicsGroups";
 import { PlayerEvents } from "../ProjectEvents";
 
@@ -68,6 +67,7 @@ export default class IntroLevelScene extends ProjectScene {
 
         //laser gun
         this.loadAllGameItems();
+        this.initLevelScene();
         // this.loadGameItems(this.laserGunsKey);
         this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince.json");
         // Load the tilemap
@@ -109,7 +109,6 @@ export default class IntroLevelScene extends ProjectScene {
         //     }
         // }
        
-        // this.addBlackLabel()
         // this.initializePlayer();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
@@ -134,9 +133,9 @@ export default class IntroLevelScene extends ProjectScene {
         // console.log("receive type")
         console.log(event.type)
         switch (event.type) {
-            case this.ButtonSelection.PAUSE: {
+            case PauseButtonEvent.PAUSE: {
+                console.log("ready to pause")
                 this.isPauseMenuHidden = !this.isPauseMenuHidden;
-
                 // this.sceneManager.changeToScene(MainMenu);
                 this.showPauseMenu(this.isPauseMenuHidden);
                 break;

@@ -58,6 +58,7 @@ import RegistryManager from "./Wolfie2D/Registry/RegistryManager";
     // game.start(HelpScene, {});
     // game.start(ControlScene,{});
     // game.start(StartScene, {});
+
 })();
 
 function runTests() { };
