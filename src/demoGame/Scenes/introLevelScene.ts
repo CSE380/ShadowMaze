@@ -42,14 +42,12 @@ import { layerNameArray } from "../LayerName";
 import { PhysicsGroups } from "../PhysicsGroups";
 import { PlayerEvents } from "../ProjectEvents";
 
-enum PauseMenuState {
-    Hidden,
-    Visible,
-    ControlsText,
-    HelpText,
+const ACTIONTYPE = {
+    PICK: "PICK",
+    USE: "USE",
 }
 
-export default class LevelScene extends ProjectScene {
+export default class IntroLevelScene extends ProjectScene {
 
     /** GameSystems in the HW4 Scene */
 
@@ -91,9 +89,12 @@ export default class LevelScene extends ProjectScene {
         let tilemapSize: Vec2 = this.walls.size;
         this.viewport.setBounds(0, 0, tilemapSize.x, tilemapSize.y);
         this.viewport.setZoomLevel(2);
-        this.initLayers();
+        // this.initLayers();
+        this.initPlayer()
+        this.initInventorySlotsMap();
+        // this.initUI();
         // create screen first 
-        this.initBlackScreen();
+        // this.initBlackScreen();
         this.center = this.viewport.getHalfSize();
         // for(let i =0;i<5;i++){
         //     for(let j =0;j<5;j++){
@@ -109,12 +110,12 @@ export default class LevelScene extends ProjectScene {
         // }
        
         // this.addBlackLabel()
-        this.initializePlayer();
+        // this.initializePlayer();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
-        this.initAllGameItems()
-        console.log()
-        this.isPlayerAtItems();
+        this.initAllGameItems();
+       
+        // this.initInventorySlotsMap();
         // this.initLaserGun();
         // this.addLevelEndLabel();
         // this.addLevelEndLabel();
@@ -141,7 +142,7 @@ export default class LevelScene extends ProjectScene {
                 break;
             }
             case MainMenuButtonEvent.Restart: {
-                this.sceneManager.changeToScene(LevelScene);
+                this.sceneManager.changeToScene(IntroLevelScene);
                 break;
             }
             case MainMenuButtonEvent.Select_levels: {
@@ -178,7 +179,10 @@ export default class LevelScene extends ProjectScene {
 
             }
         }
-        this.handleGameItemsEvent(event);
+        if (event.data.get(this.action) == ACTIONTYPE.PICK)
+            this.handlePickGameItemsEvent(event);
+        if (event.data.get(this.action) == ACTIONTYPE.USE)
+            this.handleUseGameItemsEvent(event);
     }
     // public override updateScene(){
     //     while (this.receiver.hasNextEvent()) {

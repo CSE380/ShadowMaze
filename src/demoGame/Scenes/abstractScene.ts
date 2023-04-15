@@ -36,15 +36,22 @@ import AABB from "../../Wolfie2D/DataTypes/Shapes/AABB";
 import PlayerAI from "../AI/Player/PlayerAI";
 import { GameItemsArray, GameItems } from "../GameItemsArray";
 import { PlayerInput } from "../AI/Player/PlayerController";
+import LaserGun from "../GameSystems/ItemSystem/Items/LaserGuns";
 export const GAMELayers = {
     PRIMARY: "PRIMARY",
     BACKGROUND: "BACKGROUND",
-    UIlayer: "UIlayer",
+    // UIlayer: "UIlayer",
+    UIlayer: "gameMenu"
 } as const;
+const ACTIONTYPE = {
+    PICK: "PICK",
+    USE: "USE",
+}
 export default abstract class ProjectScene extends Scene {
 
     protected wallSize: number;
-
+    protected emptyString = "";
+    protected action = "action";
     protected backgroundImage: Sprite;
     //Level end
     protected center: Vec2;
@@ -73,11 +80,11 @@ export default abstract class ProjectScene extends Scene {
     protected energyBarBg: Label;
     protected textInitPositionX = 12;
     protected textInitPositionY = 15;
-    protected offSet=65;
-    protected healthTextLablePosition = new Vec2(this.textInitPositionX, this.textInitPositionY *1);
-    protected healthLabelPosition =     new Vec2(this.textInitPositionX+this.offSet, this.textInitPositionY *2);
-    protected energyTextLablePosition = new Vec2(this.textInitPositionX, this.textInitPositionY *3);
-    protected energyBarLabelPosition =  new Vec2(this.textInitPositionX+this.offSet, this.textInitPositionY *4);
+    protected offSet = 65;
+    protected healthTextLablePosition = new Vec2(this.textInitPositionX, this.textInitPositionY * 1);
+    protected healthLabelPosition = new Vec2(this.textInitPositionX + this.offSet, this.textInitPositionY * 2);
+    protected energyTextLablePosition = new Vec2(this.textInitPositionX, this.textInitPositionY * 3);
+    protected energyBarLabelPosition = new Vec2(this.textInitPositionX + this.offSet, this.textInitPositionY * 4);
 
     //items to game 
     protected gameItemsArray = GameItemsArray;
@@ -85,6 +92,8 @@ export default abstract class ProjectScene extends Scene {
     protected laserGunsKey = "laserGuns";
     protected lightShape: AABB;
     protected lightDuration: boolean;
+    protected inventorySlotsMap = new Map<number, Map<Vec2, string>>();
+    // protected test = new Map<number,Vec2>()
     //ui display
     protected currLabels: Array<Label>;
     protected nextLabels: Array<Label>;
@@ -114,7 +123,6 @@ export default abstract class ProjectScene extends Scene {
             }
         });
         this.labelSize = 24;
-
         this.isPauseMenuHidden = true;
         this.ButtonSelection = MainMenuButtonEvent;
         for (const layerName of this.layerNames) {
@@ -159,9 +167,20 @@ export default abstract class ProjectScene extends Scene {
         }
 
     }
+    protected initInventorySlotsMap() {
+        const inventorySlotsPosition = this.load.getObject(GameItems.INVENTORYSLOT)
+        let i = 1;
+        for (let position of inventorySlotsPosition.position) {
+            const postionEventMap = new Map<Vec2, string>();
+            postionEventMap.set(position, this.emptyString);
+            this.inventorySlotsMap.set(i, postionEventMap);
+            i++;
+        }
+    }
     protected initAllGameItems() {
         for (let key of this.gameItemsArray) {
             let gameItem = this.load.getObject(key);
+            console.log(gameItem);
             // console.log(this.load.getObject(key))
             const items = new Array<gameItems>(gameItem.position.length);
             for (let i = 0; i < items.length; i++) {
@@ -173,6 +192,7 @@ export default abstract class ProjectScene extends Scene {
             }
             this.gameItemsMap.set(key, items);
         }
+        this.loadGameItems("inventorySlot");
     }
     // protected initLaserGun(key:string){
     //     let gameItem = this.load.getObject(key);
@@ -215,12 +235,7 @@ export default abstract class ProjectScene extends Scene {
         return this.lightShape;
     }
 
-    // public getMoveDir(): Vec2 { 
-    //     let dir: Vec2 = Vec2.ZERO;
-    //     dir.y = (Input.isPressed(PlayerInput.MOVE_UP) ? -1 : 0) + (Input.isPressed(PlayerInput.MOVE_DOWN) ? 1 : 0);
-    // 	dir.x = (Input.isPressed(PlayerInput.MOVE_LEFT) ? -1 : 0) + (Input.isPressed(PlayerInput.MOVE_RIGHT) ? 1 : 0);
-    //     return dir.normalize();
-    // }
+
     protected initSubscribe() {
         this.receiver.subscribe(PlayerEvents.PLAYER_ENTERED_LEVEL_END)
         this.initgameItemEventSubscribe();
@@ -232,7 +247,9 @@ export default abstract class ProjectScene extends Scene {
     }
     protected initUI(): void {
         // UILayer stuff
-        this.addUILayer(GAMELayers.UIlayer);
+        // this.addUILayer(GAMELayers.UIlayer);
+        console.log("!23")
+        this.initLayers();
 
         // HP Label
         let healthTextOption = {
@@ -241,7 +258,7 @@ export default abstract class ProjectScene extends Scene {
             layerName: GAMELayers.UIlayer,
             fontSize: 24,
             backgroundColor: Color.TRANSPARENT,
-            size:new Vec2(300, 30),
+            size: new Vec2(300, 30),
         }
         this.addLabel(healthTextOption);
         // energy text Label
@@ -251,7 +268,7 @@ export default abstract class ProjectScene extends Scene {
             layerName: GAMELayers.UIlayer,
             fontSize: 24,
             backgroundColor: Color.TRANSPARENT,
-            size:new Vec2(300, 30),
+            size: new Vec2(300, 30),
         }
         this.addLabel(energyTextOption);
         // HealthBar label
@@ -276,28 +293,28 @@ export default abstract class ProjectScene extends Scene {
         this.energyBar.backgroundColor = Color.CYAN;
 
         // // HealthBar Border
-        // this.healthBarBg = <Label>this.add.uiElement(
-        //     UIElementType.LABEL,
-        //     GAMELayers.UIlayer,
-        //     {
-        //         position: new Vec2(225, 50),
-        //         text: "",
-        //     }
-        // );
-        // this.healthBarBg.size = new Vec2(300, 25);
-        // this.healthBarBg.borderColor = Color.BLACK;
+        this.healthBarBg = <Label>this.add.uiElement(
+            UIElementType.LABEL,
+            GAMELayers.UIlayer,
+            {
+                position: this.healthLabelPosition,
+                text: "",
+            }
+        );
+        this.healthBarBg.size = new Vec2(300, 25);
+        this.healthBarBg.borderColor = Color.BLACK;
 
-        // AirBar Border
-        // this.energyBarBg = <Label>this.add.uiElement(
-        //     UIElementType.LABEL,
-        //     GAMELayers.UIlayer,
-        //     {
-        //         position: new Vec2(225, 100),
-        //         text: "",
-        //     }
-        // );
-        // this.energyBarBg.size = new Vec2(300, 25);
-        // this.energyBarBg.borderColor = Color.BLACK;
+        // energy Border
+        this.energyBarBg = <Label>this.add.uiElement(
+            UIElementType.LABEL,
+            GAMELayers.UIlayer,
+            {
+                position: this.energyBarLabelPosition,
+                text: "",
+            }
+        );
+        this.energyBarBg.size = new Vec2(300, 25);
+        this.energyBarBg.borderColor = Color.BLACK;
     }
     protected addLabel(option: Record<string, any>) {
         const newTextLabel = <Label>this.add.uiElement(UIElementType.LABEL, option.layerName || this.mainMenuLayerName, option);
@@ -321,7 +338,6 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected initializeLevelEnds() {
-
         this.levelEndArea = <Rect>this.add.graphic(GraphicType.RECT, this.mainMenuLayerName, { position: this.levelEndPosition, size: this.levelEndHalfSize });
         this.levelEndArea.addPhysics(undefined, undefined, false, true);
         // this.levelEndArea.setTrigger(PhysicsGroups.PLAYER, PlayerEvents.PLAYER_ENTERED_LEVEL_END, null);
@@ -381,8 +397,6 @@ export default abstract class ProjectScene extends Scene {
             this.addLabel(textOption);
         }
     }
-
-
     protected addBackButon(position: Vec2) {
         const leftArrow = '\u2190';
         let buttonOption = {
@@ -435,26 +449,13 @@ export default abstract class ProjectScene extends Scene {
                 this.sceneManager.changeToScene(MainMenu);
                 break;
             }
-
-            // case gameItemsArray[]
-            // case PlayerEvents.PLAYER_ENTERED_LEVEL_END:{
-            //     console.log("levelend")
-            //     this.handleEnteredLevelEnd();
-            //     // this.viewport.setZoomLevel(1);
-            //     // this.sceneManager.changeToScene(SelectLevelMenuScene);
-            // }
-            // case PlayerEvents.LEVEL_END:{
-            //     console.log("level finished")
-
-            // }
         }
-        this.handleGameItemsEvent(event);
+        
     }
-    protected handleGameItemsEvent(event: GameEvent) {
-        console.log(event.type)
+    protected handleUseGameItemsEvent(event: GameEvent) {
         switch (event.type) {
             case GameItems.LASER_GUNS: {
-                this.lightDuration = !this.lightDuration;
+                // this.lightDuration = !this.lightDuration;
                 break;
             }
             case GameItems.DOOR: {
@@ -462,6 +463,44 @@ export default abstract class ProjectScene extends Scene {
             }
             case GameItems.HEALTH_PACKS: {
 
+            }
+        }
+    }
+    protected handlePickGameItemsEvent(event: GameEvent) {
+        this.putItemToInventory(event)
+        console.log(this.inventorySlotsMap)
+        switch (event.type) {
+            case GameItems.LASER_GUNS: {
+                // this.lightDuration = !this.lightDuration;
+                console.log(this.gameItemsMap);
+                break;
+            }
+            case GameItems.DOOR: {
+                this.showLevelEndPosition();
+            }
+            case GameItems.HEALTH_PACKS: {
+
+            }
+        }
+    }
+    protected putItemToInventory(event: GameEvent) {
+        // console.log(this.inventorySlotsMap)
+        // console.log(this.gameItemsMap.get(event.type));
+
+        const gameItem = <LaserGun>event.data.get("gameItem");
+
+        for (let postionEventMap of Array.from(this.inventorySlotsMap.values())) {
+            for (const [key, value] of postionEventMap) {
+                console.log(postionEventMap)
+                if (value === this.emptyString) {
+                    this.displayVec2(key)
+                    // gameItem.position.set(key[0],key[1]);
+                    gameItem.position.set(256, 40);
+                    postionEventMap.set(key, event.type);
+
+
+                    return;
+                }
             }
         }
     }
@@ -529,6 +568,7 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected initLayers(): void {
+
         for (let i = 0; i < this.layerNames.length; i++) {
             const layerName = this.layerNames[i];
             this.addLayer(this[layerName], i);
@@ -542,23 +582,23 @@ export default abstract class ProjectScene extends Scene {
     }
     protected handleHealthChange(currentHealth: number, maxHealth: number): void {
         let unit = this.healthBarBg.size.x / maxHealth;
-    
+
         this.healthBar.size.set(
-          this.healthBarBg.size.x - unit * (maxHealth - currentHealth),
-          this.healthBarBg.size.y
+            this.healthBarBg.size.x - unit * (maxHealth - currentHealth),
+            this.healthBarBg.size.y
         );
         this.healthBar.position.set(
-          this.healthBarBg.position.x - (unit / 2) * (maxHealth - currentHealth),
-          this.healthBarBg.position.y
+            this.healthBarBg.position.x - (unit / 2) * (maxHealth - currentHealth),
+            this.healthBarBg.position.y
         );
-    
+
         this.healthBar.backgroundColor =
-          currentHealth < (maxHealth * 1) / 4
-            ? Color.RED
-            : currentHealth < (maxHealth * 3) / 4
-            ? Color.YELLOW
-            : Color.GREEN;
-      }
+            currentHealth < (maxHealth * 1) / 4
+                ? Color.RED
+                : currentHealth < (maxHealth * 3) / 4
+                    ? Color.YELLOW
+                    : Color.GREEN;
+    }
     protected showPauseMenu(flag: boolean): void {
         this.getLayer(this.emptyMenuLayer).setHidden(flag);
         this.getLayer(this.pauseMenuLayer).setHidden(flag);
@@ -577,8 +617,9 @@ export default abstract class ProjectScene extends Scene {
             // console.log(value);
             gameItems.forEach(gameItem => {
                 if (gameItem.visible && gameItem.position.distanceTo(this.player.position) < 10) {
-                    gameItem.visible = false;
-                    this.emitter.fireEvent(gameItem.name);
+                    // gameItem.visible = false;
+
+                    this.emitter.fireEvent(gameItem.name, { action: ACTIONTYPE.PICK, gameItem: gameItem });
                 }
             })
         }
@@ -590,7 +631,7 @@ export default abstract class ProjectScene extends Scene {
     /**
      * Initializes the player in the scene
      */
-    protected initializePlayer(): void {
+    protected initPlayer(): void {
         let player = this.add.animatedSprite(PlayerActor, "prince", this.gameMenu);
         this.player = player
         player.position.set(this.playerInitPosition.x, this.playerInitPosition.y);
