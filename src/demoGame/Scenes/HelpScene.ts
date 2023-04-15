@@ -39,7 +39,7 @@ export default class HelpScene extends HW4Scene {
             backgroundColor: Color.TRANSPARENT,
             fontSize: 31,
         }
-        this.addText(textOption);
+        this.addLabel(textOption);
         this.addHelpTextLayer(helpTextOption);
         this.addBackButon(center);
     }

@@ -37,7 +37,7 @@ export default class StartScene extends HW4Scene {
             backgroundColor: Color.TRANSPARENT,
             font: "Apple Chancery",
         }
-        this.addText(textOption);
+        this.addLabel(textOption);
         let buttonOption = {
             position: new Vec2(center.x, center.y + 100),
             text: StartMenuButtonEvent.START_GAME,

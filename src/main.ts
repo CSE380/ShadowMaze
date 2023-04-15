@@ -11,7 +11,6 @@ import SelectLevelMenuScene from "./demoGame/Scenes/SelectLevelMenuScene";
 import BubbleShaderType from "./demoGame/Shaders/BubbleShaderType";
 import LaserShaderType from "./demoGame/Shaders/LaserShaderType";
 import RegistryManager from "./Wolfie2D/Registry/RegistryManager";
-
 // The main function is your entrypoint into Wolfie2D. Specify your first scene and any options here.
 (function main() {
     // Run any tests

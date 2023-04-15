@@ -35,9 +35,9 @@ import ProjectScene from "./AbstractScene";
 import ControlScene from "./ControlScene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import { UIElementType } from "../../Wolfie2D/Nodes/UIElements/UIElementTypes";
-import {MainMenuButtonEvent } from "../CustomizedButton";
+import { MainMenuButtonEvent } from "../CustomizedButton";
 import Input from "../../Wolfie2D/Input/Input";
-import { controlTextArray,helpTextArray } from "../Text";
+import { controlTextArray, helpTextArray } from "../Text";
 import { layerNameArray } from "../LayerName";
 import { PhysicsGroups } from "../PhysicsGroups";
 import { PlayerEvents } from "../ProjectEvents";
@@ -52,28 +52,30 @@ enum PauseMenuState {
 export default class LevelScene extends ProjectScene {
 
     /** GameSystems in the HW4 Scene */
-    
-    
+
+
     // The wall layer of the tilemap
     private walls: OrthogonalTilemap;
     // The position graph for the navmesh
-   
-  
-    
-   
+
+
+
+
 
     /**
      * @see Scene.update()
      */
-    // public override loadScene() {
-    //     // Load the player and enemy spritesheets
-       
-    //     //laser gun
-    //     this.load.object("laserguns", "shadowMaze_assets/data/items/laserguns.json");
-    //     this.load.image("laserGun", "  shadowMaze_assets/sprites/laserGun.png");
-    //     console.log("load successfully")
+    public override loadScene() {
+        // Load the player and enemy spritesheets
 
-    // }
+        //laser gun
+        this.loadAllGameItems();
+        // this.loadGameItems(this.laserGunsKey);
+        this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince.json");
+        // Load the tilemap
+        this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
+
+    }
     /**
      * @see Scene.startScene
      */
@@ -93,7 +95,20 @@ export default class LevelScene extends ProjectScene {
         // create screen first 
         this.initBlackScreen();
         this.center = this.viewport.getHalfSize();
-        // this.addBlackLabel(0, 100);
+        // for(let i =0;i<5;i++){
+        //     for(let j =0;j<5;j++){
+        //         let x = (i )* 0.5*this.labelSize;
+        //         let y = (j ) * 0.5*this.labelSize;
+        //         // let y=0;
+        //         let options = {
+        //             position: new Vec2(x, y),
+        //             text: "",
+        //         }
+        //         this.addBlackLabel(options);
+        //     }
+        // }
+       
+        // this.addBlackLabel()
         this.initializePlayer();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
@@ -107,12 +122,12 @@ export default class LevelScene extends ProjectScene {
         // this.initControlTextLayer();
         // this.initHelpTextLayer();
     }
-    
-   
+
+
     /**
      * @see Scene.updateScene
      */
-  
+
 
     public handleEvent(event: GameEvent): void {
         // console.log("receive type")
@@ -120,7 +135,7 @@ export default class LevelScene extends ProjectScene {
         switch (event.type) {
             case this.ButtonSelection.PAUSE: {
                 this.isPauseMenuHidden = !this.isPauseMenuHidden;
-               
+
                 // this.sceneManager.changeToScene(MainMenu);
                 this.showPauseMenu(this.isPauseMenuHidden);
                 break;
@@ -144,23 +159,23 @@ export default class LevelScene extends ProjectScene {
                 this.sceneManager.changeToScene(HelpScene);
                 break;
             }
-            case MainMenuButtonEvent.Exit:{
+            case MainMenuButtonEvent.Exit: {
                 this.viewport.setZoomLevel(1);
                 this.sceneManager.changeToScene(StartScene);
                 break;
             }
-            case PlayerEvents.PLAYER_ENTERED_LEVEL_END:{
+            case PlayerEvents.PLAYER_ENTERED_LEVEL_END: {
                 console.log("levelend")
                 this.handleEnteredLevelEnd();
                 // this.viewport.setZoomLevel(1);
                 // this.sceneManager.changeToScene(SelectLevelMenuScene);
             }
-            case PlayerEvents.LEVEL_END:{
-                setTimeout(()=>{
+            case PlayerEvents.LEVEL_END: {
+                setTimeout(() => {
                     this.viewport.setZoomLevel(1);
                     this.sceneManager.changeToScene(SelectLevelMenuScene);
-                },2000)
-               
+                }, 2000)
+
             }
         }
         this.handleGameItemsEvent(event);
@@ -169,11 +184,11 @@ export default class LevelScene extends ProjectScene {
     //     while (this.receiver.hasNextEvent()) {
     //         this.handleEvent(this.receiver.getNextEvent());
     //     }
-        
+
     // }
-   
+
     /** Initializes the layers in the scene */
-   
- 
-   
+
+
+
 }

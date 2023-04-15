@@ -42,7 +42,7 @@ export default class ControlScene extends HW4Scene {
             backgroundColor:Color.TRANSPARENT,
             fontSize:50,
         }
-        this.addText(textOption);
+        this.addLabel(textOption);
         let controlTextOption = {
             position: center,
             text: controlTextArray,
