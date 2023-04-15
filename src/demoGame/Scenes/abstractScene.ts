@@ -152,19 +152,26 @@ export default abstract class ProjectScene extends Scene {
     protected initAllGameItems() {
         for (let key of this.gameItemsArray) {
             let gameItem = this.load.getObject(key);
-            console.log(gameItem);
+            console.log(key)
             // console.log(this.load.getObject(key))
             const items = new Array<gameItems>(gameItem.position.length);
             for (let i = 0; i < items.length; i++) {
-                let sprite = this.add.sprite(key,  this.GameLayers.BASE);
-                let line = <Line>this.add.graphic(GraphicType.LINE,   this.GameLayers.BASE, { start: Vec2.ZERO, end: Vec2.ZERO });
+                let sprite, line;
+                if(key === "inventorySlot"){
+                    sprite = this.add.sprite(key,  this.GameLayers.BEFORE_BASE);
+                    line = <Line>this.add.graphic(GraphicType.LINE,   this.GameLayers.BEFORE_BASE, { start: Vec2.ZERO, end: Vec2.ZERO });
+                }
+                else{
+                    sprite = this.add.sprite(key,  this.GameLayers.BASE);
+                    line = <Line>this.add.graphic(GraphicType.LINE,   this.GameLayers.BASE, { start: Vec2.ZERO, end: Vec2.ZERO });
+                }
                 items[i] = gameItems.create(sprite, line);
                 items[i].position.set(gameItem.position[i][0], gameItem.position[i][1]);
                 items[i].name = key;
             }
             this.gameItemsMap.set(key, items);
         }
-        this.loadGameItems("inventorySlot");
+        // this.loadGameItems("inventorySlot");
     }
    
     public loadScene(): void {
@@ -415,7 +422,6 @@ export default abstract class ProjectScene extends Scene {
     }
     protected handlePickGameItemsEvent(event: GameEvent) {
         this.putItemToInventory(event)
-        console.log(this.inventorySlotsMap)
         switch (event.type) {
             case GameItems.LASER_GUNS: {
                 // this.lightDuration = !this.lightDuration;
@@ -433,16 +439,13 @@ export default abstract class ProjectScene extends Scene {
     protected putItemToInventory(event: GameEvent) {
         // console.log(this.inventorySlotsMap)
         // console.log(this.gameItemsMap.get(event.type));
-
         const gameItem = <LaserGun>event.data.get("gameItem");
-
         for (let postionEventMap of Array.from(this.inventorySlotsMap.values())) {
             for (const [key, value] of postionEventMap) {
                 console.log(postionEventMap)
                 if (value === this.emptyString) {
                     this.displayVec2(key)
-                    // gameItem.position.set(key[0],key[1]);
-                    gameItem.position.set(256, 40);
+                    gameItem.position.set(key[0],key[1]);
                     postionEventMap.set(key, event.type);
                     return;
                 }
@@ -513,7 +516,7 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected initLayers(): void {
-        let depth = 0;
+        let depth = 1;
         for (const layer in GameLayers) {
             this.addLayer(layer,depth);
             depth++;
