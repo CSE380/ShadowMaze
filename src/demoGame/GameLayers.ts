@@ -1,9 +1,10 @@
 // baseLayer (base layer, where tilemap, item, player, level end locates)
 
-
 // fog of  war layer (make the screen black )
 
-// container layer (container for UI layer, to serve as a background )
+// container layer (container for next layer, to serve as a background for the pause menu)
+ 
+// PAUSE_MENU layer (display the pause menu selection )
 
 // UI layer(display the player and game status )
 

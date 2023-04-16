@@ -52,10 +52,9 @@ export default class IntroLevelScene extends ProjectScene {
 
 
     // The wall layer of the tilemap
-    private walls: OrthogonalTilemap;
     // The position graph for the navmesh
 
-
+    
 
 
 

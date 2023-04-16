@@ -45,8 +45,14 @@ import LaserGun from "../GameSystems/ItemSystem/Items/LaserGuns";
 import { ACTIONTYPE } from "../ActionType";
 import { GameLayers } from "../GameLayers";
 import { ItemButtonArray as ItemButtonKeyArray } from "../Controls";
-
+import PositionGraph from "../../Wolfie2D/DataTypes/Graphs/PositionGraph";
+import Navmesh from "../../Wolfie2D/Pathfinding/Navmesh";
+import MathUtils from "../../Wolfie2D/Utils/MathUtils";
+import NavigationPath from "../../Wolfie2D/Pathfinding/NavigationPath";
+import AstarStrategy from "../Pathfinding/AstarStrategy";
 export default abstract class ProjectScene extends Scene {
+    protected walls: OrthogonalTilemap;
+    protected path: NavigationPath;
     //button event
     protected PauseButtonEvent = PauseButtonEvent;
     protected wallSize: number;
@@ -108,6 +114,8 @@ export default abstract class ProjectScene extends Scene {
     protected pathToSprite = `shadowMaze_assets/sprites/`;
     // Level end transition timer and graphic
     protected levelTransitionTimer: Timer;
+
+    protected option:Record<string, any>;
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, {
             ...options, physics: {
@@ -120,8 +128,10 @@ export default abstract class ProjectScene extends Scene {
         // for (const layerName of this.layerNames) {
         //     this[layerName] = layerName;
         // }
-       
-        
+    }
+    public initScene(option: Record<string, any>): void {
+        this.option = option
+        console.log(this.option)
     }
     protected initLevelScene() {
         this.center = this.getViewport().getCenter();
@@ -237,7 +247,6 @@ export default abstract class ProjectScene extends Scene {
                 text: "",
             }
         );
-
         this.healthBar.size = new Vec2(300, 25);
         this.healthBar.backgroundColor = Color.GREEN;
 
@@ -286,6 +295,7 @@ export default abstract class ProjectScene extends Scene {
         newTextLabel.setBackgroundColor(option.backgroundColor || Color.BLACK)
         if (option.align)
             newTextLabel.setHAlign(option.align)
+        return newTextLabel;
     }
     protected handleEnteredLevelEnd(): void {
         if (!this.isLevelEndEnetered) {
@@ -330,13 +340,14 @@ export default abstract class ProjectScene extends Scene {
         const newButton = <Label>this.add.uiElement(UIElementType.BUTTON, option.layerName ||   this.GameLayers.BASE, option);
         newButton.size.set(50, 50);
         if (option.size) newButton.size.set(option.size.x, option.size.y);
-        newButton.borderWidth = 0;
-        newButton.borderColor = Color.TRANSPARENT;
+        newButton.setBorderWidth(option.borderWidth||0);
+        newButton.setBorderColor(option.BorderColor || Color.TRANSPARENT);
         newButton.setBackgroundColor(option.backgroundColor || Color.BLACK)
         newButton.setTextColor(option.textColor || Color.WHITE)
         newButton.onClickEventId = option.buttonName;
         newButton.setFontSize(50);
         this.receiver.subscribe(option.buttonName);
+        return newButton;
     }
     protected addControlTextLayer(option: Record<string, any>) {
         let position = option.position;
@@ -387,7 +398,7 @@ export default abstract class ProjectScene extends Scene {
         if (Input.isKeyJustPressed("escape")) {
             this.emitter.fireEvent(PauseButtonEvent.PAUSE);
         }
-       
+        this.player.moveOnPath(1,this.path)
         this.updateLabel();
         this.isLevelEnd();
         this.isPlayerAtItems();
@@ -595,14 +606,19 @@ export default abstract class ProjectScene extends Scene {
         this.buildLightShape();
         this.initCurrLabel();
         // Give the player a healthbar
-
+        let navmesh = this.initializeNavmesh(new PositionGraph(), this.walls);
+        navmesh.registerStrategy("astar", new AstarStrategy(navmesh));
+        this.navManager.addNavigableEntity("navmesh", navmesh);
+        navmesh.setStrategy("astar");
         // Give the player PlayerAI
-        player.addAI(PlayerAI);
-
+        // if(this.option.isAstarChecked){
+        //     // player.addAI()
+        // }
+        // player.addAI(PlayerAI);
+        this.player.collisionShape.halfSize.scaleTo(0.25);
         // Start the player in the "IDLE" animation
         player.animation.play("IDLE");
-        this.viewport.follow(player);
-
+        this.path = navmesh.getNavigationPath(this.player.position, this.levelEndPosition);
     }
     public initControlTextLayer() {
         let controlTextOption = {
@@ -664,5 +680,50 @@ export default abstract class ProjectScene extends Scene {
             this.addButtons(buttonOption1);
             positionY = positionY + 40;
         }
+    }
+    protected initializeNavmesh(graph: PositionGraph, walls: OrthogonalTilemap): Navmesh {
+
+        let dim: Vec2 = walls.getDimensions();
+        for (let i = 0; i < dim.y; i++) {
+            for (let j = 0; j < dim.x; j++) {
+                let tile: AABB = walls.getTileCollider(j, i);
+                graph.addPositionedNode(tile.center);
+            }
+        }
+
+        let rc: Vec2;
+        for (let i = 0; i < graph.numVertices; i++) {
+            rc = walls.getTileColRow(i);
+            if (!walls.isTileCollidable(rc.x, rc.y) &&
+                !walls.isTileCollidable(MathUtils.clamp(rc.x - 1, 0, dim.x - 1), rc.y) &&
+                !walls.isTileCollidable(MathUtils.clamp(rc.x + 1, 0, dim.x - 1), rc.y) &&
+                !walls.isTileCollidable(rc.x, MathUtils.clamp(rc.y - 1, 0, dim.y - 1)) &&
+                !walls.isTileCollidable(rc.x, MathUtils.clamp(rc.y + 1, 0, dim.y - 1)) &&
+                !walls.isTileCollidable(MathUtils.clamp(rc.x + 1, 0, dim.x - 1), MathUtils.clamp(rc.y + 1, 0, dim.y - 1)) &&
+                !walls.isTileCollidable(MathUtils.clamp(rc.x - 1, 0, dim.x - 1), MathUtils.clamp(rc.y + 1, 0, dim.y - 1)) &&
+                !walls.isTileCollidable(MathUtils.clamp(rc.x + 1, 0, dim.x - 1), MathUtils.clamp(rc.y - 1, 0, dim.y - 1)) &&
+                !walls.isTileCollidable(MathUtils.clamp(rc.x - 1, 0, dim.x - 1), MathUtils.clamp(rc.y - 1, 0, dim.y - 1))
+
+            ) {
+                // Create edge to the left
+                rc = walls.getTileColRow(i + 1);
+                if ((i + 1) % dim.x !== 0 && !walls.isTileCollidable(rc.x, rc.y)) {
+                    graph.addEdge(i, i + 1);
+                    // this.add.graphic(GraphicType.LINE, "graph", {start: this.graph.getNodePosition(i), end: this.graph.getNodePosition(i + 1)})
+                }
+                // Create edge below
+                rc = walls.getTileColRow(i + dim.x);
+                if (i + dim.x < graph.numVertices && !walls.isTileCollidable(rc.x, rc.y)) {
+                    graph.addEdge(i, i + dim.x);
+                    // this.add.graphic(GraphicType.LINE, "graph", {start: this.graph.getNodePosition(i), end: this.graph.getNodePosition(i + dim.x)})
+                }
+
+
+            }
+        }
+
+        // Set this graph as a navigable entity
+        return new Navmesh(graph);
+
     }
 }

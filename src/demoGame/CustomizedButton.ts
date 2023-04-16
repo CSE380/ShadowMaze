@@ -5,6 +5,7 @@ export enum MainMenuButtonEvent {
     Help = "Help",
     CHEAT = "CHEAT",
     Exit="Exit",
+   
 }
 
 export enum SelectMenuButtonEvent {
@@ -14,6 +15,7 @@ export enum SelectMenuButtonEvent {
     LEVEL_4 = "TREASURE HUNTER",
     LEVEL_5 = "CRINGE",
     LEVEL_6 = "FINAL BOSS",
+    
 }
 export enum PauseButtonEvent {
     PAUSE = "PAUSE",
