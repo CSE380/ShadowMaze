@@ -11,6 +11,7 @@ import SelectLevelMenuScene from "./demoGame/Scenes/SelectLevelMenuScene";
 import BubbleShaderType from "./demoGame/Shaders/BubbleShaderType";
 import LaserShaderType from "./demoGame/Shaders/LaserShaderType";
 import RegistryManager from "./Wolfie2D/Registry/RegistryManager";
+import { UseItemInput } from "./demoGame/AI/Player/PlayerController";
 // The main function is your entrypoint into Wolfie2D. Specify your first scene and any options here.
 (function main() {
     // Run any tests
@@ -30,7 +31,6 @@ import RegistryManager from "./Wolfie2D/Registry/RegistryManager";
             { name: PlayerInput.ATTACKING, keys: ["j"] },
             { name: PlayerInput.SHIELDING, keys: ["k"] },
             { name: PlayerInput.ULTIMATE, keys: ["u"] },
-            { name: "slot1", keys: ["1"] },
             { name: "slot2", keys: ["2"] },
         ],
         // useWebGL: true,   

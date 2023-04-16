@@ -21,6 +21,11 @@ import { GraphicType } from "../../Wolfie2D/Nodes/Graphics/GraphicTypes";
 import { PhysicsGroups } from "../PhysicsGroups";
 import { PlayerEvents } from "../ProjectEvents";
 import SelectLevelMenuScene from "./SelectLevelMenuScene";
+import InventoryHUD from "../GameSystems/HUD/InventoryHUD";
+
+// import HelpScene from "./HelpScene";
+// import StartScene from "./StartScene";
+// import ControlScene from "./ControlScene";
 import { TweenableProperties } from "../../Wolfie2D/Nodes/GameNode";
 import { EaseFunctionType } from "../../Wolfie2D/Utils/EaseFunctions";
 import Timer from "../../Wolfie2D/Timing/Timer";
@@ -39,8 +44,7 @@ import { PlayerInput } from "../AI/Player/PlayerController";
 import LaserGun from "../GameSystems/ItemSystem/Items/LaserGuns";
 import { ACTIONTYPE } from "../ActionType";
 import { GameLayers } from "../GameLayers";
-
-
+import { ItemButtonArray as ItemButtonKeyArray } from "../Controls";
 
 export default abstract class ProjectScene extends Scene {
     //button event
@@ -64,10 +68,10 @@ export default abstract class ProjectScene extends Scene {
     //player 
     protected player: PlayerActor;
     protected laserGuns: Array<gameItems>;
-    private lasers: Array<Graphic>;
     protected door: Sprite
     protected backgroundImageKey:string;
     //ui
+    protected inventoryHud: InventoryHUD;
     // Health labels
     protected healthLabel: Label;
     protected healthBar: Label;
@@ -90,7 +94,7 @@ export default abstract class ProjectScene extends Scene {
     protected laserGunsKey = "laserGuns";
     protected lightShape: AABB;
     protected lightDuration: boolean;
-    protected inventorySlotsMap = new Map<number, Map<Vec2, string>>();
+    protected inventorySlotsMap = new Map<number, Map<Vec2, Array<gameItems>>>();
     // protected test = new Map<number,Vec2>()
     //ui display
     protected currLabels: Array<Label>;
@@ -143,16 +147,15 @@ export default abstract class ProjectScene extends Scene {
         const inventorySlotsPosition = this.load.getObject(GameItems.INVENTORYSLOT)
         let i = 1;
         for (let position of inventorySlotsPosition.position) {
-            const postionEventMap = new Map<Vec2, string>();
-            postionEventMap.set(position, this.emptyString);
-            this.inventorySlotsMap.set(i, postionEventMap);
+            const postionItemsMap = new Map<Vec2, Array<gameItems>>();
+            postionItemsMap.set(position, []);
+            this.inventorySlotsMap.set(i, postionItemsMap);
             i++;
         }
     }
     protected initAllGameItems() {
         for (let key of this.gameItemsArray) {
             let gameItem = this.load.getObject(key);
-            console.log(key)
             // console.log(this.load.getObject(key))
             const items = new Array<gameItems>(gameItem.position.length);
             for (let i = 0; i < items.length; i++) {
@@ -171,7 +174,6 @@ export default abstract class ProjectScene extends Scene {
             }
             this.gameItemsMap.set(key, items);
         }
-        // this.loadGameItems("inventorySlot");
     }
    
     public loadScene(): void {
@@ -200,6 +202,7 @@ export default abstract class ProjectScene extends Scene {
             this.receiver.subscribe(gameItemKey);
         }
     }
+   
     protected initUI(): void {
         // UILayer stuff
         // this.addUILayer(GAMELayers.UIlayer);
@@ -384,10 +387,24 @@ export default abstract class ProjectScene extends Scene {
         if (Input.isKeyJustPressed("escape")) {
             this.emitter.fireEvent(PauseButtonEvent.PAUSE);
         }
+       
         this.updateLabel();
         this.isLevelEnd();
-        // this.displayVec2(this.getMoveDir());
         this.isPlayerAtItems();
+        this.isUseItem();
+    }
+    protected isUseItem(){
+        ItemButtonKeyArray.forEach(key=>{
+            if(Input.isKeyJustPressed(key)){
+                const positionItemMap = this.inventorySlotsMap.get(parseInt(key)) 
+                for(let [key,value] of positionItemMap.entries()){
+                    if(value.length != 0){
+                        const gameItem = value.pop();
+                        this.emitter.fireEvent(gameItem.name, { action: ACTIONTYPE.USE, gameItem: gameItem });
+                    }
+                }
+            }
+        })
     }
     public isLevelEnd() {
         const label = this.levelEndArea;
@@ -397,7 +414,7 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected handleEvent(event: GameEvent): void {
-        console.log(event.type)
+        
         switch (event.type) {
             case BackButtonEvent.BACK: {
                 this.sceneManager.changeToScene(MainMenu);
@@ -406,47 +423,40 @@ export default abstract class ProjectScene extends Scene {
         }
         
     }
+   
     protected handleUseGameItemsEvent(event: GameEvent) {
+        this.RemoveItemFromInventory(event)
         switch (event.type) {
             case GameItems.LASER_GUNS: {
-                // this.lightDuration = !this.lightDuration;
+                this.lightDuration = !this.lightDuration;
                 break;
             }
             case GameItems.DOOR: {
                 this.showLevelEndPosition();
             }
             case GameItems.HEALTH_PACKS: {
-
+                
             }
         }
+    }
+    protected RemoveItemFromInventory(event: GameEvent){
+        const gameItem = event.data.get("gameItem")
+        gameItem.visible = false;
+       
+
     }
     protected handlePickGameItemsEvent(event: GameEvent) {
         this.putItemToInventory(event)
-        switch (event.type) {
-            case GameItems.LASER_GUNS: {
-                // this.lightDuration = !this.lightDuration;
-                console.log(this.gameItemsMap);
-                break;
-            }
-            case GameItems.DOOR: {
-                this.showLevelEndPosition();
-            }
-            case GameItems.HEALTH_PACKS: {
-
-            }
-        }
     }
     protected putItemToInventory(event: GameEvent) {
-        // console.log(this.inventorySlotsMap)
         // console.log(this.gameItemsMap.get(event.type));
         const gameItem = <LaserGun>event.data.get("gameItem");
-        for (let postionEventMap of Array.from(this.inventorySlotsMap.values())) {
-            for (const [key, value] of postionEventMap) {
-                console.log(postionEventMap)
-                if (value === this.emptyString) {
-                    this.displayVec2(key)
+        for (let postionItemsMap of Array.from(this.inventorySlotsMap.values())) {
+            for (const [key, value] of postionItemsMap) {
+                if (value.length === 0 ) {
                     gameItem.position.set(key[0],key[1]);
-                    postionEventMap.set(key, event.type);
+                    postionItemsMap.set(key, [gameItem]);
+                   
                     return;
                 }
             }
@@ -464,7 +474,7 @@ export default abstract class ProjectScene extends Scene {
     public initBlackScreen() {
         const len = this.wallSize / this.labelSize;
         for (let i = 0; i <= 2 * len; i++) {
-            for (let j = 0; j <= 2 * len; j++) {
+            for (let j = 8; j <= 2 * len; j++) {
                 let x = 0.5 * i * this.labelSize;
                 let y = 0.5 * j * this.labelSize;
                 let options = {
@@ -572,6 +582,13 @@ export default abstract class ProjectScene extends Scene {
         player.health = 10;
         player.maxHealth = 10;
         player.scale = new Vec2(2, 2);
+        // this.inventoryHud = new InventoryHUD(this, player.inventory, "inventorySlot", {
+        //     start: new Vec2(232, 24),
+        //     slotLayer: GameLayers.BEFORE_BASE,
+        //     padding: 8,
+        //     itemLayer: GameLayers.BASE,
+        // });
+
         // Give the player physics
         player.addPhysics(new AABB(Vec2.ZERO, new Vec2(8, 8)));
         // player.setGroup(PhysicsGroups.PLAYER);

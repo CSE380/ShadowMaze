@@ -18,7 +18,7 @@ import HW4Scene from "./AbstractScene";
 
 // Welcome to Wolfie2D!
 // This is a simple sample scene so something displays when you run the game.
-export default class ControlScene extends HW4Scene {
+export default class CheatCodeMenuScene extends HW4Scene {
     /* ########## MEMBER DEFINITIONS ##########*/
     loadScene(): void {
         // this.load.tilemap("map", "../dist/shadowMaze_assets/tilemaps/test2.json");
@@ -32,13 +32,13 @@ export default class ControlScene extends HW4Scene {
     // or where you should initialize any other things you will need in your scene
     // Once again, this occurs strictly after loadScene(), so anything you loaded there will be available
     startScene(): void {
-        this.addUILayer(  this.GameLayers.BASE)
+        this.addUILayer(this.GameLayers.BASE)
         this.backgroundImage = this.add.sprite(this.backgroundImageKey,   this.GameLayers.BASE);
         let center = this.viewport.getCenter();
         this.backgroundImage.position.set(center.x, center.y);
         let textOption = {
             position: new Vec2(center.x, center.y - 450),
-            text: "Controls",
+            text: "Cheat Mode",
             backgroundColor:Color.TRANSPARENT,
             fontSize:50,
         }

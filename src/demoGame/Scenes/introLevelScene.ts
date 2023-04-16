@@ -94,54 +94,53 @@ export default class IntroLevelScene extends ProjectScene {
         this.initInventorySlotsMap();
         // this.initUI();
         // create screen first 
-        // this.initBlackScreen();
+        this.initBlackScreen();
         this.center = this.viewport.getHalfSize();
-        // for(let i =0;i<5;i++){
-        //     for(let j =0;j<5;j++){
-        //         let x = (i )* 0.5*this.labelSize;
-        //         let y = (j ) * 0.5*this.labelSize;
-        //         // let y=0;
-        //         let options = {
-        //             position: new Vec2(x, y),
-        //             text: "",
-        //         }
-        //         this.addBlackLabel(options);
-        //     }
-        // }
-       
-        // this.initializePlayer();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
         this.initAllGameItems();
-       
-        // this.initInventorySlotsMap();
-        // this.initLaserGun();
-        // this.addLevelEndLabel();
-        // this.addLevelEndLabel();
-        // this.addLevelEndLabel();
-        // this.initControlTextLayer();
-        // this.initHelpTextLayer();
     }
 
-
+    // public updateScene() {
+    //     while (this.receiver.hasNextEvent()) {
+    //         const gameEvent = this.receiver.getNextEvent()
+    //         this.handleEvent(gameEvent);
+    //     }
+    //     if (Input.isKeyJustPressed("escape")) {
+    //         this.emitter.fireEvent(PauseButtonEvent.PAUSE);
+            
+    //     }
+    //     this.updateLabel();
+    //     this.isLevelEnd();
+    //     this.isPlayerAtItems();
+    //     this.isUseItem();
+    // }
     /**
      * @see Scene.updateScene
      */
 
 
     public handleEvent(event: GameEvent): void {
-        // console.log("receive type")
-        console.log(event.type)
+        
+        this.handleInGameButtonEvent(event);
+        // action type:
+        console.log(event.data.get(this.action) )
+        if (event.data.get(this.action) == ACTIONTYPE.PICK)
+            this.handlePickGameItemsEvent(event);
+        if (event.data.get(this.action) == ACTIONTYPE.USE)
+            this.handleUseGameItemsEvent(event);
+    }
+
+    protected handleInGameButtonEvent(event:GameEvent){
         switch (event.type) {
-            case PauseButtonEvent.PAUSE: {
-                console.log("ready to pause")
-                this.isPauseMenuHidden = !this.isPauseMenuHidden;
-                // this.sceneManager.changeToScene(MainMenu);
-                this.showPauseMenu(this.isPauseMenuHidden);
-                break;
-            }
             case MainMenuButtonEvent.Restart: {
                 this.sceneManager.changeToScene(IntroLevelScene);
+                return;
+            }
+            case PauseButtonEvent.PAUSE: {
+                console.log(this.isPauseMenuHidden)
+                this.isPauseMenuHidden = !this.isPauseMenuHidden;
+                this.showPauseMenu(this.isPauseMenuHidden);
                 break;
             }
             case MainMenuButtonEvent.Select_levels: {
@@ -165,7 +164,6 @@ export default class IntroLevelScene extends ProjectScene {
                 break;
             }
             case PlayerEvents.PLAYER_ENTERED_LEVEL_END: {
-                console.log("levelend")
                 this.handleEnteredLevelEnd();
                 // this.viewport.setZoomLevel(1);
                 // this.sceneManager.changeToScene(SelectLevelMenuScene);
@@ -175,13 +173,8 @@ export default class IntroLevelScene extends ProjectScene {
                     this.viewport.setZoomLevel(1);
                     this.sceneManager.changeToScene(SelectLevelMenuScene);
                 }, 2000)
-
             }
         }
-        if (event.data.get(this.action) == ACTIONTYPE.PICK)
-            this.handlePickGameItemsEvent(event);
-        if (event.data.get(this.action) == ACTIONTYPE.USE)
-            this.handleUseGameItemsEvent(event);
     }
     // public override updateScene(){
     //     while (this.receiver.hasNextEvent()) {

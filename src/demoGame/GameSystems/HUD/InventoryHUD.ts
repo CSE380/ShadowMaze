@@ -72,7 +72,9 @@ export default class InventoryHUD implements Updateable {
         this.itemSlots = new Array<Sprite>();
         for (let i = 0; i < this.size; i += 1) {
             this.itemSlots[i] = this.scene.add.sprite(this.slotSprite, this.slotLayer);
-            this.itemSlots[i].scale.div(scalar);
+            this.itemSlots[i].scale.div(scalar );
+            
+            console.log( this.itemSlots[i])
         }
         // Set the positions of the item slot sprites
         let width = this.itemSlots[0].size.x;
@@ -87,6 +89,7 @@ export default class InventoryHUD implements Updateable {
             this.itemSlotNums[i].fontSize = 12;
             this.itemSlotNums[i].font = "Courier";
             this.itemSlotNums[i].textColor = Color.WHITE;
+
         }
     }
 
