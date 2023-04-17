@@ -76,29 +76,7 @@ export default class IntroLevelScene extends ProjectScene {
     /**
      * @see Scene.startScene
      */
-    public override startScene() {
-        // Add in the tilemap
-        let tilemapLayers = this.add.tilemap("level");
-        // console.log(tilemapLayers)
-        // Get the wall layer
-        // this.init()
-        this.walls = <OrthogonalTilemap>tilemapLayers[1].getItems()[0];
-        this.wallSize = this.walls.size.x;
-        // Set the viewport bounds to the tilemap
-        let tilemapSize: Vec2 = this.walls.size;
-        this.viewport.setBounds(0, 0, tilemapSize.x, tilemapSize.y);
-        this.viewport.setZoomLevel(2);
-        // this.initLayers();
-        this.initPlayer()
-        this.initInventorySlotsMap();
-        // this.initUI();
-        // create screen first 
-        this.initBlackScreen();
-        this.center = this.viewport.getHalfSize();
-        this.initPauseMenuLayer();
-        this.initializeLevelEnds();
-        this.initAllGameItems();
-    }
+   
 
     // public updateScene() {
     //     while (this.receiver.hasNextEvent()) {

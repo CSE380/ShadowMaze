@@ -59,11 +59,10 @@ export default class MainMenu extends AbstractScene  {
         console.log(event.type)
         
         switch (event.type) {
-            // case BackButtonEvent.BACK:{
-               
-            //     this.sceneManager.changeToScene(MainMenuScene,this.option);
-            //     break;
-            // }
+            case BackButtonEvent.BACK:{
+                this.sceneManager.changeToScene(MainMenuScene,this.option);
+                break;
+            }
             case SelectMenuButtonEvent.LEVEL_1: {
                 this.sceneManager.changeToScene(IntroLevelScene,this.option);
                 break;
