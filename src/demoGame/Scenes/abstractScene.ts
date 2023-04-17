@@ -362,6 +362,7 @@ export default abstract class ProjectScene extends Scene {
         });
     }
     protected addButtons(option: Record<string, any>) {
+        console.log("add button");
         const newButton = <Label>this.add.uiElement(UIElementType.BUTTON, option.layerName || this.GameLayers.BASE, option);
         newButton.size.set(50, 50);
         if (option.size) newButton.size.set(option.size.x, option.size.y);
