@@ -124,8 +124,8 @@ export default abstract class ProjectScene extends Scene {
         this.labelSize = 24;
         this.isPauseMenuHidden = true;
         this.option = {
-            isAstarChecked: true,
-            isfogOfWarChecked: true,
+            isAstarChecked: false,
+            isfogOfWarChecked:  false,
         }
         // this.ButtonSelection = MainMenuButtonEvent;
         // for (const layerName of this.layerNames) {
@@ -133,7 +133,7 @@ export default abstract class ProjectScene extends Scene {
         // }
     }
     public initScene(option: Record<string, any>): void {
-        if(!option)
+        if(option !== undefined)
         this.option = option
        
     }
@@ -205,7 +205,8 @@ export default abstract class ProjectScene extends Scene {
         this.initInventorySlotsMap();
         // this.initUI();
         // create screen first 
-        if(this.option.isfogOfWarChecked)
+        console.log(this.option.isfogOfWarChecked)
+        if(!this.option.isfogOfWarChecked)
         this.initFogOfWar();
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
@@ -242,8 +243,6 @@ export default abstract class ProjectScene extends Scene {
     protected initUI(): void {
         // UILayer stuff
         // this.addUILayer(GAMELayers.UIlayer);
-
-
         // HP Label
         let healthTextOption = {
             position: this.healthTextLablePosition,

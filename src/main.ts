@@ -58,9 +58,9 @@ import CheatCodeMenuScene from "./demoGame/Scenes/CheatCodeMenuScene";
     // game.start(IntroLevelScene, {});
     // game.start(HelpScene, {});
     // game.start(ControlScene,{});
-    // game.start(StartScene, {});
+    game.start(StartScene, {});
     // game.start(CheatCodeMenuScene,{});
-    game.start(SelectLevelMenuScene,{});
+    // game.start(SelectLevelMenuScene,{});
     // game.start(MainMenu, {});
 })();
 
