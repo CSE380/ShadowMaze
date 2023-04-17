@@ -101,7 +101,7 @@ export default class AstarStrategy extends NavPathStrat {
             for (let moveIndex of move) {
                 let nextIndex = currIndex + moveIndex
                 if (g.edges[nextIndex]== null) {
-                    // console.log("against the wall");
+                    console.log("against the wall");
                 }
                 if (g.edges[nextIndex] == null || closeIndexArr[nextIndex]) {
                     continue;

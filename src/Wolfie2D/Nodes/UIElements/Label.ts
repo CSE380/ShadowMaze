@@ -28,7 +28,7 @@ export default class Label extends UIElement {
 		this.fontSize = 30;
 		this.hAlign = "center";
 		this.vAlign = "center";
-
+		this.borderWidth = 0;
 		this.sizeAssigned = false;
 	}
 
@@ -41,7 +41,15 @@ export default class Label extends UIElement {
 	setTextColor(color: Color): void {
 		this.textColor = color;
 	}
-
+	setBackgroundColor(color: Color): void {
+		this.backgroundColor = color;
+	}
+	setBorderWidth(num:number):void{
+		this.borderWidth=num;
+	}
+	setBorderColor(color: Color):void {
+		this.borderColor = color;
+	}
 	/**
 	 * Gets a string containg the font details for rendering
 	 * @returns A string containing the font details

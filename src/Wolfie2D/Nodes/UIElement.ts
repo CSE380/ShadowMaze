@@ -67,10 +67,7 @@ export default abstract class UIElement extends CanvasNode {
 	}
 
 	// @deprecated
-	setBackgroundColor(color: Color): void {
-		this.backgroundColor = color;
-	}
-
+	
 	// @deprecated
 	setPadding(padding: Vec2): void {
 		this.padding.copy(padding);

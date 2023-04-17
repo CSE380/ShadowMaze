@@ -34,9 +34,9 @@ export default abstract class PlayerState extends State {
     public override onExit(): Record<string, any> { return {}; }
     public override update(deltaT: number): void {
 
-        if (this.parent.owner.animation.isPlaying(PlayerAnimations.IDLE)) {
-            this.parent.owner.rotation = 0;
-        }
+        // if (this.parent.owner.animation.isPlaying(PlayerAnimations.IDLE)) {
+        //     this.parent.owner.rotation = 0;
+        // }
         // Adjust the angle the player is facing 
         // this.parent.owner.rotation = this.parent.controller.rotation;
         let princeDirection = this.parent.controller.moveDir;

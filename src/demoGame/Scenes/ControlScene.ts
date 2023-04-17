@@ -32,8 +32,8 @@ export default class ControlScene extends HW4Scene {
     // or where you should initialize any other things you will need in your scene
     // Once again, this occurs strictly after loadScene(), so anything you loaded there will be available
     startScene(): void {
-        this.addUILayer(this.mainMenuLayerName)
-        this.backgroundImage = this.add.sprite(this.backgroundImageKey, this.mainMenuLayerName);
+        this.addUILayer(  this.GameLayers.BASE)
+        this.backgroundImage = this.add.sprite(this.backgroundImageKey,   this.GameLayers.BASE);
         let center = this.viewport.getCenter();
         this.backgroundImage.position.set(center.x, center.y);
         let textOption = {
@@ -42,7 +42,7 @@ export default class ControlScene extends HW4Scene {
             backgroundColor:Color.TRANSPARENT,
             fontSize:50,
         }
-        this.addText(textOption);
+        this.addLabel(textOption);
         let controlTextOption = {
             position: center,
             text: controlTextArray,
@@ -51,5 +51,22 @@ export default class ControlScene extends HW4Scene {
         }
         this.addControlTextLayer(controlTextOption);
         this.addBackButon(center);
+    }
+      public updateScene() {
+        while (this.receiver.hasNextEvent()) {
+            this.handleEvent(this.receiver.getNextEvent());
+        }
+    }
+  
+    public handleEvent(event: GameEvent): void {
+        super.handleEvent(event);
+        console.log(event.type);
+        switch (event.type) {
+            case BackButtonEvent.BACK: {
+                this.sceneManager.changeToScene(MainMenu);
+                break;
+            }
+
+        }
     }
 }

@@ -23,8 +23,8 @@ export default class HelpScene extends HW4Scene {
     // or where you should initialize any other things you will need in your scene
     // Once again, this occurs strictly after loadScene(), so anything you loaded there will be available
     startScene(): void {
-        this.addUILayer(this.mainMenuLayerName)
-        this.backgroundImage = this.add.sprite(this.backgroundImageKey, this.mainMenuLayerName);
+        this.addUILayer( this.GameLayers.BASE);
+        this.backgroundImage = this.add.sprite(this.backgroundImageKey,  this.GameLayers.BASE);
         let center = this.viewport.getCenter();
         this.backgroundImage.position.set(center.x, center.y);
         let textOption = {
@@ -39,11 +39,18 @@ export default class HelpScene extends HW4Scene {
             backgroundColor: Color.TRANSPARENT,
             fontSize: 31,
         }
-        this.addText(textOption);
+        this.addLabel(textOption);
         this.addHelpTextLayer(helpTextOption);
         this.addBackButon(center);
     }
-   
+    public updateScene() {
+        while (this.receiver.hasNextEvent()) {
+            const gameEvent = this.receiver.getNextEvent()
+            this.handleEvent(gameEvent);
+        }
+       
+       
+    }
   
     public handleEvent(event: GameEvent): void {
         super.handleEvent(event);

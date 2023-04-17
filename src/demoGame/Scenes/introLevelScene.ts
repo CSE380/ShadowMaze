@@ -35,98 +35,89 @@ import ProjectScene from "./AbstractScene";
 import ControlScene from "./ControlScene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import { UIElementType } from "../../Wolfie2D/Nodes/UIElements/UIElementTypes";
-import {MainMenuButtonEvent } from "../CustomizedButton";
+import { MainMenuButtonEvent, PauseButtonEvent } from "../CustomizedButton";
 import Input from "../../Wolfie2D/Input/Input";
-import { controlTextArray,helpTextArray } from "../Text";
-import { layerNameArray } from "../LayerName";
+import { controlTextArray, helpTextArray } from "../Text";
 import { PhysicsGroups } from "../PhysicsGroups";
 import { PlayerEvents } from "../ProjectEvents";
-
-enum PauseMenuState {
-    Hidden,
-    Visible,
-    ControlsText,
-    HelpText,
+import CheatCodeMenuScene from "./CheatCodeMenuScene";
+const ACTIONTYPE = {
+    PICK: "PICK",
+    USE: "USE",
 }
 
-export default class LevelScene extends ProjectScene {
+export default class IntroLevelScene extends ProjectScene {
 
     /** GameSystems in the HW4 Scene */
-    
-    
+
+
     // The wall layer of the tilemap
-    private walls: OrthogonalTilemap;
     // The position graph for the navmesh
-   
-  
+
     
-   
+
+
 
     /**
      * @see Scene.update()
      */
-    // public override loadScene() {
-    //     // Load the player and enemy spritesheets
-       
-    //     //laser gun
-    //     this.load.object("laserguns", "shadowMaze_assets/data/items/laserguns.json");
-    //     this.load.image("laserGun", "  shadowMaze_assets/sprites/laserGun.png");
-    //     console.log("load successfully")
+    public override loadScene() {
+        // Load the player and enemy spritesheets
 
-    // }
+        //laser gun
+        this.loadAllGameItems();
+        this.initLevelScene();
+        // this.loadGameItems(this.laserGunsKey);
+        this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince.json");
+        // Load the tilemap
+        this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
+
+    }
     /**
      * @see Scene.startScene
      */
-    public override startScene() {
-        // Add in the tilemap
-        let tilemapLayers = this.add.tilemap("level");
-        // console.log(tilemapLayers)
-        // Get the wall layer
-        // this.init()
-        this.walls = <OrthogonalTilemap>tilemapLayers[1].getItems()[0];
-        this.wallSize = this.walls.size.x;
-        // Set the viewport bounds to the tilemap
-        let tilemapSize: Vec2 = this.walls.size;
-        this.viewport.setBounds(0, 0, tilemapSize.x, tilemapSize.y);
-        this.viewport.setZoomLevel(2);
-        this.initLayers();
-        // create screen first 
-        this.initBlackScreen();
-        this.center = this.viewport.getHalfSize();
-        // this.addBlackLabel(0, 100);
-        this.initializePlayer();
-        this.initPauseMenuLayer();
-        this.initializeLevelEnds();
-        this.initAllGameItems()
-        console.log()
-        this.isPlayerAtItems();
-        // this.initLaserGun();
-        // this.addLevelEndLabel();
-        // this.addLevelEndLabel();
-        // this.addLevelEndLabel();
-        // this.initControlTextLayer();
-        // this.initHelpTextLayer();
-    }
-    
    
+
+    // public updateScene() {
+    //     while (this.receiver.hasNextEvent()) {
+    //         const gameEvent = this.receiver.getNextEvent()
+    //         this.handleEvent(gameEvent);
+    //     }
+    //     if (Input.isKeyJustPressed("escape")) {
+    //         this.emitter.fireEvent(PauseButtonEvent.PAUSE);
+            
+    //     }
+    //     this.updateLabel();
+    //     this.isLevelEnd();
+    //     this.isPlayerAtItems();
+    //     this.isUseItem();
+    // }
     /**
      * @see Scene.updateScene
      */
-  
+
 
     public handleEvent(event: GameEvent): void {
-        // console.log("receive type")
-        console.log(event.type)
+        
+        this.handleInGameButtonEvent(event);
+        // action type:
+        console.log(event.data.get(this.action) )
+        if (event.data.get(this.action) == ACTIONTYPE.PICK)
+            this.handlePickGameItemsEvent(event);
+        if (event.data.get(this.action) == ACTIONTYPE.USE)
+            this.handleUseGameItemsEvent(event);
+    }
+
+    protected handleInGameButtonEvent(event:GameEvent){
         switch (event.type) {
-            case this.ButtonSelection.PAUSE: {
-                this.isPauseMenuHidden = !this.isPauseMenuHidden;
-               
-                // this.sceneManager.changeToScene(MainMenu);
-                this.showPauseMenu(this.isPauseMenuHidden);
-                break;
-            }
             case MainMenuButtonEvent.Restart: {
-                this.sceneManager.changeToScene(LevelScene);
+                this.sceneManager.changeToScene(IntroLevelScene);
+                return;
+            }
+            case PauseButtonEvent.PAUSE: {
+                console.log(this.isPauseMenuHidden)
+                this.isPauseMenuHidden = !this.isPauseMenuHidden;
+                this.showPauseMenu(this.isPauseMenuHidden);
                 break;
             }
             case MainMenuButtonEvent.Select_levels: {
@@ -144,36 +135,38 @@ export default class LevelScene extends ProjectScene {
                 this.sceneManager.changeToScene(HelpScene);
                 break;
             }
-            case MainMenuButtonEvent.Exit:{
+            case MainMenuButtonEvent.CHEAT:{
+                this.viewport.setZoomLevel(1);
+                this.sceneManager.changeToScene(CheatCodeMenuScene);
+                break;
+            }
+            case MainMenuButtonEvent.Exit: {
                 this.viewport.setZoomLevel(1);
                 this.sceneManager.changeToScene(StartScene);
                 break;
             }
-            case PlayerEvents.PLAYER_ENTERED_LEVEL_END:{
-                console.log("levelend")
+            case PlayerEvents.PLAYER_ENTERED_LEVEL_END: {
                 this.handleEnteredLevelEnd();
                 // this.viewport.setZoomLevel(1);
                 // this.sceneManager.changeToScene(SelectLevelMenuScene);
             }
-            case PlayerEvents.LEVEL_END:{
-                setTimeout(()=>{
+            case PlayerEvents.LEVEL_END: {
+                setTimeout(() => {
                     this.viewport.setZoomLevel(1);
                     this.sceneManager.changeToScene(SelectLevelMenuScene);
-                },2000)
-               
+                }, 2000)
             }
         }
-        this.handleGameItemsEvent(event);
     }
     // public override updateScene(){
     //     while (this.receiver.hasNextEvent()) {
     //         this.handleEvent(this.receiver.getNextEvent());
     //     }
-        
+
     // }
-   
+
     /** Initializes the layers in the scene */
-   
- 
-   
+
+
+
 }

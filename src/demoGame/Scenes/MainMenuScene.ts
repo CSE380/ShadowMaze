@@ -12,7 +12,9 @@ import SelectLevelMenuScene from "./SelectLevelMenuScene";
 import HelpScene from "./HelpScene";
 import StartScene from "./StartScene";
 import ControlScene from "./ControlScene";
+import CheatCodeMenuScene from "./CheatCodeMenuScene";
 import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
+import { GameLayers } from "../GameLayers";
 export default class MainMenu extends Scene {
     private mainMenuLayerName:"mainMenu";
     // Layers, for multiple main menu screens
@@ -20,16 +22,22 @@ export default class MainMenu extends Scene {
     private about: Layer;
     private control: Layer;
     private backgroundImage: Sprite;
-
+    
     private backgroundImageKey:"backgroundImage";
+    private option:Record<string, any>;
+    public initScene(option: Record<string, any>): void {
+        this.option = option
+        console.log(this.option)
+    }
     public loadScene(){
         this.load.image(this.backgroundImageKey,"shadowMaze_assets/images/fullBackground.jpg");
     }
 
     public startScene(){
+        
         const center = this.viewport.getCenter();
-        this.mainMenu = this.addUILayer(this.mainMenuLayerName);
-        this.backgroundImage = this.add.sprite(this.backgroundImageKey,this.mainMenuLayerName);
+        this.mainMenu = this.addUILayer(  GameLayers.BASE);
+        this.backgroundImage = this.add.sprite(this.backgroundImageKey,  GameLayers.BASE);
         this.backgroundImage.position.set(center.x, center.y);
         // The main menu
         let positionY=center.y - 400;
@@ -48,7 +56,7 @@ export default class MainMenu extends Scene {
     }
     public addButtons(options:Record<string, any>){
        
-        const newButton = <Label>this.add.uiElement(UIElementType.BUTTON, this.mainMenuLayerName, options);
+        const newButton = <Label>this.add.uiElement(UIElementType.BUTTON,  GameLayers.BASE, options);
         
         newButton.size.set(300, 50);
         newButton.borderWidth = 2;
@@ -68,8 +76,7 @@ export default class MainMenu extends Scene {
         console.log(event.type)
         switch(event.type) {
             case MainMenuButtonEvent.Select_levels: {
-              
-                this.sceneManager.changeToScene(SelectLevelMenuScene);
+                this.sceneManager.changeToScene(SelectLevelMenuScene,this.option);
                 break;
             }
             case MainMenuButtonEvent.Controls: {
@@ -82,6 +89,10 @@ export default class MainMenu extends Scene {
             }
             case MainMenuButtonEvent.Exit:{
                 this.sceneManager.changeToScene(StartScene);
+            }
+            case MainMenuButtonEvent.CHEAT:{
+               
+                this.sceneManager.changeToScene( CheatCodeMenuScene);
             }
         }
     }

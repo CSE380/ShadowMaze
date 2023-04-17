@@ -15,9 +15,16 @@ export enum PlayerInput {
     SHIELDING = "SHIELDING",
     ULTIMATE = "ULTIMATE",
     PICKUP_ITEM = "PICKUP_ITEM",
-    DROP_ITEM = "DROP_ITEM"
+    DROP_ITEM = "DROP_ITEM",
+   
 }
-
+export enum UseItemInput {
+    USE_ITEM1 = "USE_ITEM1",
+    USE_ITEM2 = "USE_ITEM2",
+    USE_ITEM3 = "USE_ITEM3",
+    USE_ITEM4 = "USE_ITEM4",
+    USE_ITEM5 = "USE_ITEM5",
+  }
 export const PlayerAnimations = {
     IDLE : "IDLE",
     ATTACKING: "ATTACKING",
