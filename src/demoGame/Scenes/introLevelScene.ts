@@ -40,7 +40,7 @@ import Input from "../../Wolfie2D/Input/Input";
 import { controlTextArray, helpTextArray } from "../Text";
 import { PhysicsGroups } from "../PhysicsGroups";
 import { PlayerEvents } from "../ProjectEvents";
-
+import CheatCodeMenuScene from "./CheatCodeMenuScene";
 const ACTIONTYPE = {
     PICK: "PICK",
     USE: "USE",
@@ -133,6 +133,11 @@ export default class IntroLevelScene extends ProjectScene {
             case MainMenuButtonEvent.Help: {
                 this.viewport.setZoomLevel(1);
                 this.sceneManager.changeToScene(HelpScene);
+                break;
+            }
+            case MainMenuButtonEvent.CHEAT:{
+                this.viewport.setZoomLevel(1);
+                this.sceneManager.changeToScene(CheatCodeMenuScene);
                 break;
             }
             case MainMenuButtonEvent.Exit: {

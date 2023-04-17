@@ -689,7 +689,7 @@ export default abstract class ProjectScene extends Scene {
         let emptyMenuOption = {
             position: this.center,
             text: "",
-            size: new Vec2(300, 450),
+            size: new Vec2(300, 550),
             layerName: GameLayers.CONTAINER,
             backgroundColor: Color.WHITE,
         }
