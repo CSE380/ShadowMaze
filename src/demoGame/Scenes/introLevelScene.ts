@@ -76,7 +76,6 @@ export default class IntroLevelScene extends ProjectScene {
     /**
      * @see Scene.startScene
      */
-   
 
     // public updateScene() {
     //     while (this.receiver.hasNextEvent()) {
