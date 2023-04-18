@@ -7,11 +7,6 @@ import GameEvent from "../../Wolfie2D/Events/GameEvent";
 import { BackButtonEvent, SelectMenuButtonEvent } from "../CustomizedButton";
 import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
 import IntroLevelScene from "./IntroLevelScene";
-import LevelTwo from "./LevelTwo";
-import LevelThree from "./LevelThree";
-import LevelFour from "./LevelFour";
-import LevelFive from "./LevelFive";
-import LevelSix from "./LevelSix";
 import { GameLayers } from "../GameLayers";
 import AbstractScene from "./AbstractScene";
 import CheatCodeMenuScene from "./CheatCodeMenuScene";
@@ -36,7 +31,6 @@ export default class MainMenu extends AbstractScene  {
         this.backgroundImage.position.set(center.x, center.y);
         // The main menu
         let positionY=center.y - 100;
-
         let i = 0 ;
         for(let buttonName in SelectMenuButtonEvent){
             buttonName = SelectMenuButtonEvent[buttonName]
@@ -50,7 +44,7 @@ export default class MainMenu extends AbstractScene  {
                 this.addButtons(buttonOption);
                 break;
             }
-            i++;     
+            i++;
         }
         this.addBackButon(center);
     }
@@ -74,25 +68,16 @@ export default class MainMenu extends AbstractScene  {
                 break;
             }
             case SelectMenuButtonEvent.LEVEL_2: {
-                this.sceneManager.changeToScene(LevelTwo,this.option);
-                break;
-            }
-            case SelectMenuButtonEvent.LEVEL_3: {
-                this.sceneManager.changeToScene(LevelThree,this.option);
-                break;
-            }
-            case SelectMenuButtonEvent.LEVEL_4: {
-                this.sceneManager.changeToScene(LevelFour,this.option);
-                break;
-            }
-            case SelectMenuButtonEvent.LEVEL_5: {
-                this.sceneManager.changeToScene(LevelFive,this.option);
+                // this.sceneManager.changeToScene(AstarDemoScene);
                 break;
             }
             case SelectMenuButtonEvent.LEVEL_6: {
-                this.sceneManager.changeToScene(LevelSix,this.option);
-                break;
+
             }
+            // case SelectMenuButtonEvent.CHEAT:{
+               
+            //     this.sceneManager.changeToScene( CheatCodeMenuScene);
+            // }
         }
     }
 }

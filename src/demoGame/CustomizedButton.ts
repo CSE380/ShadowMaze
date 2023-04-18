@@ -9,12 +9,12 @@ export enum MainMenuButtonEvent {
 }
 
 export enum SelectMenuButtonEvent {
-    LEVEL_1 = "Level 1",
-    LEVEL_2 = "LEVEL 2",
-    LEVEL_3 = "LEVEL 3",
-    LEVEL_4 = "LEVEL 4",
-    LEVEL_5 = "LEVEL 5",
-    LEVEL_6 = "LEVEL 6",
+    LEVEL_1 = "INTRO",
+    LEVEL_2 = "REGULAR",
+    LEVEL_3 = "SPEED RUN",
+    LEVEL_4 = "TREASURE HUNTER",
+    LEVEL_5 = "CRINGE",
+    LEVEL_6 = "FINAL BOSS",
     
 }
 export enum PauseButtonEvent {

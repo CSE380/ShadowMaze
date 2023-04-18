@@ -89,11 +89,10 @@ export default class MainMenu extends Scene {
             }
             case MainMenuButtonEvent.Exit:{
                 this.sceneManager.changeToScene(StartScene);
-                break;
             }
             case MainMenuButtonEvent.CHEAT:{
-                this.sceneManager.changeToScene(CheatCodeMenuScene);
-                break;
+               
+                this.sceneManager.changeToScene( CheatCodeMenuScene);
             }
         }
     }
