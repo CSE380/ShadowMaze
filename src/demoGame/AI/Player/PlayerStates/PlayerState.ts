@@ -22,8 +22,8 @@ export enum PlayerStateType {
 
 export default abstract class PlayerState extends State {
 
-    protected parent: PlayerAI;
-    protected owner: PlayerActor;
+    public parent: PlayerAI;
+    public owner: PlayerActor;
 
     public constructor(parent: PlayerAI, owner: PlayerActor) {
         super(parent);
@@ -39,6 +39,7 @@ export default abstract class PlayerState extends State {
         // }
         // Adjust the angle the player is facing 
         // this.parent.owner.rotation = this.parent.controller.rotation;
+
         let princeDirection = this.parent.controller.moveDir;
         //change direction of the prince
         if (princeDirection.x == 0) {

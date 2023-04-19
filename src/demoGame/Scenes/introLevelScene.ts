@@ -54,10 +54,6 @@ export default class IntroLevelScene extends ProjectScene {
     // The wall layer of the tilemap
     // The position graph for the navmesh
 
-    
-
-
-
     /**
      * @see Scene.update()
      */
@@ -76,7 +72,6 @@ export default class IntroLevelScene extends ProjectScene {
     /**
      * @see Scene.startScene
      */
-
     // public updateScene() {
     //     while (this.receiver.hasNextEvent()) {
     //         const gameEvent = this.receiver.getNextEvent()

@@ -212,7 +212,14 @@ export default abstract class ProjectScene extends Scene {
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
         this.initAllGameItems();
+        this.initializeMonsters();
     }
+
+    protected initializeMonsters(): void {
+        let monster = this.load.getObject("");
+        
+    }
+
     public loadScene(): void {
         this.loadAllGameItems();
         // this.loadGameItems(this.laserGunsKey);
@@ -432,6 +439,7 @@ export default abstract class ProjectScene extends Scene {
         this.isLevelEnd();
         this.isPlayerAtItems();
         this.isUseItem();
+        console.log(this.player);
     }
     protected isUseItem() {
         ItemButtonKeyArray.forEach(key => {

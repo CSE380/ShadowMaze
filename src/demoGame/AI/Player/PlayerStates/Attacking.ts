@@ -12,7 +12,9 @@ export default class Attacking extends PlayerState {
     protected timer: Timer;
     
     public override onEnter(options: Record<string, any>): void {
+        console.log("attacking");
         this.parent.owner.animation.play(PlayerAnimations.ATTACKING, false);
+        // console.log(this.parent.owner.rotation);
     }
 
     public override update(deltaT: number): void {
