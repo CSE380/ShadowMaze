@@ -100,7 +100,7 @@ export default class IntroLevelScene extends ProjectScene {
 
 
     public handleEvent(event: GameEvent): void {
-        
+        console.log(event);
         this.handleInGameButtonEvent(event);
         // action type:
         // console.log(event.data.get(this.action) )
@@ -110,6 +110,8 @@ export default class IntroLevelScene extends ProjectScene {
             this.handleUseGameItemsEvent(event);
         if (event.type == "BATTLER_KILLED")
             this.handleBattlerKilled(event);
+        if (event.type == "PRINCE_HIT")
+            this.handleHealthChange(this.player.health-=5, this.player.maxHealth);
     }
 
     protected handleInGameButtonEvent(event:GameEvent){

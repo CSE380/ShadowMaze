@@ -5,6 +5,8 @@ export enum BattlerEvent {
     BATTLER_CHANGE = "BATTLER_CHANGE",
     CONSUME = "CONSUME",
     HIT = "HIT",
+
+    PRINCE_HIT = "PRINCE_HIT"
 }
 
 export enum ItemEvent {

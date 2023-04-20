@@ -120,7 +120,6 @@ export default abstract class ProjectScene extends Scene {
     protected levelTransitionTimer: Timer;
 
     //Li
-    private healthbars: Map<number, HealthbarHUD>;
     private battlers: (Battler & Actor)[];
 
     protected option: Record<string, any>;
@@ -223,7 +222,8 @@ export default abstract class ProjectScene extends Scene {
 
         // this.initFogOfWar();
         
-        this.receiver.subscribe(BattlerEvent.BATTLER_KILLED);        
+        this.receiver.subscribe(BattlerEvent.BATTLER_KILLED); 
+        this.receiver.subscribe(BattlerEvent.PRINCE_HIT);       
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
@@ -232,7 +232,6 @@ export default abstract class ProjectScene extends Scene {
     }
 
     protected initializeNPCs(): void {
-        console.log("initialize the NPC");
         let red = this.load.getObject("red");
         for (let i = 0; i < red.healers.length; i++) {
             let npc = this.add.animatedSprite(NPCActor, "RedHealer", this.GameLayers.BASE);
@@ -502,12 +501,10 @@ export default abstract class ProjectScene extends Scene {
 
     }
     protected handleBattlerKilled(event: GameEvent) {
-        console.log("handle battler killed");
         let id: number = event.data.get("id");
         let battler = this.battlers.find(b => b.id === id);
         if (battler) {
             battler.battlerActive = false;
-            console.log(battler);
         }
     }
     protected handleUseGameItemsEvent(event: GameEvent) {
@@ -681,7 +678,8 @@ export default abstract class ProjectScene extends Scene {
                 this.emitter.fireEvent(BattlerEvent.BATTLER_KILLED, {id: battler.id});
             }
             if (battler.battlerActive && battler.position.distanceTo(this.player.position) < 10) {
-                this.emitter.fireEvent(BattlerEvent.BATTLER_KILLED, {id: battler.id});
+                this.emitter.fireEvent(BattlerEvent.PRINCE_HIT);
+                // this.emitter.fireEvent(BattlerEvent.BATTLER_KILLED, {id: battler.id});
             }
         }   
     }
