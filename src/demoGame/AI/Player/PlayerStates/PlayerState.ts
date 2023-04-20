@@ -43,7 +43,7 @@ export default abstract class PlayerState extends State {
         //change direction of the prince
         if (princeDirection.x == 0) {
             if (princeDirection.y > 0) {
-                this.parent.owner.rotation = 3;
+                this.parent.owner.rotation = 3.15;
             }
             if (princeDirection.y < 0) {
                 this.parent.owner.rotation = 0;
@@ -51,7 +51,7 @@ export default abstract class PlayerState extends State {
         }
         if (princeDirection.y == 0) {
             if (princeDirection.x > 0) {
-                this.parent.owner.rotation = 4.5;
+                this.parent.owner.rotation = 4.75;
             }
             if (princeDirection.x < 0) {
                 this.parent.owner.rotation = 1.5;

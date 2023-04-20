@@ -69,8 +69,10 @@ export default class IntroLevelScene extends ProjectScene {
         this.initLevelScene();
         // this.loadGameItems(this.laserGunsKey);
         this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince_v4.json");
+        this.load.spritesheet("RedHealer", "shadowMaze_assets/spritesheets/RedHealer.json");
+        this.load.object("red", "shadowMaze_assets/data/enemies/red.json");
         // Load the tilemap
-        this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
+        this.load.tilemap("level", "shadowMaze_assets/tilemaps/LI_TEST_MAP.json");
 
     }
     /**
@@ -101,11 +103,13 @@ export default class IntroLevelScene extends ProjectScene {
         
         this.handleInGameButtonEvent(event);
         // action type:
-        console.log(event.data.get(this.action) )
+        // console.log(event.data.get(this.action) )
         if (event.data.get(this.action) == ACTIONTYPE.PICK)
             this.handlePickGameItemsEvent(event);
         if (event.data.get(this.action) == ACTIONTYPE.USE)
             this.handleUseGameItemsEvent(event);
+        if (event.type == "BATTLER_KILLED")
+            this.handleBattlerKilled(event);
     }
 
     protected handleInGameButtonEvent(event:GameEvent){

@@ -21,6 +21,8 @@ import { PhysicsGroups } from "../PhysicsGroups";
 import { PlayerEvents } from "../ProjectEvents";
 import SelectLevelMenuScene from "./SelectLevelMenuScene";
 import InventoryHUD from "../GameSystems/HUD/InventoryHUD";
+import Actor from "../../Wolfie2D/DataTypes/Interfaces/Actor";
+import { BattlerEvent } from "../ProjectEvents";
 
 // import HelpScene from "./HelpScene";
 // import StartScene from "./StartScene";
@@ -49,6 +51,9 @@ import Navmesh from "../../Wolfie2D/Pathfinding/Navmesh";
 import MathUtils from "../../Wolfie2D/Utils/MathUtils";
 import NavigationPath from "../../Wolfie2D/Pathfinding/NavigationPath";
 import AstarStrategy from "../Pathfinding/AstarStrategy";
+import NPCActor from "../Actors/NPCActor";
+import HealthbarHUD from "../GameSystems/HUD/HealthbarHUD";
+import HealerBehavior from "../AI/NPC/NPCBehavior/HealerBehavior";
 export default abstract class ProjectScene extends Scene {
     protected walls: OrthogonalTilemap;
     protected path: NavigationPath;
@@ -114,6 +119,10 @@ export default abstract class ProjectScene extends Scene {
     // Level end transition timer and graphic
     protected levelTransitionTimer: Timer;
 
+    //Li
+    private healthbars: Map<number, HealthbarHUD>;
+    private battlers: (Battler & Actor)[];
+
     protected option: Record<string, any>;
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, {
@@ -131,6 +140,9 @@ export default abstract class ProjectScene extends Scene {
         // for (const layerName of this.layerNames) {
         //     this[layerName] = layerName;
         // }
+
+        this.battlers = new Array<Battler & Actor>();
+
     }
     public initScene(option: Record<string, any>): void {
         if(option !== undefined)
@@ -207,16 +219,38 @@ export default abstract class ProjectScene extends Scene {
         // create screen first 
         console.log(this.option.isfogOfWarChecked)
         if(!this.option.isfogOfWarChecked)
-        this.initFogOfWar();
+
+
+        // this.initFogOfWar();
+        
+        this.receiver.subscribe(BattlerEvent.BATTLER_KILLED);        
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
         this.initAllGameItems();
+        this.initializeNPCs()
     }
+
+    protected initializeNPCs(): void {
+        console.log("initialize the NPC");
+        let red = this.load.getObject("red");
+        for (let i = 0; i < red.healers.length; i++) {
+            let npc = this.add.animatedSprite(NPCActor, "RedHealer", this.GameLayers.BASE);
+            npc.position.set(red.healers[i][0], red.healers[i][1]);
+            npc.addPhysics(new AABB(Vec2.ZERO, new Vec2(7,7)), null, false);
+
+            // npc.addAI(HealerBehavior);
+            this.battlers.push(npc);
+            npc.animation.play("IDLE");
+        }
+    }
+
     public loadScene(): void {
         this.loadAllGameItems();
         // this.loadGameItems(this.laserGunsKey);
         this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince.json");
+
+
         // Load the tilemap
         this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
 
@@ -416,6 +450,7 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     public updateScene() {
+
         while (this.receiver.hasNextEvent()) {
             const gameEvent = this.receiver.getNextEvent()
             this.handleEvent(gameEvent);
@@ -431,8 +466,11 @@ export default abstract class ProjectScene extends Scene {
         this.updateLabel();
         this.isLevelEnd();
         this.isPlayerAtItems();
+        this.isPlayerAttacking();
         this.isUseItem();
     }
+
+
     protected isUseItem() {
         ItemButtonKeyArray.forEach(key => {
             if (Input.isKeyJustPressed(key)) {
@@ -463,7 +501,15 @@ export default abstract class ProjectScene extends Scene {
         }
 
     }
-
+    protected handleBattlerKilled(event: GameEvent) {
+        console.log("handle battler killed");
+        let id: number = event.data.get("id");
+        let battler = this.battlers.find(b => b.id === id);
+        if (battler) {
+            battler.battlerActive = false;
+            console.log(battler);
+        }
+    }
     protected handleUseGameItemsEvent(event: GameEvent) {
         this.RemoveItemFromInventory(event)
         switch (event.type) {
@@ -598,6 +644,48 @@ export default abstract class ProjectScene extends Scene {
         this.getLayer(GameLayers.CONTAINER).setHidden(flag);
         this.getLayer(GameLayers.PAUSE_MENU).setHidden(flag);
     }
+
+    protected isPlayerAttacking() {
+        let midpoint = null;
+        switch (this.player.rotation) {
+            case 0:
+                midpoint = new Vec2(this.player.position.x, this.player.position.y - 15);
+                break;
+            case 3.15:
+                midpoint = new Vec2(this.player.position.x, this.player.position.y + 15);
+                break;
+            case 1.15:
+                midpoint = new Vec2(this.player.position.x - 15, this.player.position.y);
+                break;
+            case 4.75:
+                midpoint = new Vec2(this.player.position.x + 15, this.player.position.y);
+                break;
+            case 5.25:
+                midpoint = new Vec2(this.player.position.x + 10, this.player.position.y - 10);
+                break;
+            case 0.75:
+                midpoint = new Vec2(this.player.position.x - 10, this.player.position.y - 10);
+                break;
+            case 3.75:
+                midpoint = new Vec2(this.player.position.x + 10, this.player.position.y + 10);
+                break;
+            case 2.25:
+                midpoint = new Vec2(this.player.position.x - 10, this.player.position.y + 10);
+                break;
+            default:
+                midpoint = this.player.position;
+                break;
+        }
+        for (const battler of this.battlers) {
+            if (battler.battlerActive && battler.position.distanceTo(midpoint) <= 15 && this.player.animation.isPlaying("ATTACKING")) {
+                this.emitter.fireEvent(BattlerEvent.BATTLER_KILLED, {id: battler.id});
+            }
+            if (battler.battlerActive && battler.position.distanceTo(this.player.position) < 10) {
+                this.emitter.fireEvent(BattlerEvent.BATTLER_KILLED, {id: battler.id});
+            }
+        }   
+    }
+
     protected isPlayerAtItems() {
         for (const gameItems of this.gameItemsMap.values()) {
             gameItems.forEach(gameItem => {
@@ -608,6 +696,7 @@ export default abstract class ProjectScene extends Scene {
             })
         }
     }
+
     protected displayVec2(position: Vec2) {
         console.log(position.x + "      " + position.y)
     }
@@ -630,7 +719,7 @@ export default abstract class ProjectScene extends Scene {
         // });
 
         // Give the player physics
-        player.addPhysics(new AABB(Vec2.ZERO, new Vec2(8, 8)));
+        player.addPhysics(new AABB(Vec2.ZERO, new Vec2(8, 8)), null, true);
         // player.setGroup(PhysicsGroups.PLAYER);
         this.buildLightShape();
         this.initCurrLabel();
