@@ -41,7 +41,7 @@ export default class HelpScene extends HW4Scene {
         }
         this.addLabel(textOption);
         this.addHelpTextLayer(helpTextOption);
-        this.addBackButon(center);
+        this.addBackButon(this.backButtonPosition);
     }
     public updateScene() {
         while (this.receiver.hasNextEvent()) {

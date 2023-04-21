@@ -46,7 +46,7 @@ export default class MainMenu extends AbstractScene  {
             }
             i++;
         }
-        this.addBackButon(center);
+        this.addBackButon(this.backButtonPosition);
     }
 
     public updateScene() {

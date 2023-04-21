@@ -50,7 +50,7 @@ export default class ControlScene extends HW4Scene {
             backgroundColor:Color.TRANSPARENT,
         }
         this.addControlTextLayer(controlTextOption);
-        this.addBackButon(center);
+        this.addBackButon(this.backButtonPosition);
     }
       public updateScene() {
         while (this.receiver.hasNextEvent()) {

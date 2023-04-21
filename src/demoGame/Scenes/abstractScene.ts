@@ -58,6 +58,7 @@ import AstarStrategy from "../Pathfinding/AstarStrategy";
 import NPCActor from "../Actors/NPCActor";
 import HealthbarHUD from "../GameSystems/HUD/HealthbarHUD";
 import HealerBehavior from "../AI/NPC/NPCBehavior/HealerBehavior";
+import { MenuState } from "../MenuState";
 export default abstract class ProjectScene extends Scene {
     protected walls: OrthogonalTilemap;
     protected path: NavigationPath;
@@ -68,6 +69,9 @@ export default abstract class ProjectScene extends Scene {
     protected action = "action";
     protected backgroundImage: Sprite;
     protected GameLayers = GameLayers;
+    protected backButtonPosition = new Vec2(50,50);
+
+
     //Level end
     protected center: Vec2;
     protected levelEndArea: Rect;
@@ -85,7 +89,6 @@ export default abstract class ProjectScene extends Scene {
     protected door: Sprite
     protected backgroundImageKey: string;
     //ui
-    protected inventoryHud: InventoryHUD;
     // Health labels
     protected healthLabel: Label;
     protected healthBar: Label;
@@ -114,9 +117,10 @@ export default abstract class ProjectScene extends Scene {
     protected currLabels: Array<Label>;
     protected nextLabels: Array<Label>;
 
-    protected 
+    
     protected labelSize: number;
     protected isPauseMenuHidden: boolean;
+    protected MenuCurentState : MenuState;
     // relative path to the assets
     protected pathToItems = `shadowMaze_assets/data/items/`;
     protected pathToSprite = `shadowMaze_assets/sprites/`;
@@ -135,6 +139,7 @@ export default abstract class ProjectScene extends Scene {
         });
         this.labelSize = 32;
         this.isPauseMenuHidden = true;
+        this.MenuCurentState = MenuState.HIDDEN;
         this.option = {
             isAstarChecked: false,
             isfogOfWarChecked:  false,
@@ -220,7 +225,7 @@ export default abstract class ProjectScene extends Scene {
         if(!this.option.isfogOfWarChecked)
 
 
-        // this.initFogOfWar();
+        this.initFogOfWar();
         
         this.receiver.subscribe(BattlerEvent.BATTLER_KILLED); 
         this.receiver.subscribe(BattlerEvent.PRINCE_HIT);       
@@ -409,8 +414,9 @@ export default abstract class ProjectScene extends Scene {
    
     protected addBackButon(position: Vec2) {
         const leftArrow = '\u2190';
+        console.log(position.x );
         let buttonOption = {
-            position: new Vec2(position.x - 470, position.y - 470),
+            position: new Vec2(position.x , position.y ),
             text: leftArrow,
             buttonName: BackButtonEvent.BACK,
         }
@@ -428,6 +434,7 @@ export default abstract class ProjectScene extends Scene {
                 align: "left",
                 backgroundColor: Color.TRANSPARENT,
                 fontSize: option.fontSize,
+                layerName:GameLayers.HELP_TEXT_MENU,
             }
             this.addLabel(textOption);
         }
@@ -500,6 +507,7 @@ export default abstract class ProjectScene extends Scene {
             }
             case GameItems.DOOR: {
                 this.showLevelEndPosition();
+                break;
             }
             case GameItems.HEALTH_PACKS: {
 
@@ -509,8 +517,52 @@ export default abstract class ProjectScene extends Scene {
     protected RemoveItemFromInventory(event: GameEvent) {
         const gameItem = event.data.get("gameItem")
         gameItem.visible = false;
-
-
+    }
+    protected handleMenuStateChange(){
+        switch(this.MenuCurentState){
+            case MenuState.HIDDEN:{
+                this.MenuCurentState = MenuState.SHOWN;
+                break;
+            }
+            case MenuState.SHOWN:{
+                this.MenuCurentState = MenuState.HIDDEN;
+                break;
+            }
+            case MenuState.CONTROL_TEXT_MENU_SHOWN:{
+                this.MenuCurentState = MenuState.SHOWN;
+                break;
+            }
+            case MenuState.HELP_TEXT_MENU_SHOWN:{
+                this.MenuCurentState = MenuState.SHOWN;
+                break;
+            }
+        }
+    }
+    protected handleMenuShown(){
+        switch(this.MenuCurentState){
+            case MenuState.HIDDEN:{
+                this.setContainerAndMenu(GameLayers.PAUSE_MENU_CONTAINER,GameLayers.PAUSE_MENU,true)
+                break;
+            }
+            case MenuState.SHOWN:{
+                this.setContainerAndMenu(GameLayers.PAUSE_MENU_CONTAINER,GameLayers.PAUSE_MENU,false)
+                this.setContainerAndMenu(GameLayers.CONTROL_TEXT_MENU_CONTAINER,GameLayers.CONTROL_TEXT_MENU,true)
+                this.setContainerAndMenu(GameLayers.HELP_TEXT_MENU_CONTAINER,GameLayers.HELP_TEXT_MENU,true)
+                break;
+            }
+            case MenuState.CONTROL_TEXT_MENU_SHOWN:{
+                this.setContainerAndMenu(GameLayers.CONTROL_TEXT_MENU_CONTAINER,GameLayers.CONTROL_TEXT_MENU,false)
+                break;
+            }
+            case MenuState.HELP_TEXT_MENU_SHOWN:{
+                this.setContainerAndMenu(GameLayers.HELP_TEXT_MENU_CONTAINER,GameLayers.HELP_TEXT_MENU,false)
+                break;
+            }
+        }
+    }
+    protected setContainerAndMenu(container:string,menu:string,flag:boolean,){
+        this.getLayer(container).setHidden(flag);
+        this.getLayer(menu).setHidden(flag);
     }
     protected handlePickGameItemsEvent(event: GameEvent) {
         this.putItemToInventory(event)
@@ -557,10 +609,6 @@ export default abstract class ProjectScene extends Scene {
         label.size.set(this.labelSize * 2, this.labelSize * 2);
         label.borderWidth = 0;
         label.borderRadius = 0;
-        // console.log(label.padding)
-        // label.setHAlign("left");
-        // label.setVAlign("top");
-        label.setFontSize(60)
         label.borderColor = Color.TRANSPARENT;
         label.backgroundColor = Color.BLACK;
     }
@@ -598,13 +646,15 @@ export default abstract class ProjectScene extends Scene {
             this.addLayer(layer, depth);
             depth++;
         }
-        
-        this.showPauseMenu(this.isPauseMenuHidden);
+        this.setContainerAndMenu(GameLayers.PAUSE_MENU_CONTAINER,GameLayers.PAUSE_MENU,true);
+        this.setContainerAndMenu(GameLayers.CONTROL_TEXT_MENU_CONTAINER,GameLayers.CONTROL_TEXT_MENU,true)
+        this.setContainerAndMenu(GameLayers.HELP_TEXT_MENU_CONTAINER,GameLayers.HELP_TEXT_MENU,true)
+
         
     }
     protected handleHealthChange(currentHealth: number, maxHealth: number): void {
+        
         let unit = this.healthBarBg.size.x / maxHealth;
-
         this.healthBar.size.set(
             this.healthBarBg.size.x - unit * (maxHealth - currentHealth),
             this.healthBarBg.size.y
@@ -621,10 +671,7 @@ export default abstract class ProjectScene extends Scene {
                     ? Color.YELLOW
                     : Color.GREEN;
     }
-    protected showPauseMenu(flag: boolean): void {
-        this.getLayer(GameLayers.CONTAINER).setHidden(flag);
-        this.getLayer(GameLayers.PAUSE_MENU).setHidden(flag);
-    }
+   
 
     protected isPlayerAttacking() {
         let midpoint = null;
@@ -738,7 +785,7 @@ export default abstract class ProjectScene extends Scene {
         let controlTextOption = {
             position: new Vec2(450, 450),
             margin: 40,
-            layerName:GameLayers.TEXT_MENU
+            layerName:GameLayers.CONTROL_TEXT_MENU
         }
         this.addControlTextLayer(controlTextOption)
     }
@@ -762,7 +809,7 @@ export default abstract class ProjectScene extends Scene {
         let helpTextOption = {
             position: new Vec2(450, 450),
             margin: 40,
-            layerName: GameLayers.TEXT_MENU
+            layerName: GameLayers.CONTROL_TEXT_MENU
         }
         this.addHelpTextLayer(helpTextOption)
     }
@@ -780,10 +827,28 @@ export default abstract class ProjectScene extends Scene {
             position: this.center,
             text: "",
             size: new Vec2(300, 550),
-            layerName: GameLayers.CONTAINER,
+            layerName: GameLayers.PAUSE_MENU_CONTAINER,
             backgroundColor: Color.WHITE,
         }
         this.addLabel(emptyMenuOption);
+        let controlTextMenuOption = {
+            position: new Vec2(256,256),
+            text: "",
+            size: new Vec2(1000, 1000),
+            layerName: this.GameLayers.CONTROL_TEXT_MENU_CONTAINER,
+            backgroundColor: new Color(0,0,0,0.99),
+        }
+        this.addLabel(controlTextMenuOption);
+        this.initControlTextLayer()
+        let helpTextMenuOption = {
+            position: new Vec2(256,256),
+            text: "",
+            size: new Vec2(1000, 1000),
+            layerName: this.GameLayers.HELP_TEXT_MENU_CONTAINER,
+            backgroundColor: new Color(0,0,0,0.99),
+        }
+        this.addLabel(helpTextMenuOption);
+        this.initHelpTextLayer();
         let pauseTextOption = {
             position: new Vec2(this.center.x, this.center.y - 100),
             text: "Paused",

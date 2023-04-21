@@ -42,6 +42,7 @@ import { PhysicsGroups } from "../PhysicsGroups";
 import { PlayerEvents } from "../ProjectEvents";
 import CheatCodeMenuScene from "./CheatCodeMenuScene";
 import Scene from "../../Wolfie2D/Scene/Scene";
+import { MenuState } from "../MenuState";
 const ACTIONTYPE = {
     PICK: "PICK",
     USE: "USE",
@@ -101,7 +102,6 @@ export default class IntroLevelScene extends ProjectScene {
 
 
     public handleEvent(event: GameEvent): void {
-        console.log(event);
         this.handleInGameButtonEvent(event);
         // action type:
         // console.log(event.data.get(this.action) )
@@ -112,7 +112,7 @@ export default class IntroLevelScene extends ProjectScene {
         if (event.type == "BATTLER_KILLED")
             this.handleBattlerKilled(event);
         if (event.type == "PRINCE_HIT")
-            this.handleHealthChange(this.player.health-=5, this.player.maxHealth);
+            this.handleHealthChange(this.player.health-=1, this.player.maxHealth);
     }
     protected handleInGameButtonEvent(event:GameEvent){
         let nextScene;
@@ -122,39 +122,22 @@ export default class IntroLevelScene extends ProjectScene {
                 return;
             }
             case PauseButtonEvent.PAUSE: {
-               
-                this.isPauseMenuHidden = !this.isPauseMenuHidden;
-                this.showPauseMenu(this.isPauseMenuHidden);
+                this.handleMenuStateChange();
+                this.handleMenuShown();
                 break;
             }
             case MainMenuButtonEvent.Select_levels: {
-                 nextScene = SelectLevelMenuScene
+                nextScene = SelectLevelMenuScene
                 break;
             }
             case MainMenuButtonEvent.Controls: {
-                // nextScene = ControlScene
-                let emptyMenuOption = {
-                    position: this.center,
-                    text: "",
-                    size: new Vec2(500, 1050),
-                    layerName: this.GameLayers.PAUSE_MENU,
-                    backgroundColor: Color.BLACK,
-                }
-                // this.addLabel(emptyMenuOption);
-                
-                // let label = this.add.uiElement(UIElementType.LABEL,this.GameLayers.UI);
-                let label = <Label>this.add.uiElement(UIElementType.LABEL,this.GameLayers.UI, {position: new Vec2(205, 205), text: "HP ",size:new Vec2(205, 500),  backgroundColor: Color.BLACK,});
-                // console.log(label.setBackgroundColor(Color.BLACK));
-                label.setSize( new Vec2(500, 1050))
-                label.backgroundColor = Color.BLACK;
-            
-                console.log(label)
-                // this.initControlTextLayer();
+                this.MenuCurentState = MenuState.CONTROL_TEXT_MENU_SHOWN
+                this.handleMenuShown();
                 return;
             }
             case MainMenuButtonEvent.Help: {
-                nextScene = HelpScene
-               
+                this.MenuCurentState = MenuState.HELP_TEXT_MENU_SHOWN
+                this.handleMenuShown();
                 break;
             }
             case MainMenuButtonEvent.CHEAT:{
