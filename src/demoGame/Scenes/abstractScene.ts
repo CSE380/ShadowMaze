@@ -27,7 +27,6 @@ import { BattlerEvent } from "../ProjectEvents";
 // scene import
 // import IntroLevelScene from "./IntroLevelScene";
 // import HelpScene from "./HelpScene";
-// import StartScene from "./StartScene";
 // import ControlScene from "./ControlScene";
 // import CheatCodeMenuScene from "./CheatCodeMenuScene";
 
@@ -77,7 +76,7 @@ export default abstract class ProjectScene extends Scene {
     protected levelEndArea: Rect;
     protected levelEndLabel: Label;
     protected playerInitPosition = new Vec2(15, 300);
-    protected levelEndPosition = new Vec2(308, 20);
+    protected levelEndPosition = new Vec2(28, 250);
     protected levelEndHalfSize = new Vec2(25, 25)
     protected levelEndColor = new Color(255, 0, 0, 0.5);
     protected levelEndTimer: Timer;
@@ -197,6 +196,11 @@ export default abstract class ProjectScene extends Scene {
                 if (key === "inventorySlot") {
                     sprite = this.add.sprite(key, this.GameLayers.BEFORE_BASE);
                     line = <Line>this.add.graphic(GraphicType.LINE, this.GameLayers.BEFORE_BASE, { start: Vec2.ZERO, end: Vec2.ZERO });
+                    let numOfSlots = <Label>this.add.uiElement(UIElementType.LABEL, this.GameLayers.BEFORE_BASE, { position:new Vec2(gameItem.position[i][0]-17, gameItem.position[i][1]),text:`${i + 1}`});
+                    numOfSlots.fontSize = 24;
+                    numOfSlots.font = "Courier";
+                    numOfSlots.textColor = Color.BLACK;
+                    // numOfSlots.position.set(gameItem.position[i][0]-100, gameItem.position[i][1])
                 }
                 else {
                     sprite = this.add.sprite(key, this.GameLayers.BASE);
@@ -223,17 +227,17 @@ export default abstract class ProjectScene extends Scene {
         // this.initUI();
         // create screen first 
         if(!this.option.isfogOfWarChecked)
-
-
-        this.initFogOfWar();
+            // this.initFogOfWar();
         
-        this.receiver.subscribe(BattlerEvent.BATTLER_KILLED); 
-        this.receiver.subscribe(BattlerEvent.PRINCE_HIT);       
+             
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
         this.initAllGameItems();
-        this.initializeNPCs()
+        this.initializeNPCs();
+        this.addLevelEndLabel();
+        this.levelEndLabel.tweens.play("slideIn");
+        
     }
 
     protected initializeNPCs(): void {
@@ -268,7 +272,10 @@ export default abstract class ProjectScene extends Scene {
 
 
     protected initSubscribe() {
-        this.receiver.subscribe(PlayerEvents.PLAYER_ENTERED_LEVEL_END)
+        this.receiver.subscribe(PlayerEvents.PLAYER_ENTERED_LEVEL_END);
+        this.receiver.subscribe(PlayerEvents.LEVEL_END);
+        this.receiver.subscribe(BattlerEvent.BATTLER_KILLED); 
+        this.receiver.subscribe(BattlerEvent.PRINCE_HIT);  
         this.initgameItemEventSubscribe();
     }
     protected initgameItemEventSubscribe() {
@@ -364,7 +371,9 @@ export default abstract class ProjectScene extends Scene {
             this.isLevelEndEnetered = true;
             this.addLevelEndLabel();
             this.levelEndLabel.tweens.play("slideIn");
+           
         }
+       
     }
     protected initializeLevelEnds() {
         this.levelEndArea = <Rect>this.add.graphic(GraphicType.RECT, this.GameLayers.BASE, { position: this.levelEndPosition, size: this.levelEndHalfSize });
@@ -375,14 +384,13 @@ export default abstract class ProjectScene extends Scene {
 
     }
     protected addLevelEndLabel() {
-        this.levelEndLabel = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.UI, { position: new Vec2(500, 100), text: "Level Complete" });
-        this.levelEndLabel.size.set(1500, 60);
+        this.levelEndLabel = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.UI, { position: new Vec2(20, 96), text: "Level Complete" });
+        this.levelEndLabel.size.set(1200, 60);
         this.levelEndLabel.borderRadius = 0;
         this.levelEndLabel.backgroundColor = new Color(34, 32, 52);
         this.levelEndLabel.textColor = Color.WHITE;
         this.levelEndLabel.fontSize = 48;
         this.levelEndLabel.font = "PixelSimple";
-
         // console.log(this.levelEndLabel)
         this.levelEndLabel.tweens.add("slideIn", {
             startDelay: 0,
@@ -391,7 +399,7 @@ export default abstract class ProjectScene extends Scene {
                 {
                     property: TweenableProperties.posX,
                     start: 0,
-                    end: 150,
+                    end: 270,
                     ease: EaseFunctionType.OUT_SINE
                 }
             ],
@@ -414,7 +422,6 @@ export default abstract class ProjectScene extends Scene {
    
     protected addBackButon(position: Vec2) {
         const leftArrow = '\u2190';
-        console.log(position.x );
         let buttonOption = {
             position: new Vec2(position.x , position.y ),
             text: leftArrow,
@@ -593,7 +600,7 @@ export default abstract class ProjectScene extends Scene {
     public initFogOfWar() {
         const len = this.wallSize / this.labelSize;
         for (let i = 0; i <= 2 * len; i++) {
-            for (let j = 8; j <= 2 * len; j++) {
+            for (let j = 6; j <= 2 * len; j++) {
                 let x = 0.5 * i * this.labelSize;
                 let y = 0.5 * j * this.labelSize;
                 let options = {

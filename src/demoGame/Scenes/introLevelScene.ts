@@ -102,9 +102,9 @@ export default class IntroLevelScene extends ProjectScene {
 
 
     public handleEvent(event: GameEvent): void {
+        console.log(event)
         this.handleInGameButtonEvent(event);
         // action type:
-        // console.log(event.data.get(this.action) )
         if (event.data.get(this.action) == ACTIONTYPE.PICK)
             this.handlePickGameItemsEvent(event);
         if (event.data.get(this.action) == ACTIONTYPE.USE)
@@ -116,6 +116,7 @@ export default class IntroLevelScene extends ProjectScene {
     }
     protected handleInGameButtonEvent(event:GameEvent){
         let nextScene;
+        
         switch (event.type) {
             case MainMenuButtonEvent.Restart: {
                 nextScene = IntroLevelScene
@@ -142,7 +143,6 @@ export default class IntroLevelScene extends ProjectScene {
             }
             case MainMenuButtonEvent.CHEAT:{
                 nextScene = CheatCodeMenuScene
-             
                 break;
             }
             case MainMenuButtonEvent.Exit: {
@@ -156,10 +156,12 @@ export default class IntroLevelScene extends ProjectScene {
             case PlayerEvents.LEVEL_END: {
                 setTimeout(() => {
                     nextScene = SelectLevelMenuScene
+                    this.viewport.setZoomLevel(1);
+                    this.sceneManager.changeToScene(nextScene,this.option);
                 }, 2000)
+                return
             }
         }
-        console.log()
         if(nextScene){
             this.viewport.setZoomLevel(1);
             this.sceneManager.changeToScene(nextScene,this.option);
