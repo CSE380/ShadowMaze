@@ -36,7 +36,9 @@ export default class Label extends UIElement {
 	setText(text: string): void {
 		this.text = text;
 	}
-
+	setSize(newSize:Vec2):void{
+		this.size = newSize;
+	}
 	// @deprecated
 	setTextColor(color: Color): void {
 		this.textColor = color;

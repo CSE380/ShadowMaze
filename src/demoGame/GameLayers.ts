@@ -6,6 +6,8 @@
  
 // PAUSE_MENU layer (display the pause menu selection )
 
+// TEXT_MENU layer(display help and controls)
+
 // UI layer(display the player and game status )
 
 
@@ -15,5 +17,6 @@ export enum GameLayers {
     FOG_OF_WAR = "FOG_OF_WAR",
     CONTAINER = "CONTAINER",
     PAUSE_MENU = "PAUSE_MENU",
+    TEXT_MENU = "TEXT_MENU",
     UI = "UI",
 } 

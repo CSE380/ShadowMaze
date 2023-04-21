@@ -41,6 +41,7 @@ import { controlTextArray, helpTextArray } from "../Text";
 import { PhysicsGroups } from "../PhysicsGroups";
 import { PlayerEvents } from "../ProjectEvents";
 import CheatCodeMenuScene from "./CheatCodeMenuScene";
+import Scene from "../../Wolfie2D/Scene/Scene";
 const ACTIONTYPE = {
     PICK: "PICK",
     USE: "USE",
@@ -113,63 +114,75 @@ export default class IntroLevelScene extends ProjectScene {
         if (event.type == "PRINCE_HIT")
             this.handleHealthChange(this.player.health-=5, this.player.maxHealth);
     }
-
     protected handleInGameButtonEvent(event:GameEvent){
+        let nextScene;
         switch (event.type) {
             case MainMenuButtonEvent.Restart: {
-                this.sceneManager.changeToScene(IntroLevelScene);
+                nextScene = IntroLevelScene
                 return;
             }
             case PauseButtonEvent.PAUSE: {
-                console.log(this.isPauseMenuHidden)
+               
                 this.isPauseMenuHidden = !this.isPauseMenuHidden;
                 this.showPauseMenu(this.isPauseMenuHidden);
                 break;
             }
             case MainMenuButtonEvent.Select_levels: {
-                this.viewport.setZoomLevel(1);
-                this.sceneManager.changeToScene(SelectLevelMenuScene);
+                 nextScene = SelectLevelMenuScene
                 break;
             }
             case MainMenuButtonEvent.Controls: {
-                this.viewport.setZoomLevel(1);
-                this.sceneManager.changeToScene(ControlScene);
-                break;
+                // nextScene = ControlScene
+                let emptyMenuOption = {
+                    position: this.center,
+                    text: "",
+                    size: new Vec2(500, 1050),
+                    layerName: this.GameLayers.PAUSE_MENU,
+                    backgroundColor: Color.BLACK,
+                }
+                // this.addLabel(emptyMenuOption);
+                
+                // let label = this.add.uiElement(UIElementType.LABEL,this.GameLayers.UI);
+                let label = <Label>this.add.uiElement(UIElementType.LABEL,this.GameLayers.UI, {position: new Vec2(205, 205), text: "HP ",size:new Vec2(205, 500),  backgroundColor: Color.BLACK,});
+                // console.log(label.setBackgroundColor(Color.BLACK));
+                label.setSize( new Vec2(500, 1050))
+                label.backgroundColor = Color.BLACK;
+            
+                console.log(label)
+                // this.initControlTextLayer();
+                return;
             }
             case MainMenuButtonEvent.Help: {
-                this.viewport.setZoomLevel(1);
-                this.sceneManager.changeToScene(HelpScene);
+                nextScene = HelpScene
+               
                 break;
             }
             case MainMenuButtonEvent.CHEAT:{
-                this.viewport.setZoomLevel(1);
-                this.sceneManager.changeToScene(CheatCodeMenuScene);
+                nextScene = CheatCodeMenuScene
+             
                 break;
             }
             case MainMenuButtonEvent.Exit: {
-                this.viewport.setZoomLevel(1);
-                this.sceneManager.changeToScene(StartScene);
+                nextScene = StartScene
                 break;
             }
             case PlayerEvents.PLAYER_ENTERED_LEVEL_END: {
                 this.handleEnteredLevelEnd();
-                // this.viewport.setZoomLevel(1);
-                // this.sceneManager.changeToScene(SelectLevelMenuScene);
+                
             }
             case PlayerEvents.LEVEL_END: {
                 setTimeout(() => {
-                    this.viewport.setZoomLevel(1);
-                    this.sceneManager.changeToScene(SelectLevelMenuScene);
+                    nextScene = SelectLevelMenuScene
                 }, 2000)
             }
         }
+        if(nextScene){
+            this.viewport.setZoomLevel(1);
+            this.sceneManager.changeToScene(nextScene,this.option);
+        }
     }
-    // public override updateScene(){
-    //     while (this.receiver.hasNextEvent()) {
-    //         this.handleEvent(this.receiver.getNextEvent());
-    //     }
-
-    // }
+   
+  
 
     /** Initializes the layers in the scene */
 

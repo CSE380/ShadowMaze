@@ -24,9 +24,13 @@ import InventoryHUD from "../GameSystems/HUD/InventoryHUD";
 import Actor from "../../Wolfie2D/DataTypes/Interfaces/Actor";
 import { BattlerEvent } from "../ProjectEvents";
 
+// scene import
+// import IntroLevelScene from "./IntroLevelScene";
 // import HelpScene from "./HelpScene";
 // import StartScene from "./StartScene";
 // import ControlScene from "./ControlScene";
+// import CheatCodeMenuScene from "./CheatCodeMenuScene";
+
 import { TweenableProperties } from "../../Wolfie2D/Nodes/GameNode";
 import { EaseFunctionType } from "../../Wolfie2D/Utils/EaseFunctions";
 import Timer from "../../Wolfie2D/Timing/Timer";
@@ -68,7 +72,7 @@ export default abstract class ProjectScene extends Scene {
     protected center: Vec2;
     protected levelEndArea: Rect;
     protected levelEndLabel: Label;
-    protected playerInitPosition = new Vec2(15, 400);
+    protected playerInitPosition = new Vec2(15, 300);
     protected levelEndPosition = new Vec2(308, 20);
     protected levelEndHalfSize = new Vec2(25, 25)
     protected levelEndColor = new Color(255, 0, 0, 0.5);
@@ -110,7 +114,7 @@ export default abstract class ProjectScene extends Scene {
     protected currLabels: Array<Label>;
     protected nextLabels: Array<Label>;
 
-    //
+    protected 
     protected labelSize: number;
     protected isPauseMenuHidden: boolean;
     // relative path to the assets
@@ -129,7 +133,7 @@ export default abstract class ProjectScene extends Scene {
                 // groupNames: [PhysicsGroups.PLAYER],
             }
         });
-        this.labelSize = 24;
+        this.labelSize = 32;
         this.isPauseMenuHidden = true;
         this.option = {
             isAstarChecked: false,
@@ -202,9 +206,6 @@ export default abstract class ProjectScene extends Scene {
     }
     public startScene(): void {
         let tilemapLayers = this.add.tilemap("level");
-        // console.log(tilemapLayers)
-        // Get the wall layer
-        // this.init()
         this.walls = <OrthogonalTilemap>tilemapLayers[1].getItems()[0];
         this.wallSize = this.walls.size.x;
         // Set the viewport bounds to the tilemap
@@ -216,7 +217,6 @@ export default abstract class ProjectScene extends Scene {
         this.initInventorySlotsMap();
         // this.initUI();
         // create screen first 
-        console.log(this.option.isfogOfWarChecked)
         if(!this.option.isfogOfWarChecked)
 
 
@@ -264,7 +264,6 @@ export default abstract class ProjectScene extends Scene {
 
     protected initSubscribe() {
         this.receiver.subscribe(PlayerEvents.PLAYER_ENTERED_LEVEL_END)
-        this.receiver.subscribe(PauseButtonEvent.PAUSE);
         this.initgameItemEventSubscribe();
     }
     protected initgameItemEventSubscribe() {
@@ -282,7 +281,7 @@ export default abstract class ProjectScene extends Scene {
             text: "   HP    ",
             layerName: this.GameLayers.BASE,
             fontSize: 24,
-            backgroundColor: Color.TRANSPARENT,
+            backgroundColor: Color.ALMOST_TRANSPARENT,
             size: new Vec2(300, 30),
         }
         this.addLabel(healthTextOption);
@@ -292,7 +291,7 @@ export default abstract class ProjectScene extends Scene {
             text: "         ENERGY",
             layerName: this.GameLayers.BASE,
             fontSize: 24,
-            backgroundColor: Color.TRANSPARENT,
+            backgroundColor: Color.ALMOST_TRANSPARENT,
             size: new Vec2(300, 30),
         }
         this.addLabel(energyTextOption);
@@ -407,22 +406,7 @@ export default abstract class ProjectScene extends Scene {
         this.receiver.subscribe(option.buttonName);
         return newButton;
     }
-    protected addControlTextLayer(option: Record<string, any>) {
-        let position = option.position;
-        let yInitPosition = position.y - 400;
-        for (let text of controlTextArray) {
-            yInitPosition += option.margin
-            let textOption = {
-                position: new Vec2(position.x - 150, yInitPosition),
-                text: "• " + text,
-                align: true,
-                layerName: option.layerName,
-                fontSize: option.fontSize,
-                backgroundColor: Color.TRANSPARENT,
-            }
-            this.addLabel(textOption);
-        }
-    }
+   
     protected addBackButon(position: Vec2) {
         const leftArrow = '\u2190';
         let buttonOption = {
@@ -491,7 +475,7 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected handleEvent(event: GameEvent): void {
-
+      
         switch (event.type) {
             case BackButtonEvent.BACK: {
                 this.sceneManager.changeToScene(MainMenu);
@@ -614,9 +598,9 @@ export default abstract class ProjectScene extends Scene {
             this.addLayer(layer, depth);
             depth++;
         }
+        
         this.showPauseMenu(this.isPauseMenuHidden);
-        // this.getLayer(GameLayers.CONTAINER).setHidden(this.isPauseMenuHidden);
-        // this.getLayer(GameLayers.PAUSE_MENU).setHidden(this.isPauseMenuHidden);
+        
     }
     protected handleHealthChange(currentHealth: number, maxHealth: number): void {
         let unit = this.healthBarBg.size.x / maxHealth;
@@ -747,19 +731,38 @@ export default abstract class ProjectScene extends Scene {
         this.path = navmesh.getNavigationPath(this.player.position, this.levelEndPosition);
         console.log(this.path);
     }
+    protected displayInGameControls(){
+        this.initControlTextLayer();
+    }
     public initControlTextLayer() {
         let controlTextOption = {
-            position: this.viewport.getCenter(),
+            position: new Vec2(450, 450),
             margin: 40,
-            layerName: GameLayers.PAUSE_MENU
+            layerName:GameLayers.TEXT_MENU
         }
         this.addControlTextLayer(controlTextOption)
+    }
+    protected addControlTextLayer(option: Record<string, any>) {
+        let position = option.position;
+        let yInitPosition = position.y - 400;
+        for (let text of controlTextArray) {
+            yInitPosition += option.margin
+            let textOption = {
+                position: new Vec2(position.x - 150, yInitPosition),
+                text: "• " + text,
+                align: true,
+                layerName: option.layerName,
+                fontSize: option.fontSize,
+                backgroundColor: Color.TRANSPARENT,
+            }
+            this.addLabel(textOption);
+        }
     }
     public initHelpTextLayer() {
         let helpTextOption = {
             position: new Vec2(450, 450),
             margin: 40,
-            layerName: GameLayers.PAUSE_MENU
+            layerName: GameLayers.TEXT_MENU
         }
         this.addHelpTextLayer(helpTextOption)
     }
@@ -769,7 +772,7 @@ export default abstract class ProjectScene extends Scene {
             position: new Vec2(475, 20),
             text: pauseSign,
             layerName: GameLayers.UI,
-            buttName: "Pause",
+            buttonName: PauseButtonEvent.PAUSE,
             backgroundColor: Color.TRANSPARENT,
         }
         this.addButtons(pauseSignbuttonOption);
