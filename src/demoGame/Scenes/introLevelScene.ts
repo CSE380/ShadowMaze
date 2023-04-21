@@ -119,7 +119,7 @@ export default class IntroLevelScene extends ProjectScene {
         switch (event.type) {
             case MainMenuButtonEvent.Restart: {
                 nextScene = IntroLevelScene
-                return;
+                break;
             }
             case PauseButtonEvent.PAUSE: {
                 this.handleMenuStateChange();
@@ -151,14 +151,15 @@ export default class IntroLevelScene extends ProjectScene {
             }
             case PlayerEvents.PLAYER_ENTERED_LEVEL_END: {
                 this.handleEnteredLevelEnd();
-                
-            }
+                break;
+            }  
             case PlayerEvents.LEVEL_END: {
                 setTimeout(() => {
                     nextScene = SelectLevelMenuScene
                 }, 2000)
             }
         }
+        console.log()
         if(nextScene){
             this.viewport.setZoomLevel(1);
             this.sceneManager.changeToScene(nextScene,this.option);
