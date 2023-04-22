@@ -21,7 +21,9 @@ export default class Idle extends PlayerState {
 
     public override update(deltaT: number): void {
         super.update(deltaT);
-        if (this.parent.controller.shielding) {
+        if (this.parent.controller.shielding 
+            && this.parent.owner._ai["currentStat"]["currentShield"] == 
+            this.parent.owner._ai["maxStatValue"]) {
             this.finished(PlayerStateType.SHIELDING)
         }
         if (this.parent.controller.attacking) {

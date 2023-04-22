@@ -83,7 +83,7 @@ export default abstract class ProjectScene extends Scene {
     protected laserGuns: Array<gameItems>;
     protected door: Sprite
     protected backgroundImageKey: string;
-    protected maxStatValue= 10;
+    protected playerMaxStatValue= 10;
     //ui
     protected inGameControlTextBackground="inGameControlTextBackground"
     protected inGameHelpTextBackground="inGameHelpTextBackground"
@@ -300,53 +300,27 @@ export default abstract class ProjectScene extends Scene {
             else{
                 newText = "    "+ PlayerStatsNameArray[index];
             }
+            //bar
             statUI.label =  <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(10, yOffset), text:newText});
             statUI.label.size.set(300, 30);
             statUI.label.fontSize = 24;
             statUI.label.font = "Courier";
 
-
+            //background
             statUI.bar = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.BASE, {position: new Vec2(75, yOffset), text: ""});
 		    statUI.bar.size = new Vec2(300, 25);
 		    statUI.bar.backgroundColor = Color[PlayerStatsColorArray[index]];
 
+            //border
             statUI.barBg = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(75, yOffset), text: ""});
 		    statUI.barBg.size = new Vec2(300, 25);
 		    statUI.barBg.borderColor = Color.BLACK;
             yOffset += 20
             index ++;
             this.PlayerStatUI[stat] = statUI;
+            this.handlePlayerStatChange(stat)
         }
-        // this.healthLabel = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(13, 15), text: "HP "});
-		// this.healthLabel.size.set(300, 30);
-		// this.healthLabel.fontSize = 24;
-		// this.healthLabel.font = "Courier";
-
-        // // HealthBar
-		// this.healthBar = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.BASE, {position: new Vec2(75, 30), text: ""});
-		// this.healthBar.size = new Vec2(300, 25);
-		// this.healthBar.backgroundColor = Color.GREEN;
-
-        // // HealthBar Border
-		// this.healthBarBg = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(75, 30), text: ""});
-		// this.healthBarBg.size = new Vec2(300, 25);
-		// this.healthBarBg.borderColor = Color.BLACK;
-        
-        
-        
-        // energy lable
-        // this.energyLabel = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(28, 45), text: "ENERGY "});
-		// this.energyLabel.size.set(300, 30);
-		// this.energyLabel.fontSize = 24;
-		// this.energyLabel.font = "Courier"
-        // // energy
-		// this.energyBar = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.BASE, {position: new Vec2(75, 60), text: ""});
-		// this.energyBar.size = new Vec2(300, 25);
-		// this.energyBar.backgroundColor = Color.CYAN
-        // // energy Border
-		// this.energyBarBg = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(75, 60), text: ""});
-		// this.energyBarBg.size = new Vec2(300, 25);
-		// this.energyBarBg.borderColor = Color.BLACK;
+       
     }
     protected addLabel(option: Record<string, any>) {
         const newTextLabel = <Label>this.add.uiElement(UIElementType.LABEL, option.layerName || this.GameLayers.BASE, option);
@@ -438,11 +412,10 @@ export default abstract class ProjectScene extends Scene {
         if (this.option.isAstarChecked) {
             this.player.moveOnPath(1, this.path)
             if(this.path.isDone()){
-              
                 this.handleEnteredLevelEnd();
             }
         }
-
+        this.handlePlayerStatChange("currentShield");
         this.updateLabel();
         this.isPlayerAtLevelEnd();
         this.isPlayerAtItems();
@@ -519,7 +492,10 @@ export default abstract class ProjectScene extends Scene {
                 break;
             }
             case GameItems.HEALTH_PACKS: {
-
+                if( this.player._ai["currentStat"]["currentHealth"]<this.playerMaxStatValue)
+                this.player._ai["currentStat"]["currentHealth"]++;
+                this.handlePlayerStatChange("currentHealth");
+                break;
             }
         }
     }
@@ -665,11 +641,11 @@ export default abstract class ProjectScene extends Scene {
         const currentStatValue = this.player._ai["currentStat"][type]
         // console.log(oneStatUI)
         // console.log(currentStatValue)
-        let unit = oneStatUI["barBg"].size.x / this.maxStatValue;
-        oneStatUI["bar"].size.set(oneStatUI["barBg"].size.x - unit * (this.maxStatValue - currentStatValue ),oneStatUI["barBg"].size.y);
-		oneStatUI["bar"].position.set(oneStatUI["barBg"].position.x - (unit / 2 / this.getViewScale()) * (this.maxStatValue - currentStatValue), oneStatUI["barBg"].position.y);
+        let unit = oneStatUI["barBg"].size.x / this.playerMaxStatValue;
+        oneStatUI["bar"].size.set(oneStatUI["barBg"].size.x - unit * (this.playerMaxStatValue - currentStatValue ),oneStatUI["barBg"].size.y);
+		oneStatUI["bar"].position.set(oneStatUI["barBg"].position.x - (unit / 2 / this.getViewScale()) * (this.playerMaxStatValue - currentStatValue), oneStatUI["barBg"].position.y);
 		if(type =="currentHealth")
-        oneStatUI["bar"].backgroundColor = currentStatValue < this.maxStatValue * 1/4 ? Color.RED: currentStatValue < this.maxStatValue * 3/4 ? Color.YELLOW : Color.GREEN;
+        oneStatUI["bar"].backgroundColor = currentStatValue < this.playerMaxStatValue * 1/4 ? Color.RED: currentStatValue < this.playerMaxStatValue * 3/4 ? Color.YELLOW : Color.GREEN;
     }
    
 
@@ -743,7 +719,6 @@ export default abstract class ProjectScene extends Scene {
         // player.setGroup(PhysicsGroups.PLAYER);
         this.buildLightShape();
         this.initCurrLabel();
-        // Give the player a healthbar
 
         // Give the player PlayerAI
         if (this.option.isAstarChecked) {
@@ -756,7 +731,6 @@ export default abstract class ProjectScene extends Scene {
         // 
         player.animation.play("IDLE");
 
-        // Start the player in the "IDLE" animation
 
 
     }

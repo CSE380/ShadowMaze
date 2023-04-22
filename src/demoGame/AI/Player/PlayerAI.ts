@@ -11,6 +11,7 @@ import { Idle, Shielding, Moving, Dead, PlayerStateType, Attacking } from "./Pla
 import { BattlerEvent } from "../../ProjectEvents";
 import Timer from "../../../Wolfie2D/Timing/Timer";
 import { PlayerStatsArray } from "../../PlayerStatsArray";
+import MathUtils from "../../../Wolfie2D/Utils/MathUtils";
 /**
  * The AI that controls the player. The players AI has been configured as a Finite State Machine (FSM)
  * with 4 states; Idle, Moving, shielding, and Dead.
@@ -25,20 +26,15 @@ export default class PlayerAI extends StateMachineAI implements AI {
     public inventory: Inventory;
     /** The players held item */
     public item: Item | null;
-    //hp
-    private currentHealth: number;
-    private maxHealth: number;
-    private minHealth: number;
-    // energy
-    private currentEnergy: number;
-    private maxEnergy: number;
-    private minEnergy: number;
+ 
     // hit 
     private invincibleTime: Timer;
     private isInvincible = false;
     //stats of AI
     private currentStatValue = 10;
     private statNames = PlayerStatsArray;
+    private minStatValue = 0;
+    private maxStatValue = 10;
     private currentStat = {};
     public initializeAI(owner: PlayerActor, opts: Record<string, any>): void {
         this.owner = owner;
@@ -59,19 +55,12 @@ export default class PlayerAI extends StateMachineAI implements AI {
     }
 
     public activate(options: Record<string, any>): void {
-        this.currentHealth = 10;
-
-        // Set upper and lower bounds on the player's health
-        this.minHealth = 0;
-        this.maxHealth = 10;
-
-        // Set the player's current Energy
-        this.currentEnergy = 10;
-        // Set upper and lower bounds on the player's Energy
-        this.minEnergy = 0;
-        this.maxEnergy = 20;
         for (const name of this.statNames) {
             this.currentStat[name] = this.currentStatValue; // Set default value for each stat
+            // if(name !=='currentHealth'){
+            //     this.currentStat[name] = 0;
+            // }
+            console.log(this.currentStat[name])
         }
     }
 
@@ -82,7 +71,11 @@ export default class PlayerAI extends StateMachineAI implements AI {
         }
 
         // If the player is out of hp - play the death animation
-       
+         this.currentStat['currentShield'] = MathUtils.clamp(
+            this.currentStat['currentShield']  + deltaT*3,
+            this.minStatValue,
+            this.maxStatValue,
+          );
     }
 
     public destroy(): void { }
@@ -105,7 +98,7 @@ export default class PlayerAI extends StateMachineAI implements AI {
         if (!this.isInvincible) {
             this.isInvincible = true;
             this.invincibleTime.start();
-            if (this.currentHealth <= this.minHealth) {
+            if ( this.currentStat["currentHealth"] <= this.minStatValue) {
                 this.emitter.fireEvent(BattlerEvent.PRINCE_DEAD);
                 return;
             }
