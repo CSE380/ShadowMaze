@@ -39,9 +39,11 @@ export default class IntroLevelScene extends ProjectScene {
         this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince_v4.json");
         this.load.spritesheet("RedHealer", "shadowMaze_assets/spritesheets/RedHealer.json");
         this.load.object("red", "shadowMaze_assets/data/enemies/red.json");
-        // Load the tilemap
-        this.load.tilemap("level", "shadowMaze_assets/tilemaps/LI_TEST_MAP.json");
+        this.load.image(this.inGameControlTextBackground, "shadowMaze_assets/images/inGameControlTextBackground.png");
+        this.load.image(this.inGameHelpTextBackground, "shadowMaze_assets/images/inGameHelpTextBackground.png");
 
+        // Load the tilemap
+        this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
     }
     /**
      * @see Scene.startScene
