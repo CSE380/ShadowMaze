@@ -825,7 +825,6 @@ export default abstract class ProjectScene extends Scene {
             backgroundColor: new Color(0, 0, 0, 0.99),
         }
         this.addLabel(controlTextMenuOption);
-        this.add.graphic
         this.initControlTextLayer()
         let helpTextMenuOption = {
             position: new Vec2(256, 256),
