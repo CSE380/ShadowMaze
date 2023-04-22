@@ -71,7 +71,7 @@ export default abstract class ProjectScene extends Scene {
     protected levelEndArea: Rect;
     protected levelEndTransitionLabel: Label;
     protected playerInitPosition = new Vec2(15, 300);
-    protected levelEndPosition = new Vec2(30, 250);
+    protected levelEndPosition = new Vec2(30, 400);
     protected levelEndHalfSize = new Vec2(25, 25)
     protected levelEndColor = new Color(255, 0, 0, 0.5);
     protected levelEndTimer: Timer;
@@ -83,6 +83,8 @@ export default abstract class ProjectScene extends Scene {
     protected door: Sprite
     protected backgroundImageKey: string;
     //ui
+    protected inGameControlTextBackground="inGameControlTextBackground"
+    protected inGameHelpTextBackground="inGameHelpTextBackground"
     // Health labels
     protected healthLabel: Label;
     protected healthBar: Label;
@@ -251,7 +253,7 @@ export default abstract class ProjectScene extends Scene {
         this.loadAllGameItems();
         // this.loadGameItems(this.laserGunsKey);
         this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince.json");
-
+        
 
         // Load the tilemap
         this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
@@ -394,23 +396,7 @@ export default abstract class ProjectScene extends Scene {
         }
         this.addButtons(buttonOption);
     }
-    protected addHelpTextLayer(option: Record<string, any>) {
-        let position = option.position;
-        let yInitPosition = position.y - 400;
-        const newText = helpTextArray;
-        for (let text of newText) {
-            yInitPosition += option.margin
-            let textOption = {
-                position: new Vec2(position.x - 320, yInitPosition),
-                text: text,
-                align: "left",
-                backgroundColor: Color.TRANSPARENT,
-                fontSize: option.fontSize,
-                layerName: GameLayers.HELP_TEXT_MENU,
-            }
-            this.addLabel(textOption);
-        }
-    }
+   
     public updateScene() {
 
         while (this.receiver.hasNextEvent()) {
@@ -423,6 +409,10 @@ export default abstract class ProjectScene extends Scene {
 
         if (this.option.isAstarChecked) {
             this.player.moveOnPath(1, this.path)
+            if(this.path.isDone()){
+              
+                this.handleEnteredLevelEnd();
+            }
         }
 
         this.updateLabel();
@@ -795,9 +785,28 @@ export default abstract class ProjectScene extends Scene {
         let helpTextOption = {
             position: new Vec2(450, 450),
             margin: 40,
-            layerName: GameLayers.CONTROL_TEXT_MENU
+            layerName: GameLayers.HELP_TEXT_MENU
         }
         this.addHelpTextLayer(helpTextOption)
+    }
+    protected addHelpTextLayer(option: Record<string, any>) {
+        let position = option.position;
+        let yInitPosition = position.y - 400;
+        const newText = helpTextArray;
+        for (let text of newText) {
+            yInitPosition += option.margin
+            console.log(text)
+            let textOption = {
+                position: new Vec2(position.x - 320, yInitPosition),
+                text: text,
+                align: "left",
+                backgroundColor: Color.ALMOST_TRANSPARENT,
+                fontSize: option.fontSize,
+                layerName: option.layerName,
+            }
+            this.addLabel(textOption);
+            // this.add.uiElement(UIElementType.LABEL,option.layerName,textOption);
+        }
     }
     public initPauseMenuLayer() {
         const pauseSign = "\u23F8";
@@ -817,24 +826,22 @@ export default abstract class ProjectScene extends Scene {
             backgroundColor: Color.WHITE,
         }
         this.addLabel(emptyMenuOption);
-        let controlTextMenuOption = {
-            position: new Vec2(256, 256),
-            text: "",
-            size: new Vec2(700, 700),
-            layerName: this.GameLayers.CONTROL_TEXT_MENU_CONTAINER,
-            backgroundColor: new Color(0, 0, 0, 0.99),
+        this.backgroundImage  = this.add.sprite(this.inGameControlTextBackground,GameLayers.CONTROL_TEXT_MENU_CONTAINER);
+        this.backgroundImage.position.set(this.center.x,this.center.y+10);
+        let controlTextOption = {
+            position: new Vec2(400, 515),
+            margin: 30,
+            layerName: GameLayers.CONTROL_TEXT_MENU
         }
-        this.addLabel(controlTextMenuOption);
-        this.initControlTextLayer()
-        let helpTextMenuOption = {
-            position: new Vec2(256, 256),
-            text: "",
-            size: new Vec2(1000, 1000),
-            layerName: this.GameLayers.HELP_TEXT_MENU_CONTAINER,
-            backgroundColor: new Color(0, 0, 0, 0.99),
+        this.addControlTextLayer(controlTextOption)
+        let inGameControlTextBackgroundImage = this.add.sprite(this.inGameHelpTextBackground,GameLayers.HELP_TEXT_MENU_CONTAINER);
+        inGameControlTextBackgroundImage.position.set(this.center.x,this.center.y+10);
+        let helpTextOption = {
+            position: new Vec2(435, 450),
+            margin: 40,
+            layerName: GameLayers.HELP_TEXT_MENU
         }
-        this.addLabel(helpTextMenuOption);
-        this.initHelpTextLayer();
+        this.addHelpTextLayer(helpTextOption)
         let pauseTextOption = {
             position: new Vec2(this.center.x, this.center.y - 100),
             text: "Paused",
