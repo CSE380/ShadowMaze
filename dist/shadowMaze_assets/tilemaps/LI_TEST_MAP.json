@@ -319,15 +319,15 @@
  "tileheight":8,
  "tilesets":[
         {
-         "columns":4,
+         "columns":192,
          "firstgid":1,
-         "image":"map.png",
-         "imageheight":32,
-         "imagewidth":32,
+         "image":"calm-water-autotiles-anim.png",
+         "imageheight":128,
+         "imagewidth":1536,
          "margin":0,
-         "name":"AA",
+         "name":"BB",
          "spacing":0,
-         "tilecount":16,
+         "tilecount":3080,
          "tileheight":8,
          "tilewidth":8
         }, 
