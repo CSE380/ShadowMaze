@@ -214,19 +214,20 @@ export default abstract class ProjectScene extends Scene {
         // this.initLayers();
         this.initLevelScene();
         this.initPlayer();
-        this.initPlayerStatUI();
+        
         this.initInventorySlotsMap();
         // create screen first 
         if (!this.option.isfogOfWarChecked)
             // this.initFogOfWar();
-
-
             this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
         this.initAllGameItems();
-        if(!this.option.isAstarChecked)
-        this.initializeNPCs();
+        if(!this.option.isAstarChecked){
+            this.initPlayerStatUI();
+            this.initializeNPCs();
+        }
+       
         // this.addLevelEndLabel();
         // this.levelEndLabel.tweens.play("slideIn");
 
@@ -415,7 +416,10 @@ export default abstract class ProjectScene extends Scene {
                 this.handleEnteredLevelEnd();
             }
         }
-        this.handlePlayerStatChange("currentShield");
+        else{
+            this.handlePlayerStatChange("currentShield");
+        }
+        
         this.updateLabel();
         this.isPlayerAtLevelEnd();
         this.isPlayerAtItems();
