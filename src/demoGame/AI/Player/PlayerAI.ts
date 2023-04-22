@@ -54,14 +54,14 @@ export default class PlayerAI extends StateMachineAI implements AI {
     }
 
     public activate(options: Record<string, any>): void {
-        this.currentHealth = 10;
+        this.currentHealth = 1;
 
         // Set upper and lower bounds on the player's health
         this.minHealth = 0;
         this.maxHealth = 10;
 
         // Set the player's current Energy
-        this.currentEnergy = 20;
+        this.currentEnergy = 1;
 
         // Set upper and lower bounds on the player's Energy
         this.minEnergy = 0;
@@ -75,16 +75,12 @@ export default class PlayerAI extends StateMachineAI implements AI {
         }
 
         // If the player is out of hp - play the death animation
-        if (this.currentHealth <= this.minHealth) {
-            this.emitter.fireEvent(BattlerEvent.PRINCE_DEAD);
-            return;
-        }
+       
     }
 
     public destroy(): void { }
 
     public handleEvent(event: GameEvent): void {
-        console.log(event)
         switch (event.type) {
             case BattlerEvent.PRINCE_HIT: {
                 this.handlePrinceHit();
@@ -102,6 +98,10 @@ export default class PlayerAI extends StateMachineAI implements AI {
         if (!this.isInvincible) {
             this.isInvincible = true;
             this.invincibleTime.start();
+            if (this.currentHealth <= this.minHealth) {
+                this.emitter.fireEvent(BattlerEvent.PRINCE_DEAD);
+                return;
+            }
         }
     }
     protected handleinvincibleTimeEnd = () => {

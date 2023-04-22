@@ -215,7 +215,15 @@ export default abstract class ProjectScene extends Scene {
         this.viewport.setBounds(0, 0, tilemapSize.x, tilemapSize.y);
         this.viewport.setZoomLevel(2);
         // this.initLayers();
-        this.initPlayer()
+        this.initPlayer();
+        this.handleHealthChange(
+            this.player._ai["currentHealth"],
+            this.player._ai["maxHealth"]
+        );
+        this.handleEnergyChange(
+            this.player._ai["currentEnergy"],
+            this.player._ai["maxEnergy"]
+          );
         this.initInventorySlotsMap();
         // this.initUI();
         // create screen first 
@@ -285,68 +293,36 @@ export default abstract class ProjectScene extends Scene {
         // UILayer stuff
         // this.addUILayer(GAMELayers.UIlayer);
         // HP Label
-        let healthTextOption = {
-            position: this.healthTextLablePosition,
-            text: "   HP    ",
-            layerName: this.GameLayers.BASE,
-            fontSize: 24,
-            backgroundColor: Color.ALMOST_TRANSPARENT,
-            size: new Vec2(300, 30),
-        }
-        this.addLabel(healthTextOption);
-        // energy text Label
-        let energyTextOption = {
-            position: this.energyTextLablePosition,
-            text: "         ENERGY",
-            layerName: this.GameLayers.BASE,
-            fontSize: 24,
-            backgroundColor: Color.ALMOST_TRANSPARENT,
-            size: new Vec2(300, 30),
-        }
-        this.addLabel(energyTextOption);
-        // HealthBar label
-        this.healthBar = <Label>this.add.uiElement(
-            UIElementType.LABEL,
-            this.GameLayers.BASE,
-            {
-                position: this.healthLabelPosition,
-                text: "",
-            }
-        );
-        this.healthBar.size = new Vec2(300, 25);
-        this.healthBar.backgroundColor = Color.GREEN;
+        this.healthLabel = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(13, 15), text: "HP "});
+		this.healthLabel.size.set(300, 30);
+		this.healthLabel.fontSize = 24;
+		this.healthLabel.font = "Courier";
 
-        //energyBar
-        this.energyBar = <Label>this.add.uiElement(UIElementType.LABEL, this.GameLayers.BASE, {
-            position: this.energyBarLabelPosition,
-            text: "",
-        });
-        this.energyBar.size = new Vec2(300, 25);
-        this.energyBar.backgroundColor = Color.CYAN;
+        // HealthBar
+		this.healthBar = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.BASE, {position: new Vec2(75, 30), text: ""});
+		this.healthBar.size = new Vec2(300, 25);
+		this.healthBar.backgroundColor = Color.GREEN;
 
-        // // HealthBar Border
-        this.healthBarBg = <Label>this.add.uiElement(
-            UIElementType.LABEL,
-            this.GameLayers.BASE,
-            {
-                position: this.healthLabelPosition,
-                text: "",
-            }
-        );
-        this.healthBarBg.size = new Vec2(300, 25);
-        this.healthBarBg.borderColor = Color.BLACK;
-
+        // HealthBar Border
+		this.healthBarBg = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(75, 30), text: ""});
+		this.healthBarBg.size = new Vec2(300, 25);
+		this.healthBarBg.borderColor = Color.BLACK;
+        
+        
+        
+        // energy lable
+        this.energyLabel = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(28, 45), text: "ENERGY "});
+		this.energyLabel.size.set(300, 30);
+		this.energyLabel.fontSize = 24;
+		this.energyLabel.font = "Courier"
+        // energy
+		this.energyBar = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.BASE, {position: new Vec2(75, 60), text: ""});
+		this.energyBar.size = new Vec2(300, 25);
+		this.energyBar.backgroundColor = Color.CYAN
         // energy Border
-        this.energyBarBg = <Label>this.add.uiElement(
-            UIElementType.LABEL,
-            this.GameLayers.BASE,
-            {
-                position: this.energyBarLabelPosition,
-                text: "",
-            }
-        );
-        this.energyBarBg.size = new Vec2(300, 25);
-        this.energyBarBg.borderColor = Color.BLACK;
+		this.energyBarBg = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(75, 60), text: ""});
+		this.energyBarBg.size = new Vec2(300, 25);
+		this.energyBarBg.borderColor = Color.BLACK;
     }
     protected addLabel(option: Record<string, any>) {
         const newTextLabel = <Label>this.add.uiElement(UIElementType.LABEL, option.layerName || this.GameLayers.BASE, option);
@@ -510,10 +486,11 @@ export default abstract class ProjectScene extends Scene {
                 break;
             }
             case BattlerEvent.PRINCE_DEAD: {
-                setTimeout(() => {
-                    this.viewport.setZoomLevel(1);
-                    this.sceneManager.changeToScene(MainMenu, this.option);
-                }, 2000)
+                console.log("game over")
+                // setTimeout(() => {
+                //     this.viewport.setZoomLevel(1);
+                //     this.sceneManager.changeToScene(MainMenu, this.option);
+                // }, 2000)
             }
         }
     }
@@ -679,23 +656,15 @@ export default abstract class ProjectScene extends Scene {
     }
     protected handleHealthChange(currentHealth: number, maxHealth: number): void {
         let unit = this.healthBarBg.size.x / maxHealth;
-        this.healthBar.size.set(
-            this.healthBarBg.size.x - unit * (maxHealth - currentHealth),
-            this.healthBarBg.size.y
-        );
-        this.healthBar.position.set(
-            this.healthBarBg.position.x - (unit / 2) * (maxHealth - currentHealth),
-            this.healthBarBg.position.y
-        );
-
-        this.healthBar.backgroundColor =
-            currentHealth < (maxHealth * 1) / 4
-                ? Color.RED
-                : currentHealth < (maxHealth * 3) / 4
-                    ? Color.YELLOW
-                    : Color.GREEN;
+        this.healthBar.size.set(this.healthBarBg.size.x - unit * (maxHealth - currentHealth), this.healthBarBg.size.y);
+		this.healthBar.position.set(this.healthBarBg.position.x - (unit / 2 / this.getViewScale()) * (maxHealth - currentHealth), this.healthBarBg.position.y);
+		this.healthBar.backgroundColor = currentHealth < maxHealth * 1/4 ? Color.RED: currentHealth < maxHealth * 3/4 ? Color.YELLOW : Color.GREEN;
     }
-
+    protected handleEnergyChange(currentEnergy: number, maxEnergy: number): void {
+        let unit = this.energyBarBg.size.x / maxEnergy;
+        this.energyBar.size.set(this.energyBarBg.size.x - unit * (maxEnergy - currentEnergy), this.energyBarBg.size.y);
+		this.energyBar.position.set(this.energyBarBg.position.x - (unit / 2 / this.getViewScale()) * (maxEnergy - currentEnergy), this.energyBarBg.position.y);
+    }
 
     protected isPlayerAttacking() {
         let midpoint = null;
