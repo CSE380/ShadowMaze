@@ -71,7 +71,7 @@ export default abstract class ProjectScene extends Scene {
     protected levelEndArea: Rect;
     protected levelEndTransitionLabel: Label;
     protected playerInitPosition = new Vec2(15, 300);
-    protected levelEndPosition = new Vec2(30, 250);
+    protected levelEndPosition = new Vec2(30, 400);
     protected levelEndHalfSize = new Vec2(25, 25)
     protected levelEndColor = new Color(255, 0, 0, 0.5);
     protected levelEndTimer: Timer;
@@ -223,7 +223,7 @@ export default abstract class ProjectScene extends Scene {
         // this.initUI();
         // create screen first 
         if (!this.option.isfogOfWarChecked)
-            this.initFogOfWar();
+            // this.initFogOfWar();
 
 
             this.center = this.viewport.getHalfSize();
@@ -409,6 +409,10 @@ export default abstract class ProjectScene extends Scene {
 
         if (this.option.isAstarChecked) {
             this.player.moveOnPath(1, this.path)
+            if(this.path.isDone()){
+              
+                this.handleEnteredLevelEnd();
+            }
         }
 
         this.updateLabel();
@@ -791,16 +795,17 @@ export default abstract class ProjectScene extends Scene {
         const newText = helpTextArray;
         for (let text of newText) {
             yInitPosition += option.margin
+            console.log(text)
             let textOption = {
                 position: new Vec2(position.x - 320, yInitPosition),
                 text: text,
                 align: "left",
-                backgroundColor: Color.TRANSPARENT,
+                backgroundColor: Color.ALMOST_TRANSPARENT,
                 fontSize: option.fontSize,
                 layerName: option.layerName,
             }
-            let label= this.addLabel(textOption);
-            console.log(label.backgroundColor)
+            this.addLabel(textOption);
+            // this.add.uiElement(UIElementType.LABEL,option.layerName,textOption);
         }
     }
     public initPauseMenuLayer() {
@@ -821,7 +826,6 @@ export default abstract class ProjectScene extends Scene {
             backgroundColor: Color.WHITE,
         }
         this.addLabel(emptyMenuOption);
-        
         this.backgroundImage  = this.add.sprite(this.inGameControlTextBackground,GameLayers.CONTROL_TEXT_MENU_CONTAINER);
         this.backgroundImage.position.set(this.center.x,this.center.y+10);
         let controlTextOption = {
@@ -833,11 +837,10 @@ export default abstract class ProjectScene extends Scene {
         let inGameControlTextBackgroundImage = this.add.sprite(this.inGameHelpTextBackground,GameLayers.HELP_TEXT_MENU_CONTAINER);
         inGameControlTextBackgroundImage.position.set(this.center.x,this.center.y+10);
         let helpTextOption = {
-            position: new Vec2(450, 450),
+            position: new Vec2(435, 450),
             margin: 40,
             layerName: GameLayers.HELP_TEXT_MENU
         }
-        
         this.addHelpTextLayer(helpTextOption)
         let pauseTextOption = {
             position: new Vec2(this.center.x, this.center.y - 100),
