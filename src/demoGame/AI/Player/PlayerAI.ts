@@ -10,6 +10,7 @@ import PlayerController from "./PlayerController";
 import { Idle, Shielding, Moving, Dead, PlayerStateType, Attacking } from "./PlayerStates/PlayerState";
 import { BattlerEvent } from "../../ProjectEvents";
 import Timer from "../../../Wolfie2D/Timing/Timer";
+import { PlayerStatsArray } from "../../PlayerStatsArray";
 /**
  * The AI that controls the player. The players AI has been configured as a Finite State Machine (FSM)
  * with 4 states; Idle, Moving, shielding, and Dead.
@@ -35,6 +36,10 @@ export default class PlayerAI extends StateMachineAI implements AI {
     // hit 
     private invincibleTime: Timer;
     private isInvincible = false;
+    //stats of AI
+    private currentStatValue = 10;
+    private statNames = PlayerStatsArray;
+    private currentStat = {};
     public initializeAI(owner: PlayerActor, opts: Record<string, any>): void {
         this.owner = owner;
         this.controller = new PlayerController(owner);
@@ -54,18 +59,20 @@ export default class PlayerAI extends StateMachineAI implements AI {
     }
 
     public activate(options: Record<string, any>): void {
-        this.currentHealth = 1;
+        this.currentHealth = 10;
 
         // Set upper and lower bounds on the player's health
         this.minHealth = 0;
         this.maxHealth = 10;
 
         // Set the player's current Energy
-        this.currentEnergy = 1;
-
+        this.currentEnergy = 10;
         // Set upper and lower bounds on the player's Energy
         this.minEnergy = 0;
         this.maxEnergy = 20;
+        for (const name of this.statNames) {
+            this.currentStat[name] = this.currentStatValue; // Set default value for each stat
+        }
     }
 
     public update(deltaT: number): void {

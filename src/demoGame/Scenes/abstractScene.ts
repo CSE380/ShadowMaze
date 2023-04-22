@@ -11,6 +11,7 @@ import { BackButtonEvent } from "../CustomizedButton";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
 import MainMenu from "./MainMenuScene";
 import { helpTextArray, controlTextArray } from "../Text";
+import { PlayerStatsArray, PlayerStatsColorArray,PlayerStatsNameArray} from "../PlayerStatsArray";
 import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
 import SceneManager from "../../Wolfie2D/Scene/SceneManager";
 import Viewport from "../../Wolfie2D/SceneGraph/Viewport";
@@ -82,24 +83,18 @@ export default abstract class ProjectScene extends Scene {
     protected laserGuns: Array<gameItems>;
     protected door: Sprite
     protected backgroundImageKey: string;
+    protected maxStatValue= 10;
     //ui
     protected inGameControlTextBackground="inGameControlTextBackground"
     protected inGameHelpTextBackground="inGameHelpTextBackground"
     // Health labels
-    protected healthLabel: Label;
-    protected healthBar: Label;
-    protected healthBarBg: Label;
-    //oprotectedy labels
-    protected energyLabel: Label;
-    protected energyBar: Label;
-    protected energyBarBg: Label;
-    protected textInitPositionX = 10;
-    protected textInitPositionY = 15;
-    protected offSet = 65;
-    protected healthTextLablePosition = new Vec2(this.textInitPositionX, this.textInitPositionY * 1);
-    protected healthLabelPosition = new Vec2(this.textInitPositionX + this.offSet, this.textInitPositionY * 2);
-    protected energyTextLablePosition = new Vec2(this.textInitPositionX, this.textInitPositionY * 3);
-    protected energyBarLabelPosition = new Vec2(this.textInitPositionX + this.offSet, this.textInitPositionY * 4);
+    protected PlayerStatUI = {};
+    protected oneStatUI = {
+        label:Label,
+        bar:Label,
+        barBg:Label,
+    }
+
 
     //items to game 
     protected gameItemsArray = GameItemsArray;
@@ -160,7 +155,7 @@ export default abstract class ProjectScene extends Scene {
         this.levelEndTimer = new Timer(1000)
         this.isLevelEndEnetered = false;
         this.initLayers();
-        this.initUI();
+       
     }
     protected loadGameItems(key: string) {
         this.load.object(key, `${this.pathToItems}${key}.json`);
@@ -217,10 +212,10 @@ export default abstract class ProjectScene extends Scene {
         this.viewport.setBounds(0, 0, tilemapSize.x, tilemapSize.y);
         this.viewport.setZoomLevel(2);
         // this.initLayers();
+        this.initLevelScene();
         this.initPlayer();
-       
+        this.initPlayerStatUI();
         this.initInventorySlotsMap();
-        // this.initUI();
         // create screen first 
         if (!this.option.isfogOfWarChecked)
             // this.initFogOfWar();
@@ -285,40 +280,73 @@ export default abstract class ProjectScene extends Scene {
         }
     }
 
-    protected initUI(): void {
+    protected initPlayerStatUI(): void {
         // UILayer stuff
         // this.addUILayer(GAMELayers.UIlayer);
         // HP Label
-        this.healthLabel = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(13, 15), text: "HP "});
-		this.healthLabel.size.set(300, 30);
-		this.healthLabel.fontSize = 24;
-		this.healthLabel.font = "Courier";
+        const currentStat = this.player._ai["currentStat"];
+        let yOffset = 10;
+        let index = 0;
+        let newText:string;
+        for(const stat of   Object.keys(currentStat)){
+            let statUI = {
+                label:null,
+                bar:null,
+                barBg:null,
+            };
+            if(PlayerStatsNameArray[index] == 'HP'){
+                newText = PlayerStatsNameArray[index];
+            }
+            else{
+                newText = "    "+ PlayerStatsNameArray[index];
+            }
+            statUI.label =  <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(10, yOffset), text:newText});
+            statUI.label.size.set(300, 30);
+            statUI.label.fontSize = 24;
+            statUI.label.font = "Courier";
 
-        // HealthBar
-		this.healthBar = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.BASE, {position: new Vec2(75, 30), text: ""});
-		this.healthBar.size = new Vec2(300, 25);
-		this.healthBar.backgroundColor = Color.GREEN;
 
-        // HealthBar Border
-		this.healthBarBg = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(75, 30), text: ""});
-		this.healthBarBg.size = new Vec2(300, 25);
-		this.healthBarBg.borderColor = Color.BLACK;
+            statUI.bar = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.BASE, {position: new Vec2(75, yOffset), text: ""});
+		    statUI.bar.size = new Vec2(300, 25);
+		    statUI.bar.backgroundColor = Color[PlayerStatsColorArray[index]];
+
+            statUI.barBg = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(75, yOffset), text: ""});
+		    statUI.barBg.size = new Vec2(300, 25);
+		    statUI.barBg.borderColor = Color.BLACK;
+            yOffset += 20
+            index ++;
+            this.PlayerStatUI[stat] = statUI;
+        }
+        // this.healthLabel = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(13, 15), text: "HP "});
+		// this.healthLabel.size.set(300, 30);
+		// this.healthLabel.fontSize = 24;
+		// this.healthLabel.font = "Courier";
+
+        // // HealthBar
+		// this.healthBar = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.BASE, {position: new Vec2(75, 30), text: ""});
+		// this.healthBar.size = new Vec2(300, 25);
+		// this.healthBar.backgroundColor = Color.GREEN;
+
+        // // HealthBar Border
+		// this.healthBarBg = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(75, 30), text: ""});
+		// this.healthBarBg.size = new Vec2(300, 25);
+		// this.healthBarBg.borderColor = Color.BLACK;
         
         
         
         // energy lable
-        this.energyLabel = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(28, 45), text: "ENERGY "});
-		this.energyLabel.size.set(300, 30);
-		this.energyLabel.fontSize = 24;
-		this.energyLabel.font = "Courier"
-        // energy
-		this.energyBar = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.BASE, {position: new Vec2(75, 60), text: ""});
-		this.energyBar.size = new Vec2(300, 25);
-		this.energyBar.backgroundColor = Color.CYAN
-        // energy Border
-		this.energyBarBg = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(75, 60), text: ""});
-		this.energyBarBg.size = new Vec2(300, 25);
-		this.energyBarBg.borderColor = Color.BLACK;
+        // this.energyLabel = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(28, 45), text: "ENERGY "});
+		// this.energyLabel.size.set(300, 30);
+		// this.energyLabel.fontSize = 24;
+		// this.energyLabel.font = "Courier"
+        // // energy
+		// this.energyBar = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.BASE, {position: new Vec2(75, 60), text: ""});
+		// this.energyBar.size = new Vec2(300, 25);
+		// this.energyBar.backgroundColor = Color.CYAN
+        // // energy Border
+		// this.energyBarBg = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(75, 60), text: ""});
+		// this.energyBarBg.size = new Vec2(300, 25);
+		// this.energyBarBg.borderColor = Color.BLACK;
     }
     protected addLabel(option: Record<string, any>) {
         const newTextLabel = <Label>this.add.uiElement(UIElementType.LABEL, option.layerName || this.GameLayers.BASE, option);
@@ -439,7 +467,6 @@ export default abstract class ProjectScene extends Scene {
     }
     public isPlayerAtLevelEnd() {
         if (this.levelEndPosition.distanceSqTo(this.player.position)<10) {
-            console.log("end")
             if (!this.isLevelEndEnetered)
                 this.emitter.fireEvent(PlayerEvents.PLAYER_ENTERED_LEVEL_END)
         }
@@ -460,16 +487,12 @@ export default abstract class ProjectScene extends Scene {
             }
             case BattlerEvent.PRINCE_HIT: {
                 if (!this.player._ai["isInvincible"]) {
-                    this.player._ai["currentHealth"]--;
-                    this.handleHealthChange(
-                        this.player._ai["currentHealth"],
-                        this.player._ai["maxHealth"]
-                    );
+                    this.player._ai["currentStat"]["currentHealth"]--;
+                    this.handlePlayerStatChange("currentHealth");
                 }
                 break;
             }
             case BattlerEvent.PRINCE_DEAD: {
-                console.log("game over")
                 setTimeout(() => {
                     this.viewport.setZoomLevel(1);
                     this.sceneManager.changeToScene(SelectLevelMenuScene, this.option);
@@ -635,17 +658,20 @@ export default abstract class ProjectScene extends Scene {
         this.setContainerAndMenu(GameLayers.CONTROL_TEXT_MENU_CONTAINER, GameLayers.CONTROL_TEXT_MENU, true)
         this.setContainerAndMenu(GameLayers.HELP_TEXT_MENU_CONTAINER, GameLayers.HELP_TEXT_MENU, true)
     }
-    protected handleHealthChange(currentHealth: number, maxHealth: number): void {
-        let unit = this.healthBarBg.size.x / maxHealth;
-        this.healthBar.size.set(this.healthBarBg.size.x - unit * (maxHealth - currentHealth), this.healthBarBg.size.y);
-		this.healthBar.position.set(this.healthBarBg.position.x - (unit / 2 / this.getViewScale()) * (maxHealth - currentHealth), this.healthBarBg.position.y);
-		this.healthBar.backgroundColor = currentHealth < maxHealth * 1/4 ? Color.RED: currentHealth < maxHealth * 3/4 ? Color.YELLOW : Color.GREEN;
+    protected handlePlayerStatChange(type: string): void {
+        console.log( );
+        // this.PlayerStatUI[PlayerStatsNameArray[index]] = statUI;
+        let oneStatUI = this.PlayerStatUI[type] 
+        const currentStatValue = this.player._ai["currentStat"][type]
+        // console.log(oneStatUI)
+        // console.log(currentStatValue)
+        let unit = oneStatUI["barBg"].size.x / this.maxStatValue;
+        oneStatUI["bar"].size.set(oneStatUI["barBg"].size.x - unit * (this.maxStatValue - currentStatValue ),oneStatUI["barBg"].size.y);
+		oneStatUI["bar"].position.set(oneStatUI["barBg"].position.x - (unit / 2 / this.getViewScale()) * (this.maxStatValue - currentStatValue), oneStatUI["barBg"].position.y);
+		if(type =="currentHealth")
+        oneStatUI["bar"].backgroundColor = currentStatValue < this.maxStatValue * 1/4 ? Color.RED: currentStatValue < this.maxStatValue * 3/4 ? Color.YELLOW : Color.GREEN;
     }
-    protected handleEnergyChange(currentEnergy: number, maxEnergy: number): void {
-        let unit = this.energyBarBg.size.x / maxEnergy;
-        this.energyBar.size.set(this.energyBarBg.size.x - unit * (maxEnergy - currentEnergy), this.energyBarBg.size.y);
-		this.energyBar.position.set(this.energyBarBg.position.x - (unit / 2 / this.getViewScale()) * (maxEnergy - currentEnergy), this.energyBarBg.position.y);
-    }
+   
 
     protected isPlayerAttacking() {
         let midpoint = null;
@@ -683,6 +709,7 @@ export default abstract class ProjectScene extends Scene {
                 this.emitter.fireEvent(BattlerEvent.MONSTER_DEAD, { id: battler.id });
             }
             if (battler.battlerActive && battler.position.distanceTo(this.player.position) < 10) {
+               if(!this.player._ai['isInvincible'])
                 this.emitter.fireEvent(BattlerEvent.PRINCE_HIT);
                 // this.emitter.fireEvent(BattlerEvent.BATTLER_KILLED, {id: battler.id});
             }
@@ -710,12 +737,6 @@ export default abstract class ProjectScene extends Scene {
         player.health = 10;
         player.maxHealth = 10;
         player.scale = new Vec2(2, 2);
-        // this.inventoryHud = new InventoryHUD(this, player.inventory, "inventorySlot", {
-        //     start: new Vec2(232, 24),
-        //     slotLayer: GameLayers.BEFORE_BASE,
-        //     padding: 8,
-        //     itemLayer: GameLayers.BASE,
-        // });
 
         // Give the player physics
         player.addPhysics(new AABB(Vec2.ZERO, new Vec2(8, 8)), null, true);
@@ -731,14 +752,6 @@ export default abstract class ProjectScene extends Scene {
         }
         else {
             player.addAI(PlayerAI);
-            this.handleHealthChange(
-                this.player._ai["currentHealth"],
-                this.player._ai["maxHealth"]
-            );
-            this.handleEnergyChange(
-                this.player._ai["currentEnergy"],
-                this.player._ai["maxEnergy"]
-              );
         }
         // 
         player.animation.play("IDLE");
@@ -795,7 +808,6 @@ export default abstract class ProjectScene extends Scene {
         const newText = helpTextArray;
         for (let text of newText) {
             yInitPosition += option.margin
-            console.log(text)
             let textOption = {
                 position: new Vec2(position.x - 320, yInitPosition),
                 text: text,

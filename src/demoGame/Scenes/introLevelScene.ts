@@ -34,7 +34,7 @@ export default class IntroLevelScene extends ProjectScene {
 
         //laser gun
         this.loadAllGameItems();
-        this.initLevelScene();
+        // this.initLevelScene();
         // this.loadGameItems(this.laserGunsKey);
         this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince_v4.json");
         this.load.spritesheet("RedHealer", "shadowMaze_assets/spritesheets/RedHealer.json");
