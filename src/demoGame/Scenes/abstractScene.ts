@@ -69,7 +69,7 @@ export default abstract class ProjectScene extends Scene {
     //Level end
     protected center: Vec2;
     protected levelEndArea: Rect;
-    protected levelEndLabel: Label;
+    protected levelEndTransitionLabel: Label;
     protected playerInitPosition = new Vec2(15, 300);
     protected levelEndPosition = new Vec2(30, 250);
     protected levelEndHalfSize = new Vec2(25, 25)
@@ -337,7 +337,7 @@ export default abstract class ProjectScene extends Scene {
         if (!this.isLevelEndEnetered) {
             this.isLevelEndEnetered = true;
             this.addLevelEndLabel();
-            this.levelEndLabel.tweens.play("slideIn");
+            this.levelEndTransitionLabel.tweens.play("slideIn");
         }
 
     }
@@ -350,14 +350,14 @@ export default abstract class ProjectScene extends Scene {
 
     }
     protected addLevelEndLabel() {
-        this.levelEndLabel = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.UI, { position: new Vec2(20, 96), text: "Level Complete" });
-        this.levelEndLabel.size.set(1200, 60);
-        this.levelEndLabel.borderRadius = 0;
-        this.levelEndLabel.backgroundColor = new Color(34, 32, 52);
-        this.levelEndLabel.textColor = Color.WHITE;
-        this.levelEndLabel.fontSize = 48;
-        this.levelEndLabel.font = "PixelSimple";
-        this.levelEndLabel.tweens.add("slideIn", {
+        this.levelEndTransitionLabel = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.UI, { position: new Vec2(20, 96), text: "Level Complete" });
+        this.levelEndTransitionLabel.size.set(1200, 60);
+        this.levelEndTransitionLabel.borderRadius = 0;
+        this.levelEndTransitionLabel.backgroundColor = new Color(34, 32, 52);
+        this.levelEndTransitionLabel.textColor = Color.WHITE;
+        this.levelEndTransitionLabel.fontSize = 48;
+        this.levelEndTransitionLabel.font = "PixelSimple";
+        this.levelEndTransitionLabel.tweens.add("slideIn", {
             startDelay: 0,
             duration: 1000,
             effects: [
@@ -423,9 +423,6 @@ export default abstract class ProjectScene extends Scene {
 
         if (this.option.isAstarChecked) {
             this.player.moveOnPath(1, this.path)
-            if(this.path.isDone()){
-                this.handleEnteredLevelEnd();
-            }
         }
 
         this.updateLabel();
@@ -451,8 +448,7 @@ export default abstract class ProjectScene extends Scene {
         })
     }
     public isPlayerAtLevelEnd() {
-        const label = this.levelEndArea;
-        if (Math.abs(label.position.x - this.player.position.x) <= 3 && (Math.abs(label.position.y - this.player.position.y) <= 3)) {
+        if (this.levelEndPosition.distanceSqTo(this.player.position)<10) {
             console.log("end")
             if (!this.isLevelEndEnetered)
                 this.emitter.fireEvent(PlayerEvents.PLAYER_ENTERED_LEVEL_END)
@@ -770,9 +766,7 @@ export default abstract class ProjectScene extends Scene {
         this.path = navmesh.getNavigationPath(this.player.position, this.levelEndPosition);
         console.log(this.path);
     }
-    protected displayInGameControls() {
-        this.initControlTextLayer();
-    }
+    
     public initControlTextLayer() {
         let controlTextOption = {
             position: new Vec2(450, 450),
@@ -826,11 +820,12 @@ export default abstract class ProjectScene extends Scene {
         let controlTextMenuOption = {
             position: new Vec2(256, 256),
             text: "",
-            size: new Vec2(1000, 1000),
+            size: new Vec2(700, 700),
             layerName: this.GameLayers.CONTROL_TEXT_MENU_CONTAINER,
             backgroundColor: new Color(0, 0, 0, 0.99),
         }
         this.addLabel(controlTextMenuOption);
+        this.add.graphic
         this.initControlTextLayer()
         let helpTextMenuOption = {
             position: new Vec2(256, 256),
