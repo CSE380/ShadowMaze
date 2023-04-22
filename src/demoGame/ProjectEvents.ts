@@ -1,12 +1,8 @@
 export enum BattlerEvent {
-    BATTLER_KILLED = "BATTLER_KILLED",
-    BATTLER_RESPAWN = "BATTLER_RESPAWN",
-    
-    BATTLER_CHANGE = "BATTLER_CHANGE",
-    CONSUME = "CONSUME",
-    HIT = "HIT",
-
-    PRINCE_HIT = "PRINCE_HIT"
+    MONSTER_DEAD = "MONSTER_DEAD",
+    MONSTER_HIT= "MONSTER_HIT",
+    PRINCE_HIT = "PRINCE_HIT",
+    PRINCE_DEAD = "PRINCE_DEAD",
 }
 
 export enum ItemEvent {
