@@ -114,7 +114,7 @@ export default class CheatCodeMenuScene extends HW4Scene {
                     isAstarChecked:this.isAstarChecked,
                     isfogOfWarChecked:this.isfogOfWarChecked,
                 }
-                this.sceneManager.changeToScene(MainMenu,option);
+                this.sceneManager.changeToScene(SelectLevelMenuScene,option);
                 break;
             }
             case this.Astar: {

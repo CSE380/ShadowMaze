@@ -25,7 +25,7 @@ import { BattlerEvent } from "../ProjectEvents";
 // scene import
 // import IntroLevelScene from "./IntroLevelScene";
 // import StartScene from "./StartScene";
-// import CheatCodeMenuScene from "./CheatCodeMenuScene";
+import SelectLevelMenuScene from "./SelectLevelMenuScene";
 
 import { TweenableProperties } from "../../Wolfie2D/Nodes/GameNode";
 import { EaseFunctionType } from "../../Wolfie2D/Utils/EaseFunctions";
@@ -71,7 +71,7 @@ export default abstract class ProjectScene extends Scene {
     protected levelEndArea: Rect;
     protected levelEndLabel: Label;
     protected playerInitPosition = new Vec2(15, 300);
-    protected levelEndPosition = new Vec2(28, 250);
+    protected levelEndPosition = new Vec2(30, 250);
     protected levelEndHalfSize = new Vec2(25, 25)
     protected levelEndColor = new Color(255, 0, 0, 0.5);
     protected levelEndTimer: Timer;
@@ -216,14 +216,7 @@ export default abstract class ProjectScene extends Scene {
         this.viewport.setZoomLevel(2);
         // this.initLayers();
         this.initPlayer();
-        this.handleHealthChange(
-            this.player._ai["currentHealth"],
-            this.player._ai["maxHealth"]
-        );
-        this.handleEnergyChange(
-            this.player._ai["currentEnergy"],
-            this.player._ai["maxEnergy"]
-          );
+       
         this.initInventorySlotsMap();
         // this.initUI();
         // create screen first 
@@ -235,6 +228,7 @@ export default abstract class ProjectScene extends Scene {
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
         this.initAllGameItems();
+        if(!this.option.isAstarChecked)
         this.initializeNPCs();
         // this.addLevelEndLabel();
         // this.levelEndLabel.tweens.play("slideIn");
@@ -247,7 +241,6 @@ export default abstract class ProjectScene extends Scene {
             let npc = this.add.animatedSprite(NPCActor, "RedHealer", this.GameLayers.BASE);
             npc.position.set(red.healers[i][0], red.healers[i][1]);
             npc.addPhysics(new AABB(Vec2.ZERO, new Vec2(7, 7)), null, false);
-
             // npc.addAI(HealerBehavior);
             this.battlers.push(npc);
             npc.animation.play("IDLE");
@@ -275,6 +268,7 @@ export default abstract class ProjectScene extends Scene {
     protected initSubscribe() {
         this.receiver.subscribe(PlayerEvents.PLAYER_ENTERED_LEVEL_END);
         this.receiver.subscribe(PlayerEvents.LEVEL_END);
+        
         this.initBattlerEventSubscribe();
         this.initGameItemEventSubscribe();
     }
@@ -344,7 +338,6 @@ export default abstract class ProjectScene extends Scene {
             this.isLevelEndEnetered = true;
             this.addLevelEndLabel();
             this.levelEndLabel.tweens.play("slideIn");
-
         }
 
     }
@@ -430,10 +423,13 @@ export default abstract class ProjectScene extends Scene {
 
         if (this.option.isAstarChecked) {
             this.player.moveOnPath(1, this.path)
+            if(this.path.isDone()){
+                this.handleEnteredLevelEnd();
+            }
         }
 
         this.updateLabel();
-        this.isLevelEnd();
+        this.isPlayerAtLevelEnd();
         this.isPlayerAtItems();
         this.isPlayerAttacking();
         this.isUseItem();
@@ -454,9 +450,10 @@ export default abstract class ProjectScene extends Scene {
             }
         })
     }
-    public isLevelEnd() {
+    public isPlayerAtLevelEnd() {
         const label = this.levelEndArea;
         if (Math.abs(label.position.x - this.player.position.x) <= 3 && (Math.abs(label.position.y - this.player.position.y) <= 3)) {
+            console.log("end")
             if (!this.isLevelEndEnetered)
                 this.emitter.fireEvent(PlayerEvents.PLAYER_ENTERED_LEVEL_END)
         }
@@ -487,10 +484,10 @@ export default abstract class ProjectScene extends Scene {
             }
             case BattlerEvent.PRINCE_DEAD: {
                 console.log("game over")
-                // setTimeout(() => {
-                //     this.viewport.setZoomLevel(1);
-                //     this.sceneManager.changeToScene(MainMenu, this.option);
-                // }, 2000)
+                setTimeout(() => {
+                    this.viewport.setZoomLevel(1);
+                    this.sceneManager.changeToScene(SelectLevelMenuScene, this.option);
+                }, 2000)
             }
         }
     }
@@ -651,8 +648,6 @@ export default abstract class ProjectScene extends Scene {
         this.setContainerAndMenu(GameLayers.PAUSE_MENU_CONTAINER, GameLayers.PAUSE_MENU, true);
         this.setContainerAndMenu(GameLayers.CONTROL_TEXT_MENU_CONTAINER, GameLayers.CONTROL_TEXT_MENU, true)
         this.setContainerAndMenu(GameLayers.HELP_TEXT_MENU_CONTAINER, GameLayers.HELP_TEXT_MENU, true)
-
-
     }
     protected handleHealthChange(currentHealth: number, maxHealth: number): void {
         let unit = this.healthBarBg.size.x / maxHealth;
@@ -750,6 +745,14 @@ export default abstract class ProjectScene extends Scene {
         }
         else {
             player.addAI(PlayerAI);
+            this.handleHealthChange(
+                this.player._ai["currentHealth"],
+                this.player._ai["maxHealth"]
+            );
+            this.handleEnergyChange(
+                this.player._ai["currentEnergy"],
+                this.player._ai["maxEnergy"]
+              );
         }
         // 
         player.animation.play("IDLE");

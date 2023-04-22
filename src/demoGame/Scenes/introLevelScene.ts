@@ -58,7 +58,7 @@ export default class IntroLevelScene extends ProjectScene {
     }
     protected handleInGameButtonEvent(event:GameEvent){
         let nextScene;
-        
+        console.log(event)
         switch (event.type) {
             case MainMenuButtonEvent.Restart: {
                 nextScene = IntroLevelScene
@@ -101,7 +101,7 @@ export default class IntroLevelScene extends ProjectScene {
                     this.viewport.setZoomLevel(1);
                     this.sceneManager.changeToScene(nextScene,this.option);
                 }, 2000)
-                return
+                return;
             }
         }
         if(nextScene){
