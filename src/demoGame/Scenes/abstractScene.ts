@@ -11,14 +11,14 @@ import { BackButtonEvent } from "../CustomizedButton";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
 import MainMenu from "./MainMenuScene";
 import { helpTextArray, controlTextArray } from "../Text";
-import { PlayerStatsArray, PlayerStatsColorArray,PlayerStatsNameArray} from "../PlayerStatsArray";
+import { PlayerStatsArray, PlayerStatsColorArray, PlayerStatsNameArray } from "../PlayerStatsArray";
 import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
 import SceneManager from "../../Wolfie2D/Scene/SceneManager";
 import Viewport from "../../Wolfie2D/SceneGraph/Viewport";
 import RenderingManager from "../../Wolfie2D/Rendering/RenderingManager";
 import Rect from "../../Wolfie2D/Nodes/Graphics/Rect";
 import { GraphicType } from "../../Wolfie2D/Nodes/Graphics/GraphicTypes";
-import { PlayerEvents,BattlerEvent,MessageBox,AllGameEventType } from "../ProjectEvents";
+import { PlayerEvents, BattlerEvent, MessageBox, AllGameEventType } from "../ProjectEvents";
 
 import Actor from "../../Wolfie2D/DataTypes/Interfaces/Actor";
 
@@ -54,9 +54,9 @@ import NavigationPath from "../../Wolfie2D/Pathfinding/NavigationPath";
 import AstarStrategy from "../Pathfinding/AstarStrategy";
 import NPCActor from "../Actors/NPCActor";
 import { MenuState } from "../MenuState";
-const enum tweensEffect{
-    SLIDEIN="slideIn",
-    SLIDEOUT="slideOut",
+const enum tweensEffect {
+    SLIDEIN = "slideIn",
+    SLIDEOUT = "slideOut",
 }
 export default abstract class ProjectScene extends Scene {
     protected walls: OrthogonalTilemap;
@@ -79,8 +79,8 @@ export default abstract class ProjectScene extends Scene {
     protected levelEndArea: Rect;
     protected levelEndTransitionLabel: Label;
     protected messageBoxLabel: Label;
-    protected playerInitPosition = new Vec2(15, 300);
-    protected levelEndPosition = new Vec2(20, 400);
+    protected playerInitPosition = new Vec2(475, 490);
+    protected levelEndPosition = new Vec2(300, 95);
     protected levelEndHalfSize = new Vec2(25, 25)
     protected levelEndColor = new Color(255, 0, 0, 0.5);
     protected levelEndTimer: Timer;
@@ -90,16 +90,16 @@ export default abstract class ProjectScene extends Scene {
     protected laserGuns: Array<gameItems>;
     protected door: Sprite
     protected backgroundImageKey: string;
-    protected playerMaxStatValue= 10;
+    protected playerMaxStatValue = 10;
     //ui
-    protected inGameControlTextBackground="inGameControlTextBackground"
-    protected inGameHelpTextBackground="inGameHelpTextBackground"
+    protected inGameControlTextBackground = "inGameControlTextBackground"
+    protected inGameHelpTextBackground = "inGameHelpTextBackground"
     // Health labels
     protected PlayerStatUI = {};
     protected oneStatUI = {
-        label:Label,
-        bar:Label,
-        barBg:Label,
+        label: Label,
+        bar: Label,
+        barBg: Label,
     }
 
 
@@ -160,8 +160,8 @@ export default abstract class ProjectScene extends Scene {
         this.levelEndTimer = new Timer(1000)
         this.isLevelEndEnetered = false;
         this.initLayers();
-        this.levelEndTransitionLabel = this.addTweenLabel(this.levelEndTransitionLabel,PlayerEvents.LEVEL_END);
-        this.messageBoxLabel = this.addTweenLabel(this.messageBoxLabel,MessageBox.HIDDEN);
+        this.levelEndTransitionLabel = this.addTweenLabel(this.levelEndTransitionLabel, PlayerEvents.LEVEL_END);
+        this.messageBoxLabel = this.addTweenLabel(this.messageBoxLabel, MessageBox.HIDDEN);
     }
     protected loadGameItems(key: string) {
         this.load.object(key, `${this.pathToItems}${key}.json`);
@@ -186,7 +186,7 @@ export default abstract class ProjectScene extends Scene {
     }
     protected initAllGameItems() {
         for (let key of this.gameItemsArray) {
-            let gameItem = this.load.getObject(key);            const items = new Array<gameItems>(gameItem.position.length);
+            let gameItem = this.load.getObject(key); const items = new Array<gameItems>(gameItem.position.length);
             for (let i = 0; i < items.length; i++) {
                 let sprite, line;
                 if (key === "inventorySlot") {
@@ -220,7 +220,7 @@ export default abstract class ProjectScene extends Scene {
         // this.initLayers();
         this.initLevelScene();
         this.initPlayer();
-        
+
         this.initInventorySlotsMap();
         // create screen first 
         if (!this.option.isfogOfWarChecked)
@@ -229,7 +229,7 @@ export default abstract class ProjectScene extends Scene {
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
         this.initAllGameItems();
-        if(!this.option.isAstarChecked){
+        if (!this.option.isAstarChecked) {
             this.initPlayerStatUI();
             this.initializeNPCs();
         }
@@ -251,7 +251,7 @@ export default abstract class ProjectScene extends Scene {
         this.loadAllGameItems();
         // this.loadGameItems(this.laserGunsKey);
         this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince.json");
-        
+
 
         // Load the tilemap
         this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
@@ -270,10 +270,10 @@ export default abstract class ProjectScene extends Scene {
             ...Object.values(BattlerEvent),
             ...Object.values(PlayerEvents),
             ...Object.values(MessageBox),
-          ]);
+        ]);
         this.initGameItemEventSubscribe();
     }
-    
+
     protected initGameEventSubscribe(gameEvents: AllGameEventType[]) {
         for (const event of gameEvents) {
             this.receiver.subscribe(event);
@@ -292,40 +292,40 @@ export default abstract class ProjectScene extends Scene {
         const currentStat = this.player._ai["currentStat"];
         let yOffset = 10;
         let index = 0;
-        let newText:string;
-        for(const stat of   Object.keys(currentStat)){
+        let newText: string;
+        for (const stat of Object.keys(currentStat)) {
             let statUI = {
-                label:null,
-                bar:null,
-                barBg:null,
+                label: null,
+                bar: null,
+                barBg: null,
             };
-            if(PlayerStatsNameArray[index] == 'HP'){
+            if (PlayerStatsNameArray[index] == 'HP') {
                 newText = PlayerStatsNameArray[index];
             }
-            else{
-                newText = "    "+ PlayerStatsNameArray[index];
+            else {
+                newText = "    " + PlayerStatsNameArray[index];
             }
             //bar
-            statUI.label =  <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(10, yOffset), text:newText});
+            statUI.label = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.BASE, { position: new Vec2(10, yOffset), text: newText });
             statUI.label.size.set(300, 30);
             statUI.label.fontSize = 24;
             statUI.label.font = "Courier";
 
             //background
-            statUI.bar = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.BASE, {position: new Vec2(75, yOffset), text: ""});
-		    statUI.bar.size = new Vec2(300, 25);
-		    statUI.bar.backgroundColor = Color[PlayerStatsColorArray[index]];
+            statUI.bar = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.BASE, { position: new Vec2(75, yOffset), text: "" });
+            statUI.bar.size = new Vec2(300, 25);
+            statUI.bar.backgroundColor = Color[PlayerStatsColorArray[index]];
 
             //border
-            statUI.barBg = <Label>this.add.uiElement(UIElementType.LABEL,  GameLayers.BASE, {position: new Vec2(75, yOffset), text: ""});
-		    statUI.barBg.size = new Vec2(300, 25);
-		    statUI.barBg.borderColor = Color.BLACK;
+            statUI.barBg = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.BASE, { position: new Vec2(75, yOffset), text: "" });
+            statUI.barBg.size = new Vec2(300, 25);
+            statUI.barBg.borderColor = Color.BLACK;
             yOffset += 20
-            index ++;
+            index++;
             this.PlayerStatUI[stat] = statUI;
             this.handlePlayerStatChange(stat)
         }
-       
+
     }
     protected addLabel(option: Record<string, any>) {
         const newTextLabel = <Label>this.add.uiElement(UIElementType.LABEL, option.layerName || this.GameLayers.BASE, option);
@@ -345,7 +345,7 @@ export default abstract class ProjectScene extends Scene {
     protected handleEnteredLevelEnd(): void {
         if (!this.isLevelEndEnetered) {
             this.isLevelEndEnetered = true;
-            
+
             this.levelEndTransitionLabel.tweens.play(tweensEffect.SLIDEIN);
         }
 
@@ -358,7 +358,7 @@ export default abstract class ProjectScene extends Scene {
         this.levelEndArea.color = this.levelEndColor;
 
     }
-    protected addTweenLabel(label:Label,onEndEvent:string):Label {
+    protected addTweenLabel(label: Label, onEndEvent: string): Label {
         label = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.UI, { position: new Vec2(-500, 96), text: "Level Complete" });
         label.size.set(1200, 60);
         label.borderRadius = 0;
@@ -417,7 +417,7 @@ export default abstract class ProjectScene extends Scene {
         }
         this.addButtons(buttonOption);
     }
-   
+
     public updateScene() {
 
         while (this.receiver.hasNextEvent()) {
@@ -430,14 +430,14 @@ export default abstract class ProjectScene extends Scene {
 
         if (this.option.isAstarChecked) {
             this.player.moveOnPath(1, this.path)
-            if(this.path.isDone()){
+            if (this.path.isDone()) {
                 this.handleEnteredLevelEnd();
             }
         }
-        else{
+        else {
             this.handlePlayerStatChange("currentShield");
         }
-        
+
         this.updateLabel();
         this.isPlayerAtLevelEnd();
         this.isPlayerAtItems();
@@ -457,16 +457,16 @@ export default abstract class ProjectScene extends Scene {
                         this.emitter.fireEvent(gameItem.name, { action: ACTIONTYPE.USE, gameItem: gameItem });
                         return;
                     }
-                    else{
-                        this.emitter.fireEvent(MessageBox.SHOW,{message:MessageBox.ITEM_NOT_FOUND});
+                    else {
+                        this.emitter.fireEvent(MessageBox.SHOW, { message: MessageBox.ITEM_NOT_FOUND });
                     }
                 }
-               
+
             }
         })
     }
     public isPlayerAtLevelEnd() {
-        if (this.levelEndPosition.distanceSqTo(this.player.position)<10) {
+        if (this.levelEndPosition.distanceSqTo(this.player.position) < 10) {
             if (!this.isLevelEndEnetered)
                 this.emitter.fireEvent(PlayerEvents.PLAYER_ENTERED_LEVEL_END)
         }
@@ -480,21 +480,27 @@ export default abstract class ProjectScene extends Scene {
         this.handleBattlerEvents(event);
         this.handleInGameMessageBox(event);
     }
-    protected handleInGameMessageBox(event:GameEvent){
-        switch(event.type) {
+    protected handleInGameMessageBox(event: GameEvent) {
+        switch (event.type) {
             case MessageBox.SHOW:
                 this.messageBoxLabel.text = event.data.get("message");
                 this.messageBoxLabel.tweens.play(tweensEffect.SLIDEIN);
                 break;
             case MessageBox.HIDDEN:
                 this.messageBoxLabel.tweens.play(tweensEffect.SLIDEOUT);
-            
+
         }
     }
     protected handleBattlerEvents(event: GameEvent) {
         switch (event.type) {
             case BattlerEvent.MONSTER_DEAD: {
                 this.handleBattlerKilled(event);
+                console.log(this.player._ai["currentStat"]["currentEnergy"])
+                if (this.player._ai["currentStat"]["currentEnergy"] < this.playerMaxStatValue) {
+                    this.player._ai["currentStat"]["currentEnergy"]++;
+                    this.handlePlayerStatChange("currentEnergy");
+                }
+
                 break;
             }
             case BattlerEvent.PRINCE_HIT: {
@@ -531,8 +537,8 @@ export default abstract class ProjectScene extends Scene {
                 break;
             }
             case GameItems.HEALTH_PACKS: {
-                if( this.player._ai["currentStat"]["currentHealth"]<this.playerMaxStatValue)
-                this.player._ai["currentStat"]["currentHealth"]++;
+                if (this.player._ai["currentStat"]["currentHealth"] < this.playerMaxStatValue)
+                    this.player._ai["currentStat"]["currentHealth"]++;
                 this.handlePlayerStatChange("currentHealth");
                 break;
             }
@@ -675,15 +681,15 @@ export default abstract class ProjectScene extends Scene {
     }
     protected handlePlayerStatChange(type: string): void {
         // this.PlayerStatUI[PlayerStatsNameArray[index]] = statUI;
-        let oneStatUI = this.PlayerStatUI[type] 
+        let oneStatUI = this.PlayerStatUI[type]
         const currentStatValue = this.player._ai["currentStat"][type]
         let unit = oneStatUI["barBg"].size.x / this.playerMaxStatValue;
-        oneStatUI["bar"].size.set(oneStatUI["barBg"].size.x - unit * (this.playerMaxStatValue - currentStatValue ),oneStatUI["barBg"].size.y);
-		oneStatUI["bar"].position.set(oneStatUI["barBg"].position.x - (unit / 2 / this.getViewScale()) * (this.playerMaxStatValue - currentStatValue), oneStatUI["barBg"].position.y);
-		if(type =="currentHealth")
-        oneStatUI["bar"].backgroundColor = currentStatValue < this.playerMaxStatValue * 1/4 ? Color.RED: currentStatValue < this.playerMaxStatValue * 3/4 ? Color.YELLOW : Color.GREEN;
+        oneStatUI["bar"].size.set(oneStatUI["barBg"].size.x - unit * (this.playerMaxStatValue - currentStatValue), oneStatUI["barBg"].size.y);
+        oneStatUI["bar"].position.set(oneStatUI["barBg"].position.x - (unit / 2 / this.getViewScale()) * (this.playerMaxStatValue - currentStatValue), oneStatUI["barBg"].position.y);
+        if (type == "currentHealth")
+            oneStatUI["bar"].backgroundColor = currentStatValue < this.playerMaxStatValue * 1 / 4 ? Color.RED : currentStatValue < this.playerMaxStatValue * 3 / 4 ? Color.YELLOW : Color.GREEN;
     }
-   
+
 
     protected isPlayerAttacking() {
         let midpoint = null;
@@ -721,8 +727,8 @@ export default abstract class ProjectScene extends Scene {
                 this.emitter.fireEvent(BattlerEvent.MONSTER_DEAD, { id: battler.id });
             }
             if (battler.battlerActive && battler.position.distanceTo(this.player.position) < 10) {
-               if(!this.player._ai['isInvincible'])
-                this.emitter.fireEvent(BattlerEvent.PRINCE_HIT);
+                if (!this.player._ai['isInvincible'])
+                    this.emitter.fireEvent(BattlerEvent.PRINCE_HIT);
                 // this.emitter.fireEvent(BattlerEvent.BATTLER_KILLED, {id: battler.id});
             }
         }
@@ -779,7 +785,7 @@ export default abstract class ProjectScene extends Scene {
         this.path = navmesh.getNavigationPath(this.player.position, this.levelEndPosition);
         console.log(this.path);
     }
-    
+
     public initControlTextLayer() {
         let controlTextOption = {
             position: new Vec2(450, 450),
@@ -848,16 +854,16 @@ export default abstract class ProjectScene extends Scene {
             backgroundColor: Color.WHITE,
         }
         this.addLabel(emptyMenuOption);
-        this.backgroundImage  = this.add.sprite(this.inGameControlTextBackground,GameLayers.CONTROL_TEXT_MENU_CONTAINER);
-        this.backgroundImage.position.set(this.center.x,this.center.y+10);
+        this.backgroundImage = this.add.sprite(this.inGameControlTextBackground, GameLayers.CONTROL_TEXT_MENU_CONTAINER);
+        this.backgroundImage.position.set(this.center.x, this.center.y + 10);
         let controlTextOption = {
             position: new Vec2(400, 515),
             margin: 30,
             layerName: GameLayers.CONTROL_TEXT_MENU
         }
         this.addControlTextLayer(controlTextOption)
-        let inGameControlTextBackgroundImage = this.add.sprite(this.inGameHelpTextBackground,GameLayers.HELP_TEXT_MENU_CONTAINER);
-        inGameControlTextBackgroundImage.position.set(this.center.x,this.center.y+10);
+        let inGameControlTextBackgroundImage = this.add.sprite(this.inGameHelpTextBackground, GameLayers.HELP_TEXT_MENU_CONTAINER);
+        inGameControlTextBackgroundImage.position.set(this.center.x, this.center.y + 10);
         let helpTextOption = {
             position: new Vec2(435, 450),
             margin: 40,
