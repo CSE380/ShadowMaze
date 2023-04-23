@@ -37,7 +37,6 @@ import Line from "../../Wolfie2D/Nodes/Graphics/Line";
 import BubbleShaderType from "../Shaders/BubbleShaderType";
 import LaserShaderType from "../Shaders/LaserShaderType";
 import Graphic from "../../Wolfie2D/Nodes/Graphic";
-import LaserBehavior from "../AI/LaserBehavior";
 import { MainMenuButtonEvent, PauseButtonEvent } from "../CustomizedButton";
 import AABB from "../../Wolfie2D/DataTypes/Shapes/AABB";
 import PlayerAI from "../AI/Player/PlayerAI";
@@ -54,6 +53,9 @@ import NavigationPath from "../../Wolfie2D/Pathfinding/NavigationPath";
 import AstarStrategy from "../Pathfinding/AstarStrategy";
 import NPCActor from "../Actors/NPCActor";
 import { MenuState } from "../MenuState";
+import SlimeBehavior from "../AI/NPC/NPCBehavior/SlimeBehavior";
+import BasicTargetable from "../GameSystems/Targeting/BasicTargetable";
+import Position from "../GameSystems/Targeting/Position";
 const enum tweensEffect {
     SLIDEIN = "slideIn",
     SLIDEOUT = "slideOut",
@@ -221,6 +223,11 @@ export default abstract class ProjectScene extends Scene {
         this.initLevelScene();
         this.initPlayer();
 
+        let navmesh = this.initializeNavmesh(new PositionGraph(), this.walls);
+        navmesh.registerStrategy("astar", new AstarStrategy(navmesh));
+        navmesh.setStrategy("astar");
+        this.navManager.addNavigableEntity("navmesh", navmesh);
+
         this.initInventorySlotsMap();
         // create screen first 
         if (!this.option.isfogOfWarChecked)
@@ -236,14 +243,18 @@ export default abstract class ProjectScene extends Scene {
     }
 
     protected initializeNPCs(): void {
-        let red = this.load.getObject("red");
-        for (let i = 0; i < red.healers.length; i++) {
-            let npc = this.add.animatedSprite(NPCActor, "RedHealer", this.GameLayers.BASE);
-            npc.position.set(red.healers[i][0], red.healers[i][1]);
+        let monster = this.load.getObject("monster");
+        for (let i = 0; i < monster.slime.length; i++) {
+            let npc = this.add.animatedSprite(NPCActor, "black_pudding", this.GameLayers.BASE);
+            npc.position.set(monster.slime[i][0], monster.slime[i][1]);
             npc.addPhysics(new AABB(Vec2.ZERO, new Vec2(7, 7)), null, false);
             // npc.addAI(HealerBehavior);
+            npc.scale = new Vec2(0.2, 0.2);
+            console.log(npc.position);
+            npc.navkey = "navmesh";
+            npc.addAI(SlimeBehavior, {target: new BasicTargetable(new Position(npc.position.x, npc.position.y)), range: 100});
+            npc.animation.play("IDLE", true);
             this.battlers.push(npc);
-            npc.animation.play("IDLE");
         }
     }
 
@@ -629,7 +640,7 @@ export default abstract class ProjectScene extends Scene {
                     position: new Vec2(x, y),
                     text: "",
                 }
-                this.addBlackLabel(options);
+                // this.addBlackLabel(options);
             }
         }
     }
@@ -723,6 +734,9 @@ export default abstract class ProjectScene extends Scene {
                 break;
         }
         for (const battler of this.battlers) {
+            if (battler == this.player) {
+                continue;
+            }
             if (battler.battlerActive && battler.position.distanceTo(midpoint) <= 15 && this.player.animation.isPlaying("ATTACKING")) {
                 this.emitter.fireEvent(BattlerEvent.MONSTER_DEAD, { id: battler.id });
             }
@@ -772,6 +786,7 @@ export default abstract class ProjectScene extends Scene {
         }
         // 
         player.animation.play("IDLE");
+        this.battlers.push(player);
 
 
 
@@ -897,6 +912,7 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected initializeNavmesh(graph: PositionGraph, walls: OrthogonalTilemap): Navmesh {
+        
 
         let dim: Vec2 = walls.getDimensions();
         for (let i = 0; i < dim.y; i++) {
@@ -941,4 +957,6 @@ export default abstract class ProjectScene extends Scene {
         return new Navmesh(graph);
 
     }
+
+    public abstract getBattlers(): Battler[];
 }

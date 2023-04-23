@@ -11,6 +11,7 @@ import { GameLayers } from "../GameLayers";
 import AbstractScene from "./AbstractScene";
 import CheatCodeMenuScene from "./CheatCodeMenuScene";
 import MainMenuScene from "./MainMenuScene";
+import Battler from "../GameSystems/BattleSystem/Battler";
 export default class MainMenu extends AbstractScene  {
     private mainMenuLayerName = "mainMenu";
     // private backgroundImageKey = "backgroundImage";
@@ -80,4 +81,7 @@ export default class MainMenu extends AbstractScene  {
             // }
         }
     }
+
+    public getBattlers(): Battler[] { return this.battlers; }
+
 }

@@ -6,6 +6,7 @@ import GameEvent from "../../Wolfie2D/Events/GameEvent";
 import { BackButtonEvent } from "../CustomizedButton";
 import MainMenu from "./MainMenuScene";
 import HW4Scene from "./AbstractScene";
+import Battler from "../GameSystems/BattleSystem/Battler";
 /* #################### CLASS DEFINITION #################### */
 
 // Welcome to Wolfie2D!
@@ -63,4 +64,7 @@ export default class HelpScene extends HW4Scene {
 
         }
     }
+
+    public getBattlers(): Battler[] { return this.battlers; }
+
 }

@@ -3,6 +3,7 @@ import GameEvent from "../../Wolfie2D/Events/GameEvent";
 import SelectLevelMenuScene from "./SelectLevelMenuScene";
 import StartScene from "./StartScene";
 import ProjectScene from "./AbstractScene";
+import Battler from "../GameSystems/BattleSystem/Battler";
 
 import { MainMenuButtonEvent, PauseButtonEvent } from "../CustomizedButton";
 
@@ -38,7 +39,9 @@ export default class IntroLevelScene extends ProjectScene {
         // this.loadGameItems(this.laserGunsKey);
         this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince_v4.json");
         this.load.spritesheet("RedHealer", "shadowMaze_assets/spritesheets/RedHealer.json");
+        this.load.spritesheet("black_pudding", "shadowMaze_assets/spritesheets/black_pudding.json");
         this.load.object("red", "shadowMaze_assets/data/enemies/red.json");
+        this.load.object("monster", "shadowMaze_assets/data/enemies/monster.json")
         this.load.image(this.inGameControlTextBackground, "shadowMaze_assets/images/inGameControlTextBackground.png");
         this.load.image(this.inGameHelpTextBackground, "shadowMaze_assets/images/inGameHelpTextBackground.png");
 
@@ -112,9 +115,8 @@ export default class IntroLevelScene extends ProjectScene {
             this.sceneManager.changeToScene(nextScene,this.option);
         }
     }
-   
-  
 
+    public getBattlers(): Battler[] { return this.battlers; }
     /** Initializes the layers in the scene */
 
 

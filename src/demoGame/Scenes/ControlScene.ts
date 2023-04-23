@@ -14,6 +14,7 @@ import MainMenu from "./MainMenuScene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import { controlTextArray } from "../Text";
 import HW4Scene from "./AbstractScene";
+import Battler from "../GameSystems/BattleSystem/Battler";
 /* #################### CLASS DEFINITION #################### */
 
 // Welcome to Wolfie2D!
@@ -69,4 +70,7 @@ export default class ControlScene extends HW4Scene {
 
         }
     }
+
+    public getBattlers(): Battler[] { return this.battlers; }
+
 }
