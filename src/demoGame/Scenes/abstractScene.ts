@@ -54,6 +54,7 @@ import NavigationPath from "../../Wolfie2D/Pathfinding/NavigationPath";
 import AstarStrategy from "../Pathfinding/AstarStrategy";
 import NPCActor from "../Actors/NPCActor";
 import { MenuState } from "../MenuState";
+import { MessageBox } from "../MessageBox";
 export default abstract class ProjectScene extends Scene {
     protected walls: OrthogonalTilemap;
     protected path: NavigationPath;
@@ -66,17 +67,19 @@ export default abstract class ProjectScene extends Scene {
     protected GameLayers = GameLayers;
     protected backButtonPosition = new Vec2(50, 50);
 
-
+    //message box to display invalid action
+    // level transtion
+    protected levelTransitionTimer: Timer;
+    protected levelTransitionScreen: Rect;
     //Level end
     protected center: Vec2;
     protected levelEndArea: Rect;
     protected levelEndTransitionLabel: Label;
     protected playerInitPosition = new Vec2(15, 300);
-    protected levelEndPosition = new Vec2(30, 400);
+    protected levelEndPosition = new Vec2(20, 400);
     protected levelEndHalfSize = new Vec2(25, 25)
     protected levelEndColor = new Color(255, 0, 0, 0.5);
     protected levelEndTimer: Timer;
-    protected levelTransitionScreen: Rect;
     protected isLevelEndEnetered: boolean;
     //player 
     protected player: PlayerActor;
@@ -115,8 +118,6 @@ export default abstract class ProjectScene extends Scene {
     // relative path to the assets
     protected pathToItems = `shadowMaze_assets/data/items/`;
     protected pathToSprite = `shadowMaze_assets/sprites/`;
-    // Level end transition timer and graphic
-    protected levelTransitionTimer: Timer;
 
     //Li
     protected battlers: (Battler & Actor)[];
@@ -219,7 +220,7 @@ export default abstract class ProjectScene extends Scene {
         // create screen first 
         if (!this.option.isfogOfWarChecked)
             // this.initFogOfWar();
-            this.center = this.viewport.getHalfSize();
+        this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
         this.initAllGameItems();
@@ -266,10 +267,11 @@ export default abstract class ProjectScene extends Scene {
     protected initSubscribe() {
         this.receiver.subscribe(PlayerEvents.PLAYER_ENTERED_LEVEL_END);
         this.receiver.subscribe(PlayerEvents.LEVEL_END);
-        
+        this.receiver.subscribe(MessageBox.WARNING);
         this.initBattlerEventSubscribe();
         this.initGameItemEventSubscribe();
     }
+    
     protected initBattlerEventSubscribe() {
         for (const event of Object.values(BattlerEvent)) {
             this.receiver.subscribe(event);
@@ -341,7 +343,7 @@ export default abstract class ProjectScene extends Scene {
     protected handleEnteredLevelEnd(): void {
         if (!this.isLevelEndEnetered) {
             this.isLevelEndEnetered = true;
-            this.addLevelEndLabel();
+            this.addLevelEndLabel(this.levelEndTransitionLabel,PlayerEvents.LEVEL_END);
             this.levelEndTransitionLabel.tweens.play("slideIn");
         }
 
@@ -354,7 +356,7 @@ export default abstract class ProjectScene extends Scene {
         this.levelEndArea.color = this.levelEndColor;
 
     }
-    protected addLevelEndLabel() {
+    protected addLevelEndLabel(label:Label,onEndEvent:string) {
         this.levelEndTransitionLabel = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.UI, { position: new Vec2(20, 96), text: "Level Complete" });
         this.levelEndTransitionLabel.size.set(1200, 60);
         this.levelEndTransitionLabel.borderRadius = 0;
@@ -373,7 +375,7 @@ export default abstract class ProjectScene extends Scene {
                     ease: EaseFunctionType.OUT_SINE
                 }
             ],
-            onEnd: PlayerEvents.LEVEL_END,
+            onEnd: onEndEvent,
         });
     }
     protected addButtons(option: Record<string, any>) {
@@ -424,12 +426,12 @@ export default abstract class ProjectScene extends Scene {
         this.isPlayerAtLevelEnd();
         this.isPlayerAtItems();
         this.isPlayerAttacking();
-        this.isUseItem();
+        this.isPlayerUseItem();
 
     }
 
 
-    protected isUseItem() {
+    protected isPlayerUseItem() {
         ItemButtonKeyArray.forEach(key => {
             if (Input.isKeyJustPressed(key)) {
                 const positionItemMap = this.inventorySlotsMap.get(parseInt(key))
@@ -437,8 +439,13 @@ export default abstract class ProjectScene extends Scene {
                     if (value.length != 0) {
                         const gameItem = value.pop();
                         this.emitter.fireEvent(gameItem.name, { action: ACTIONTYPE.USE, gameItem: gameItem });
+                        return;
+                    }
+                    else{
+                        this.emitter.fireEvent(MessageBox.WARNING,{message:MessageBox.ITEM_NOT_FOUND});
                     }
                 }
+               
             }
         })
     }
@@ -455,6 +462,12 @@ export default abstract class ProjectScene extends Scene {
         if (event.data.get(this.action) == ACTIONTYPE.USE)
             this.handleUseGameItemsEvent(event);
         this.handleBattlerEvents(event);
+        this.handleInGameMessageBox(event);
+    }
+    protected handleInGameMessageBox(event:GameEvent){
+       if(event.type == MessageBox.WARNING){
+            console.log(event.data.get('message'))
+       }
     }
     protected handleBattlerEvents(event: GameEvent) {
         switch (event.type) {
@@ -504,7 +517,7 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected RemoveItemFromInventory(event: GameEvent) {
-        const gameItem = event.data.get("gameItem")
+        const gameItem = event.data.get("gameItem");
         gameItem.visible = false;
     }
     protected handleMenuStateChange() {
@@ -639,12 +652,9 @@ export default abstract class ProjectScene extends Scene {
         this.setContainerAndMenu(GameLayers.HELP_TEXT_MENU_CONTAINER, GameLayers.HELP_TEXT_MENU, true)
     }
     protected handlePlayerStatChange(type: string): void {
-        console.log( );
         // this.PlayerStatUI[PlayerStatsNameArray[index]] = statUI;
         let oneStatUI = this.PlayerStatUI[type] 
         const currentStatValue = this.player._ai["currentStat"][type]
-        // console.log(oneStatUI)
-        // console.log(currentStatValue)
         let unit = oneStatUI["barBg"].size.x / this.playerMaxStatValue;
         oneStatUI["bar"].size.set(oneStatUI["barBg"].size.x - unit * (this.playerMaxStatValue - currentStatValue ),oneStatUI["barBg"].size.y);
 		oneStatUI["bar"].position.set(oneStatUI["barBg"].position.x - (unit / 2 / this.getViewScale()) * (this.playerMaxStatValue - currentStatValue), oneStatUI["barBg"].position.y);
