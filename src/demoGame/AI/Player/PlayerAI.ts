@@ -3,7 +3,6 @@ import AI from "../../../Wolfie2D/DataTypes/Interfaces/AI";
 import Vec2 from "../../../Wolfie2D/DataTypes/Vec2";
 import GameEvent from "../../../Wolfie2D/Events/GameEvent";
 import PlayerActor from "../../Actors/PlayerActor";
-import { ItemEvent } from "../../ProjectEvents";
 import Inventory from "../../GameSystems/ItemSystem/Inventory";
 import Item from "../../GameSystems/ItemSystem/Item";
 import PlayerController from "./PlayerController";
@@ -60,7 +59,6 @@ export default class PlayerAI extends StateMachineAI implements AI {
             // if(name !=='currentHealth'){
             //     this.currentStat[name] = 0;
             // }
-            console.log(this.currentStat[name])
         }
     }
 

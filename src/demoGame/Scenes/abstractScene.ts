@@ -18,10 +18,10 @@ import Viewport from "../../Wolfie2D/SceneGraph/Viewport";
 import RenderingManager from "../../Wolfie2D/Rendering/RenderingManager";
 import Rect from "../../Wolfie2D/Nodes/Graphics/Rect";
 import { GraphicType } from "../../Wolfie2D/Nodes/Graphics/GraphicTypes";
-import { PlayerEvents } from "../ProjectEvents";
+import { PlayerEvents,BattlerEvent,MessageBox,AllGameEventType } from "../ProjectEvents";
 
 import Actor from "../../Wolfie2D/DataTypes/Interfaces/Actor";
-import { BattlerEvent } from "../ProjectEvents";
+
 
 // scene import
 // import IntroLevelScene from "./IntroLevelScene";
@@ -54,7 +54,10 @@ import NavigationPath from "../../Wolfie2D/Pathfinding/NavigationPath";
 import AstarStrategy from "../Pathfinding/AstarStrategy";
 import NPCActor from "../Actors/NPCActor";
 import { MenuState } from "../MenuState";
-import { MessageBox } from "../MessageBox";
+const enum tweensEffect{
+    SLIDEIN="slideIn",
+    SLIDEOUT="slideOut",
+}
 export default abstract class ProjectScene extends Scene {
     protected walls: OrthogonalTilemap;
     protected path: NavigationPath;
@@ -75,6 +78,7 @@ export default abstract class ProjectScene extends Scene {
     protected center: Vec2;
     protected levelEndArea: Rect;
     protected levelEndTransitionLabel: Label;
+    protected messageBoxLabel: Label;
     protected playerInitPosition = new Vec2(15, 300);
     protected levelEndPosition = new Vec2(20, 400);
     protected levelEndHalfSize = new Vec2(25, 25)
@@ -156,7 +160,8 @@ export default abstract class ProjectScene extends Scene {
         this.levelEndTimer = new Timer(1000)
         this.isLevelEndEnetered = false;
         this.initLayers();
-       
+        this.levelEndTransitionLabel = this.addTweenLabel(this.levelEndTransitionLabel,PlayerEvents.LEVEL_END);
+        this.messageBoxLabel = this.addTweenLabel(this.messageBoxLabel,MessageBox.HIDDEN);
     }
     protected loadGameItems(key: string) {
         this.load.object(key, `${this.pathToItems}${key}.json`);
@@ -219,7 +224,7 @@ export default abstract class ProjectScene extends Scene {
         this.initInventorySlotsMap();
         // create screen first 
         if (!this.option.isfogOfWarChecked)
-            // this.initFogOfWar();
+            this.initFogOfWar();
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
@@ -228,10 +233,6 @@ export default abstract class ProjectScene extends Scene {
             this.initPlayerStatUI();
             this.initializeNPCs();
         }
-       
-        // this.addLevelEndLabel();
-        // this.levelEndLabel.tweens.play("slideIn");
-
     }
 
     protected initializeNPCs(): void {
@@ -265,15 +266,16 @@ export default abstract class ProjectScene extends Scene {
 
 
     protected initSubscribe() {
-        this.receiver.subscribe(PlayerEvents.PLAYER_ENTERED_LEVEL_END);
-        this.receiver.subscribe(PlayerEvents.LEVEL_END);
-        this.receiver.subscribe(MessageBox.WARNING);
-        this.initBattlerEventSubscribe();
+        this.initGameEventSubscribe([
+            ...Object.values(BattlerEvent),
+            ...Object.values(PlayerEvents),
+            ...Object.values(MessageBox),
+          ]);
         this.initGameItemEventSubscribe();
     }
     
-    protected initBattlerEventSubscribe() {
-        for (const event of Object.values(BattlerEvent)) {
+    protected initGameEventSubscribe(gameEvents: AllGameEventType[]) {
+        for (const event of gameEvents) {
             this.receiver.subscribe(event);
         }
     }
@@ -343,8 +345,8 @@ export default abstract class ProjectScene extends Scene {
     protected handleEnteredLevelEnd(): void {
         if (!this.isLevelEndEnetered) {
             this.isLevelEndEnetered = true;
-            this.addLevelEndLabel(this.levelEndTransitionLabel,PlayerEvents.LEVEL_END);
-            this.levelEndTransitionLabel.tweens.play("slideIn");
+            
+            this.levelEndTransitionLabel.tweens.play(tweensEffect.SLIDEIN);
         }
 
     }
@@ -356,17 +358,17 @@ export default abstract class ProjectScene extends Scene {
         this.levelEndArea.color = this.levelEndColor;
 
     }
-    protected addLevelEndLabel(label:Label,onEndEvent:string) {
-        this.levelEndTransitionLabel = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.UI, { position: new Vec2(20, 96), text: "Level Complete" });
-        this.levelEndTransitionLabel.size.set(1200, 60);
-        this.levelEndTransitionLabel.borderRadius = 0;
-        this.levelEndTransitionLabel.backgroundColor = new Color(34, 32, 52);
-        this.levelEndTransitionLabel.textColor = Color.WHITE;
-        this.levelEndTransitionLabel.fontSize = 48;
-        this.levelEndTransitionLabel.font = "PixelSimple";
-        this.levelEndTransitionLabel.tweens.add("slideIn", {
+    protected addTweenLabel(label:Label,onEndEvent:string):Label {
+        label = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.UI, { position: new Vec2(-500, 96), text: "Level Complete" });
+        label.size.set(1200, 60);
+        label.borderRadius = 0;
+        label.backgroundColor = new Color(34, 32, 52);
+        label.textColor = Color.WHITE;
+        label.fontSize = 48;
+        label.font = "PixelSimple";
+        label.tweens.add(tweensEffect.SLIDEIN, {
             startDelay: 0,
-            duration: 1000,
+            duration: 2000,
             effects: [
                 {
                     property: TweenableProperties.posX,
@@ -377,6 +379,20 @@ export default abstract class ProjectScene extends Scene {
             ],
             onEnd: onEndEvent,
         });
+        label.tweens.add(tweensEffect.SLIDEOUT, {
+            startDelay: 4000,
+            duration: 2000,
+            effects: [
+                {
+                    property: TweenableProperties.posX,
+                    start: 270,
+                    end: 1000,
+                    ease: EaseFunctionType.OUT_SINE
+                }
+            ],
+            // onEnd: onEndEvent,
+        });
+        return label;
     }
     protected addButtons(option: Record<string, any>) {
         const newButton = <Label>this.add.uiElement(UIElementType.BUTTON, option.layerName || this.GameLayers.BASE, option);
@@ -442,7 +458,7 @@ export default abstract class ProjectScene extends Scene {
                         return;
                     }
                     else{
-                        this.emitter.fireEvent(MessageBox.WARNING,{message:MessageBox.ITEM_NOT_FOUND});
+                        this.emitter.fireEvent(MessageBox.SHOW,{message:MessageBox.ITEM_NOT_FOUND});
                     }
                 }
                
@@ -465,9 +481,15 @@ export default abstract class ProjectScene extends Scene {
         this.handleInGameMessageBox(event);
     }
     protected handleInGameMessageBox(event:GameEvent){
-       if(event.type == MessageBox.WARNING){
-            console.log(event.data.get('message'))
-       }
+        switch(event.type) {
+            case MessageBox.SHOW:
+                this.messageBoxLabel.text = event.data.get("message");
+                this.messageBoxLabel.tweens.play(tweensEffect.SLIDEIN);
+                break;
+            case MessageBox.HIDDEN:
+                this.messageBoxLabel.tweens.play(tweensEffect.SLIDEOUT);
+            
+        }
     }
     protected handleBattlerEvents(event: GameEvent) {
         switch (event.type) {
