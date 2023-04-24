@@ -248,7 +248,6 @@ export default abstract class ProjectScene extends Scene {
             let npc = this.add.animatedSprite(NPCActor, "black_pudding", this.GameLayers.BASE);
             npc.position.set(monster.slime[i][0], monster.slime[i][1]);
             npc.addPhysics(new AABB(Vec2.ZERO, new Vec2(7, 7)), null, false);
-            // npc.addAI(HealerBehavior);
             npc.scale = new Vec2(0.2, 0.2);
             console.log(npc.position);
             npc.navkey = "navmesh";
