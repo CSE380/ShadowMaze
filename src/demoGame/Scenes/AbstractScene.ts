@@ -777,6 +777,7 @@ export default abstract class ProjectScene extends Scene {
         this.initCurrLabel();
 
         // Give the player PlayerAI
+        
         if (this.option.isAstarChecked) {
             console.log("Auto Pilot");
             this.initAstarMode();
