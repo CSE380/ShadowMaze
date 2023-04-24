@@ -24,9 +24,8 @@ export default class StartScene extends HW4Scene {
     // or where you should initialize any other things you will need in your scene
     // Once again, this occurs strictly after loadScene(), so anything you loaded there will be available
     startScene(): void {
-
-        this.addUILayer(this.mainMenuLayerName)
-        this.backgroundImage = this.add.sprite(this.backgroundImageKey, this.mainMenuLayerName);
+        this.addUILayer(  this.GameLayers.BASE)
+        this.backgroundImage = this.add.sprite(this.backgroundImageKey,   this.GameLayers.BASE);
         let center = this.viewport.getCenter();
         this.backgroundImage.position.set(center.x, center.y);
         let textOption = {
@@ -37,7 +36,7 @@ export default class StartScene extends HW4Scene {
             backgroundColor: Color.TRANSPARENT,
             font: "Apple Chancery",
         }
-        this.addText(textOption);
+        this.addLabel(textOption);
         let buttonOption = {
             position: new Vec2(center.x, center.y + 100),
             text: StartMenuButtonEvent.START_GAME,
@@ -48,7 +47,12 @@ export default class StartScene extends HW4Scene {
         this.addButtons(buttonOption);
     }
 
-
+    public updateScene() {
+        while (this.receiver.hasNextEvent()) {
+            const gameEvent = this.receiver.getNextEvent()
+            this.handleEvent(gameEvent);
+        }
+    }
 
 
     public handleEvent(event: GameEvent): void {

@@ -1,11 +1,24 @@
 export enum BattlerEvent {
-    BATTLER_KILLED = "BATTLER_KILLED",
-    BATTLER_RESPAWN = "BATTLER_RESPAWN",
-    
-    BATTLER_CHANGE = "BATTLER_CHANGE",
-    CONSUME = "CONSUME",
-    HIT = "HIT",
+    MONSTER_DEAD = "MONSTER_DEAD",
+    MONSTER_HIT= "MONSTER_HIT",
+    PRINCE_HIT = "PRINCE_HIT",
+    PRINCE_DEAD = "PRINCE_DEAD",
 }
+
+
+export enum PlayerEvents {
+    LEVEL_END= "LEVEL_END",
+    PLAYER_ENTERED_LEVEL_END= "PLAYER_ENTERED_LEVEL_END",
+} 
+
+export enum MessageBox {
+    SHOW="SHOW",
+    HIDDEN = "HIDDEN",
+    INVALID_ACTION = "You can not perform that action.",
+    ITEM_NOT_FOUND = "That item cannot be found in your inventory.",
+    SKILL_ON_CD = "That skill is on cooldown.",
+}
+export type AllGameEventType= BattlerEvent | PlayerEvents | MessageBox;
 
 export enum ItemEvent {
     ITEM_REQUEST = "ITEM_REQUEST",
@@ -21,19 +34,3 @@ export enum HudEvent {
     HEALTH_CHANGE = "HEALTH_CHANGE",
     USE_HPACK = "USE_HPACK"
 }
-
-// export enum PlayerEvent {
-//     PLAYER_KILLED = "PLAYER_KILLED",
-
-// }
-
-/**
- * A set of events for HW4
- */
-export const PlayerEvents = {
-    LEVEL_START: "LEVEL_START",
-    LEVEL_END: "LEVEL_END",
-    PLAYER_ENTERED_LEVEL_END: "PLAYER_ENTERED_LEVEL_END",
-    FIRING_LASER: "FIRING_LASER",
-
-} as const;

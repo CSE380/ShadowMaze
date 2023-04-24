@@ -35,7 +35,9 @@ export default class Color {
 	static get TRANSPARENT(): Color {
 		return new Color(0, 0, 0, 0);
 	}
-	
+	static get ALMOST_TRANSPARENT(): Color {
+		return new Color(0, 0, 0, 0.1);
+	}
 	/**	
 	 * Red color
 	 * @returns rgb(255, 0, 0)

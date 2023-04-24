@@ -13,6 +13,8 @@ export default class Shielding extends PlayerState {
     
     public override onEnter(options: Record<string, any>): void {
         this.parent.owner.animation.play(PlayerAnimations.SHIELDING, false);
+        this.parent.owner._ai["currentStat"]["currentShield"] = 0;
+       
     }
 
     public override update(deltaT: number): void {

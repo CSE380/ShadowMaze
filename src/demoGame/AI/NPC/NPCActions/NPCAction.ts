@@ -84,6 +84,11 @@ export default abstract class NPCAction extends GoapAction {
         this.path = null;
         return {};
     }
+    public safeExit() {
+        this.actor.clearTarget();
+        this.target = null;
+        this.path = null;
+    }
 
     public handleInput(event: GameEvent): void {
         switch (event.type) {
