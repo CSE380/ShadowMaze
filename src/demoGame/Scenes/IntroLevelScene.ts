@@ -17,26 +17,15 @@ const ACTIONTYPE = {
 
 export default class IntroLevelScene extends ProjectScene {
 
-    /** GameSystems in the HW4 Scene */
-
-
-    // The wall layer of the tilemap
-    // The position graph for the navmesh
-
-    
-
-
+    public static readonly LEVEL_MUSIC_KEY = "LEVEL_MUSIC";
+    public static readonly LEVEL_MUSIC_PATH = "hw4_assets/music/level2.mp3";
 
     /**
      * @see Scene.update()
      */
     public override loadScene() {
-        // Load the player and enemy spritesheets
-
-        //laser gun
+        
         this.loadAllGameItems();
-        // this.initLevelScene();
-        // this.loadGameItems(this.laserGunsKey);
         this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince_v4.json");
 
         this.load.spritesheet("black_pudding", "shadowMaze_assets/spritesheets/black_pudding.json");
