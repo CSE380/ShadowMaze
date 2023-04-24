@@ -5,6 +5,20 @@ import NavPathStrat from "../../Wolfie2D/Pathfinding/Strategies/NavigationStrate
 
 // TODO Construct a NavigationPath object using A*
 
+class Node {
+    index: number;
+    parent: Node;
+    g: number;
+    h: number;
+
+    constructor(index: number, parent?: Node, g?: number, h?: number) {
+        this.index = index;
+        this.parent = parent;
+        this.g = g;
+        this.h = h;
+    }
+}
+
 /**
  * The AstarStrategy class is an extension of the abstract NavPathStrategy class. For our navigation system, you can
  * now specify and define your own pathfinding strategy. Originally, the two options were to use Djikstras or a
@@ -14,7 +28,6 @@ import NavPathStrat from "../../Wolfie2D/Pathfinding/Strategies/NavigationStrate
  * - Peter
  */
 export default class AstarStrategy extends NavPathStrat {
-
     /**
      * @see NavPathStrat.buildPath()
      */
