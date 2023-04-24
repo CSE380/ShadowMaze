@@ -47,6 +47,10 @@ export default class AstarStrategy extends NavPathStrat {
             pathNode = pathNode.parent;
         }
         // pathStack.push(this.mesh.graph.positions[start]);
+        if (pathStack.size() == 1) {
+            let emptyStack = new Stack<Vec2>(0);
+            return new NavigationPath(emptyStack);
+        }
         return new NavigationPath(pathStack);
     }
     
