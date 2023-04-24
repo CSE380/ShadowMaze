@@ -18,13 +18,16 @@ const ACTIONTYPE = {
 export default class IntroLevelScene extends ProjectScene {
 
     public static readonly LEVEL_MUSIC_KEY = "LEVEL_MUSIC";
-    public static readonly LEVEL_MUSIC_PATH = "hw4_assets/music/level2.mp3";
+    public static readonly LEVEL_MUSIC_PATH = "shadowMaze_assests/music/level_bgm.mp3";
 
     /**
      * @see Scene.update()
      */
     public override loadScene() {
-        
+        this.levelMusicKey = IntroLevelScene.LEVEL_MUSIC_KEY
+
+        this.load.audio(this.levelMusicKey, IntroLevelScene.LEVEL_MUSIC_PATH);
+
         this.loadAllGameItems();
         this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince_v4.json");
 

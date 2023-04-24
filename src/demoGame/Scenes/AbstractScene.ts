@@ -104,7 +104,6 @@ export default abstract class ProjectScene extends Scene {
         barBg: Label,
     }
 
-
     //items to game 
     protected gameItemsArray = GameItemsArray;
     protected gameItemsMap = new Map<string, Array<gameItems>>();
@@ -117,6 +116,8 @@ export default abstract class ProjectScene extends Scene {
     protected currLabels: Array<Label>;
     protected nextLabels: Array<Label>;
 
+    //audio and music
+    protected levelMusicKey: string;
 
     protected labelSize: number;
     protected isPauseMenuHidden: boolean;
