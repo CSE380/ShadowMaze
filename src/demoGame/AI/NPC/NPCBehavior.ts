@@ -5,7 +5,7 @@ import GameNode from "../../../Wolfie2D/Nodes/GameNode";
 import Line from "../../../Wolfie2D/Nodes/Graphics/Line";
 import Timer from "../../../Wolfie2D/Timing/Timer";
 import NPCActor from "../../Actors/NPCActor";
-import { ItemEvent } from "../../ProjectEvents";
+import { BattlerEvent, ItemEvent } from "../../ProjectEvents";
 import NPCAction from "./NPCActions/NPCAction";
 import { HudEvent } from "../../ProjectEvents";
 
@@ -20,7 +20,7 @@ export default abstract class NPCBehavior extends StateMachineGoapAI<NPCAction> 
     public initializeAI(owner: NPCActor, options: Record<string, any>): void {
         this.owner = owner;
         this.receiver.subscribe(ItemEvent.LASERGUN_FIRED);
-        
+        this.receiver.subscribe(BattlerEvent.MONSTER_ATTACK);
     }
 
     public activate(options: Record<string, any>): void {}
@@ -37,6 +37,10 @@ export default abstract class NPCBehavior extends StateMachineGoapAI<NPCAction> 
             case ItemEvent.LASERGUN_FIRED: {
                 console.log("Catching and handling lasergun fired event!!!");
                 this.handleLasergunFired(event.data.get("actorId"), event.data.get("to"), event.data.get("from"));
+                break;
+            }
+            case BattlerEvent.MONSTER_ATTACK: {
+                console.log("MONSTER ATTACK");
                 break;
             }
             default: {

@@ -1,6 +1,6 @@
 {
-  "name": "monster",
-  "spriteSheetImage": "monster.png",
+  "name": "troll",
+  "spriteSheetImage": "troll.png",
   "spriteWidth": 32,
   "spriteHeight": 32,
   "leftBuffer": 0,

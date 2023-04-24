@@ -248,8 +248,17 @@ export default abstract class ProjectScene extends Scene {
             let npc = this.add.animatedSprite(NPCActor, "black_pudding", this.GameLayers.BASE);
             npc.position.set(monster.slime[i][0], monster.slime[i][1]);
             npc.addPhysics(new AABB(Vec2.ZERO, new Vec2(7, 7)), null, false);
-            npc.scale = new Vec2(0.2, 0.2);
-            console.log(npc.position);
+            npc.scale = new Vec2(0.15, 0.15);
+            npc.navkey = "navmesh";
+            npc.addAI(SlimeBehavior, {target: new BasicTargetable(new Position(npc.position.x, npc.position.y)), range: 100});
+            npc.animation.play("IDLE", true);
+            this.battlers.push(npc);
+        }
+        for (let i = 0; i < monster.troll.length; i++) {
+            let npc = this.add.animatedSprite(NPCActor, "troll", this.GameLayers.BASE);
+            npc.position.set(monster.troll[i][0], monster.troll[i][1]);
+            npc.addPhysics(new AABB(Vec2.ZERO, new Vec2(7, 7)), null, false);
+            npc.scale = new Vec2(1.5, 1.5);
             npc.navkey = "navmesh";
             npc.addAI(SlimeBehavior, {target: new BasicTargetable(new Position(npc.position.x, npc.position.y)), range: 100});
             npc.animation.play("IDLE", true);
@@ -639,7 +648,7 @@ export default abstract class ProjectScene extends Scene {
                     position: new Vec2(x, y),
                     text: "",
                 }
-                // this.addBlackLabel(options);
+                this.addBlackLabel(options);
             }
         }
     }
@@ -741,7 +750,7 @@ export default abstract class ProjectScene extends Scene {
             }
             if (battler.battlerActive && battler.position.distanceTo(this.player.position) < 10) {
                 if (!this.player._ai['isInvincible'])
-                    this.emitter.fireEvent(BattlerEvent.PRINCE_HIT);
+                    this.emitter.fireEvent(BattlerEvent.PRINCE_HIT, {id: battler.id});
                 // this.emitter.fireEvent(BattlerEvent.BATTLER_KILLED, {id: battler.id});
             }
         }
@@ -770,7 +779,7 @@ export default abstract class ProjectScene extends Scene {
         player.scale = new Vec2(2, 2);
 
         // Give the player physics
-        player.addPhysics(new AABB(Vec2.ZERO, new Vec2(8, 8)), null, true);
+        player.addPhysics(new AABB(Vec2.ZERO, new Vec2(8, 8)), null, false);
         // player.setGroup(PhysicsGroups.PLAYER);
         this.buildLightShape();
         this.initCurrLabel();
