@@ -58,4 +58,8 @@ export default class NavigationPath implements Path<Vec2> {
 	toString(): string {
 		return this.path.toString()
 	}
+
+	distance(): number {
+		return this.path.size();
+	}
 }

@@ -58,10 +58,16 @@ export default abstract class NPCAction extends GoapAction {
             // Construct a path from the actor to the target
             this.path = this.actor.getPath(this.actor.position, this.target.position);
             // console.log(this.target);
+            
         }
     }
 
     public update(deltaT: number): void {
+        // console.log(this.path.distance());
+        if (this.path.distance() > 50) {
+            this.onEnter(null);
+            return; 
+        }
         if (this.path == null) {
             this.onEnter(null);
             return;

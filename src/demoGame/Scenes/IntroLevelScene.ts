@@ -17,26 +17,18 @@ const ACTIONTYPE = {
 
 export default class IntroLevelScene extends ProjectScene {
 
-    /** GameSystems in the HW4 Scene */
-
-
-    // The wall layer of the tilemap
-    // The position graph for the navmesh
-
-    
-
-
+    public static readonly LEVEL_MUSIC_KEY = "LEVEL_MUSIC";
+    public static readonly LEVEL_MUSIC_PATH = "shadowMaze_assets/music/level_bgm.mp3";
 
     /**
      * @see Scene.update()
      */
     public override loadScene() {
-        // Load the player and enemy spritesheets
+        this.levelMusicKey = IntroLevelScene.LEVEL_MUSIC_KEY
 
-        //laser gun
+        this.load.audio(this.levelMusicKey, IntroLevelScene.LEVEL_MUSIC_PATH);
+
         this.loadAllGameItems();
-        // this.initLevelScene();
-        // this.loadGameItems(this.laserGunsKey);
         this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince_v4.json");
 
         this.load.spritesheet("black_pudding", "shadowMaze_assets/spritesheets/black_pudding.json");
@@ -106,15 +98,13 @@ export default class IntroLevelScene extends ProjectScene {
             case PlayerEvents.LEVEL_END: {
                 setTimeout(() => {
                     nextScene = SelectLevelMenuScene
-                    this.viewport.setZoomLevel(1);
-                    this.sceneManager.changeToScene(nextScene,this.option);
+                    this.sceneChange(nextScene)
                 }, 2000)
                 return;
             }
         }
         if(nextScene){
-            this.viewport.setZoomLevel(1);
-            this.sceneManager.changeToScene(nextScene,this.option);
+            this.sceneChange(nextScene)
         }
     }
 

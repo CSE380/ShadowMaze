@@ -35,8 +35,11 @@ export default class Color {
 	static get TRANSPARENT(): Color {
 		return new Color(0, 0, 0, 0);
 	}
-	static get ALMOST_TRANSPARENT(): Color {
-		return new Color(0, 0, 0, 0.1);
+	static get FOG_OF_WAR_TRANSPARENT(): Color {
+		return new Color(0, 0, 0, 0.01);
+	}
+	static get FOG_OF_WAR_BLACK(): Color {
+		return new Color(0, 0, 0, 0.99);
 	}
 	/**	
 	 * Red color
