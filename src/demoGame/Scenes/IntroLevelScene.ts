@@ -29,6 +29,7 @@ export default class IntroLevelScene extends ProjectScene {
         this.load.audio(this.levelMusicKey, IntroLevelScene.LEVEL_MUSIC_PATH);
 
         this.loadAllGameItems();
+        this.loadUltimateWave();
         this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince_v4.json");
 
         this.load.spritesheet("black_pudding", "shadowMaze_assets/spritesheets/black_pudding.json");

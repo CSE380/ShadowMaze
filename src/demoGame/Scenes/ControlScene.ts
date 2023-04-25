@@ -53,7 +53,7 @@ export default class ControlScene extends HW4Scene {
         this.addControlTextLayer(controlTextOption);
         this.addBackButon(this.backButtonPosition);
     }
-      public updateScene() {
+      public updateScene(deltaT: number) {
         while (this.receiver.hasNextEvent()) {
             this.handleEvent(this.receiver.getNextEvent());
         }

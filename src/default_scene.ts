@@ -35,7 +35,7 @@ export default class default_scene extends Scene {
         
     }
 
-    // updateScene() is where you can handle any frame by frame updates to your scene.
+    // updateScene(deltaT: number) is where you can handle any frame by frame updates to your scene.
     // For the most part, GameNode logic can be abstracted to AI, but there may be
     // things you want to control for the whole scene, like player score.
     // The argument to updateScene is the time step of the update frame

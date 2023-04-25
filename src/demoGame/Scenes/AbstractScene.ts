@@ -74,7 +74,7 @@ export default abstract class ProjectScene extends Scene {
     protected backgroundImage: Sprite;
     protected GameLayers = GameLayers;
     protected backButtonPosition = new Vec2(50, 50);
-
+    protected ultimateWaveKey = "ultimateWave"
     //message box to display invalid action
     // level transtion
     protected levelTransitionTimer: Timer;
@@ -96,6 +96,7 @@ export default abstract class ProjectScene extends Scene {
     protected door: Sprite
     protected backgroundImageKey: string;
     protected playerMaxStatValue = 10;
+    protected ultimateWave: Sprite;
     //ui
     protected inGameControlTextBackground = "inGameControlTextBackground"
     protected inGameHelpTextBackground = "inGameHelpTextBackground"
@@ -131,8 +132,8 @@ export default abstract class ProjectScene extends Scene {
 
     //Li
     protected battlers: (Battler & Actor)[];
-    protected BattlerEvent = BattlerEvents;
     protected option: Record<string, any>;
+
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, {
             ...options, physics: {
@@ -172,13 +173,20 @@ export default abstract class ProjectScene extends Scene {
     protected loadGameItems(key: string) {
         this.load.object(key, `${this.pathToItems}${key}.json`);
         this.load.image(key, `${this.pathToSprite}${key}.png`);
-
+    }
+    protected loadUltimateWave(){
+        let key = this.ultimateWaveKey;
+        this.load.image(key, `${this.pathToSprite}${key}.png`);
+    }
+    protected initUltimateWave(){
+        this.ultimateWave = this.add.sprite(this.ultimateWaveKey,GameLayers.BASE);
+        this.ultimateWave.position.set(this.player.position.x,this.player.position.y+50);
+        
     }
     protected loadAllGameItems() {
         for (let key of this.gameItemsArray) {
             this.loadGameItems(key);
         }
-
     }
     protected initInventorySlotsMap() {
         const inventorySlotsPosition = this.load.getObject(GameItems.INVENTORYSLOT)
@@ -192,7 +200,8 @@ export default abstract class ProjectScene extends Scene {
     }
     protected initAllGameItems() {
         for (let key of this.gameItemsArray) {
-            let gameItem = this.load.getObject(key); const items = new Array<gameItems>(gameItem.position.length);
+            let gameItem = this.load.getObject(key); 
+            const items = new Array<gameItems>(gameItem.position.length);
             for (let i = 0; i < items.length; i++) {
                 let sprite, line;
                 if (key === "inventorySlot") {
@@ -217,7 +226,6 @@ export default abstract class ProjectScene extends Scene {
     }
     public startScene(): void {
         let tilemapLayers = this.add.tilemap("level");
-        console.log(this.levelMusicKey)
 
         this.walls = <OrthogonalTilemap>tilemapLayers[1].getItems()[0];
         this.wallSize = this.walls.size.x;
@@ -228,7 +236,7 @@ export default abstract class ProjectScene extends Scene {
         // this.initLayers();
         this.initLevelScene();
         this.initPlayer();
-
+        this.initUltimateWave();
         let navmesh = this.initializeNavmesh(new PositionGraph(), this.walls);
         navmesh.registerStrategy("astar", new AstarStrategy(navmesh));
         navmesh.setStrategy("astar");
@@ -237,7 +245,7 @@ export default abstract class ProjectScene extends Scene {
         this.initInventorySlotsMap();
         // create screen first 
         if (!this.option.isfogOfWarChecked)
-            this.initFogOfWar();
+            // this.initFogOfWar();
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
@@ -445,7 +453,7 @@ export default abstract class ProjectScene extends Scene {
         this.addButtons(buttonOption);
     }
 
-    public updateScene() {
+    public updateScene(deltaT: number) {
 
         while (this.receiver.hasNextEvent()) {
             const gameEvent = this.receiver.getNextEvent()
@@ -467,15 +475,17 @@ export default abstract class ProjectScene extends Scene {
             this.isPlayerAttacking();
             this.isPlayerUseItem();
         }
-
+        if(this.ultimateWave.visible){
+            
+        }
         this.updateLabel();
         this.isPlayerAtLevelEnd();
-       
     }
-    protected sceneChange(nextScene){
-        this.viewport.setZoomLevel(1);
-        this.sceneManager.changeToScene(nextScene,this.option);
-        this.emitter.fireEvent(GameEventType.STOP_SOUND, {key: this.levelMusicKey, loop: true, holdReference: true});
+    protected updateUltimateWave(deltaT: number){
+        const facingDirection = this.player.rotation;
+       
+        this.ultimateWave.position.set(this.ultimateWave.position.x+60*deltaT,this.ultimateWave.position.y);
+
     }
 
     protected isPlayerUseItem() {
@@ -635,7 +645,6 @@ export default abstract class ProjectScene extends Scene {
                 if (value.length === 0) {
                     gameItem.position.set(key[0], key[1]);
                     postionItemsMap.set(key, [gameItem]);
-
                     return;
                 }
             }
@@ -764,7 +773,6 @@ export default abstract class ProjectScene extends Scene {
             if (battler.battlerActive && battler.position.distanceTo(this.player.position) < 10) {
                 if (!this.player._ai['isInvincible'])
                     this.emitter.fireEvent(BattlerEvents.PRINCE_HIT, {id: battler.id});
-                // this.emitter.fireEvent(BattlerEvent.BATTLER_KILLED, {id: battler.id});
             }
         }
     }
@@ -872,6 +880,11 @@ export default abstract class ProjectScene extends Scene {
             this.addLabel(textOption);
             // this.add.uiElement(UIElementType.LABEL,option.layerName,textOption);
         }
+    }
+    protected sceneChange(nextScene){
+        this.viewport.setZoomLevel(1);
+        this.sceneManager.changeToScene(nextScene,this.option);
+        this.emitter.fireEvent(GameEventType.STOP_SOUND, {key: this.levelMusicKey, loop: true, holdReference: true});
     }
     public initPauseMenuLayer() {
         const pauseSign = "\u23F8";

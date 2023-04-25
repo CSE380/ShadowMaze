@@ -50,7 +50,7 @@ export default class MainMenu extends AbstractScene  {
         this.addBackButon(this.backButtonPosition);
     }
 
-    public updateScene() {
+    public updateScene(deltaT: number) {
         while (this.receiver.hasNextEvent()) {
             this.handleEvent(this.receiver.getNextEvent());
         }
