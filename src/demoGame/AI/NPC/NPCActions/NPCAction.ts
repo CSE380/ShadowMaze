@@ -63,7 +63,7 @@ export default abstract class NPCAction extends GoapAction {
     }
 
     public update(deltaT: number): void {
-        console.log(this.path.distance());
+        // console.log(this.path.distance());
         if (this.path.distance() > 50) {
             this.onEnter(null);
             return; 

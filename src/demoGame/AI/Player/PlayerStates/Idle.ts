@@ -3,7 +3,7 @@ import GameEvent from "../../../../Wolfie2D/Events/GameEvent";
 import { PlayerAnimationType, PlayerStateType } from "./PlayerState";
 import { PlayerAnimations } from "../PlayerController";
 import PlayerState from "./PlayerState";
-import { MessageBox } from "../../../ProjectEvents";
+import { MessageBoxEvents } from "../../../ProjectEvents";
 export default class Idle extends PlayerState {
 
     public override onEnter(options: Record<string, any>): void {
@@ -25,7 +25,7 @@ export default class Idle extends PlayerState {
             if(this.parent.owner._ai["currentStat"]["currentShield"] == this.parent.owner._ai["maxStatValue"])
                 this.finished(PlayerStateType.SHIELDING)
             else{
-                this.emitter.fireEvent(MessageBox.SHOW,{message:MessageBox.SKILL_ON_CD})
+                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.SKILL_ON_CD})
             }
         }
         if (this.parent.controller.attacking) {
