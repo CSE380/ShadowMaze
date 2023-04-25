@@ -1,5 +1,5 @@
 export enum GameItems {
-    LASER_GUNS = "laserGuns",
+    LANTERNS = "lantern",
     DOOR = "door",
     HEALTH_PACKS = "healthPacks",
     INVENTORYSLOT = "inventorySlot",

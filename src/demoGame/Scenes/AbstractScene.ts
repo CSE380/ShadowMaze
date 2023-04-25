@@ -559,7 +559,7 @@ export default abstract class ProjectScene extends Scene {
     protected handleUseGameItemsEvent(event: GameEvent) {
         this.RemoveItemFromInventory(event)
         switch (event.type) {
-            case GameItems.LASER_GUNS: {
+            case GameItems.LANTERNS: {
                 this.lightDuration = !this.lightDuration;
                 break;
             }
