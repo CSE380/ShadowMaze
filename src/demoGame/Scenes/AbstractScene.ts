@@ -56,6 +56,9 @@ import { MenuState } from "../MenuState";
 import SlimeBehavior from "../AI/NPC/NPCBehavior/SlimeBehavior";
 import BasicTargetable from "../GameSystems/Targeting/BasicTargetable";
 import Position from "../GameSystems/Targeting/Position";
+
+//
+import { GameEventType } from "../../Wolfie2D/Events/GameEventType";
 const enum tweensEffect {
     SLIDEIN = "slideIn",
     SLIDEOUT = "slideOut",
@@ -83,6 +86,7 @@ export default abstract class ProjectScene extends Scene {
     protected messageBoxLabel: Label;
     protected playerInitPosition = new Vec2(260, 235);
     protected levelEndPosition = new Vec2(20, 490);
+    // protected levelEndPosition = new Vec2(260, 350);
     protected levelEndHalfSize = new Vec2(25, 25)
     protected levelEndColor = new Color(255, 0, 0, 0.5);
     protected levelEndTimer: Timer;
@@ -214,6 +218,8 @@ export default abstract class ProjectScene extends Scene {
     }
     public startScene(): void {
         let tilemapLayers = this.add.tilemap("level");
+        console.log(this.levelMusicKey)
+
         this.walls = <OrthogonalTilemap>tilemapLayers[1].getItems()[0];
         this.wallSize = this.walls.size.x;
         // Set the viewport bounds to the tilemap
@@ -241,6 +247,7 @@ export default abstract class ProjectScene extends Scene {
             this.initPlayerStatUI();
             this.initializeNPCs();
         }
+        this.emitter.fireEvent(GameEventType.PLAY_SOUND, {key: this.levelMusicKey, loop: true, holdReference: true});
     }
 
     protected initializeNPCs(): void {
@@ -465,7 +472,11 @@ export default abstract class ProjectScene extends Scene {
         this.isPlayerUseItem();
 
     }
-
+    protected sceneChange(nextScene){
+        this.viewport.setZoomLevel(1);
+        this.sceneManager.changeToScene(nextScene,this.option);
+        this.emitter.fireEvent(GameEventType.STOP_SOUND, {key: this.levelMusicKey, loop: true, holdReference: true});
+    }
 
     protected isPlayerUseItem() {
         ItemButtonKeyArray.forEach(key => {
@@ -659,7 +670,7 @@ export default abstract class ProjectScene extends Scene {
         label.borderWidth = 0;
         label.borderRadius = 0;
         label.borderColor = Color.TRANSPARENT;
-        label.backgroundColor = Color.BLACK;
+        label.backgroundColor = Color.FOG_OF_WAR_BLACK;
     }
     public updateLabel() {
         this.nextLabels = this.transparentLabels();
@@ -681,11 +692,11 @@ export default abstract class ProjectScene extends Scene {
     }
     public updateColor(label: Label) {
         if (label.backgroundColor) {
-            if (label.backgroundColor.isEqual(Color.BLACK)) {
-                label.backgroundColor = Color.TRANSPARENT;
+            if (label.backgroundColor.isEqual(Color.FOG_OF_WAR_BLACK)) {
+                label.backgroundColor = Color.FOG_OF_WAR_TRANSPARENT;
             }
-            else if (label.backgroundColor.isEqual(Color.TRANSPARENT)) {
-                label.backgroundColor = Color.BLACK;
+            else if (label.backgroundColor.isEqual(Color.FOG_OF_WAR_TRANSPARENT)) {
+                label.backgroundColor = Color.FOG_OF_WAR_BLACK;
             }
         }
     }
@@ -853,7 +864,7 @@ export default abstract class ProjectScene extends Scene {
                 position: new Vec2(position.x - 320, yInitPosition),
                 text: text,
                 align: "left",
-                backgroundColor: Color.ALMOST_TRANSPARENT,
+                backgroundColor: Color.FOG_OF_WAR_TRANSPARENT,
                 fontSize: option.fontSize,
                 layerName: option.layerName,
             }

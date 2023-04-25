@@ -18,7 +18,7 @@ const ACTIONTYPE = {
 export default class IntroLevelScene extends ProjectScene {
 
     public static readonly LEVEL_MUSIC_KEY = "LEVEL_MUSIC";
-    public static readonly LEVEL_MUSIC_PATH = "shadowMaze_assests/music/level_bgm.mp3";
+    public static readonly LEVEL_MUSIC_PATH = "shadowMaze_assets/music/level_bgm.mp3";
 
     /**
      * @see Scene.update()
@@ -98,15 +98,13 @@ export default class IntroLevelScene extends ProjectScene {
             case PlayerEvents.LEVEL_END: {
                 setTimeout(() => {
                     nextScene = SelectLevelMenuScene
-                    this.viewport.setZoomLevel(1);
-                    this.sceneManager.changeToScene(nextScene,this.option);
+                    this.sceneChange(nextScene)
                 }, 2000)
                 return;
             }
         }
         if(nextScene){
-            this.viewport.setZoomLevel(1);
-            this.sceneManager.changeToScene(nextScene,this.option);
+            this.sceneChange(nextScene)
         }
     }
 
