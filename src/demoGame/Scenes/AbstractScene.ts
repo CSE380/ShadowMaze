@@ -74,7 +74,7 @@ export default abstract class ProjectScene extends Scene {
     protected backgroundImage: Sprite;
     protected GameLayers = GameLayers;
     protected backButtonPosition = new Vec2(50, 50);
-    protected ultimateWaveKey = "ultimateWave"
+   
     //message box to display invalid action
     // level transtion
     protected levelTransitionTimer: Timer;
@@ -97,6 +97,8 @@ export default abstract class ProjectScene extends Scene {
     protected backgroundImageKey: string;
     protected playerMaxStatValue = 10;
     protected ultimateWave: Sprite;
+    protected ultimateWaveKey = "ultimateWave"
+    protected ultimateWaveDirection:Vec2;
     //ui
     protected inGameControlTextBackground = "inGameControlTextBackground"
     protected inGameHelpTextBackground = "inGameHelpTextBackground"
@@ -167,6 +169,7 @@ export default abstract class ProjectScene extends Scene {
         this.levelEndTimer = new Timer(1000)
         this.isLevelEndEnetered = false;
         this.initLayers();
+        this.initUltimateWave();
         this.levelEndTransitionLabel = this.addTweenLabel(this.levelEndTransitionLabel, PlayerEvents.LEVEL_END);
         this.messageBoxLabel = this.addTweenLabel(this.messageBoxLabel, MessageBoxEvents.HIDDEN);
     }
@@ -180,9 +183,9 @@ export default abstract class ProjectScene extends Scene {
     }
     protected initUltimateWave(){
         this.ultimateWave = this.add.sprite(this.ultimateWaveKey,GameLayers.BASE);
-        this.ultimateWave.position.set(this.player.position.x,this.player.position.y+50);
-        
+        // this.ultimateWave.position.set(this.player.position.x,this.player.position.y+50);
     }
+   
     protected loadAllGameItems() {
         for (let key of this.gameItemsArray) {
             this.loadGameItems(key);
@@ -236,7 +239,6 @@ export default abstract class ProjectScene extends Scene {
         // this.initLayers();
         this.initLevelScene();
         this.initPlayer();
-        this.initUltimateWave();
         let navmesh = this.initializeNavmesh(new PositionGraph(), this.walls);
         navmesh.registerStrategy("astar", new AstarStrategy(navmesh));
         navmesh.setStrategy("astar");
@@ -306,6 +308,7 @@ export default abstract class ProjectScene extends Scene {
             ...Object.values(PlayerEvents),
             ...Object.values(MessageBoxEvents),
         ]);
+        this.receiver.subscribe(PlayerInput.ULTIMATE);
         this.initGameItemEventSubscribe();
     }
 
@@ -482,7 +485,7 @@ export default abstract class ProjectScene extends Scene {
         this.isPlayerAtLevelEnd();
     }
     protected updateUltimateWave(deltaT: number){
-        const facingDirection = this.player.rotation;
+        
        
         this.ultimateWave.position.set(this.ultimateWave.position.x+60*deltaT,this.ultimateWave.position.y);
 
@@ -518,6 +521,7 @@ export default abstract class ProjectScene extends Scene {
             this.handlePickGameItemsEvent(event);
         if (event.data.get(this.action) == ACTIONTYPE.USE)
             this.handleUseGameItemsEvent(event);
+       
         this.handleBattlerEvents(event);
         this.handleInGameMessageBox(event);
     }
@@ -556,6 +560,10 @@ export default abstract class ProjectScene extends Scene {
                     this.viewport.setZoomLevel(1);
                     this.sceneManager.changeToScene(SelectLevelMenuScene, this.option);
                 }, 2000)
+            }
+            case PlayerInput.ULTIMATE:{
+                this.initUltimateWave();
+                
             }
         }
     }
@@ -733,6 +741,22 @@ export default abstract class ProjectScene extends Scene {
 
 
     protected isPlayerAttacking() {
+        let midpoint = this.getFaceDirection();
+        
+        for (const battler of this.battlers) {
+            if (battler == this.player) {
+                continue;
+            }
+            if (battler.battlerActive && battler.position.distanceTo(midpoint) <= 15 && this.player.animation.isPlaying("ATTACKING")) {
+                this.emitter.fireEvent(BattlerEvents.MONSTER_DEAD, { id: battler.id });
+            }
+            if (battler.battlerActive && battler.position.distanceTo(this.player.position) < 10) {
+                if (!this.player._ai['isInvincible'])
+                    this.emitter.fireEvent(BattlerEvents.PRINCE_HIT, {id: battler.id});
+            }
+        }
+    }
+    protected getFaceDirection(){
         let midpoint = null;
         switch (this.player.rotation) {
             case 0:
@@ -763,20 +787,8 @@ export default abstract class ProjectScene extends Scene {
                 midpoint = this.player.position;
                 break;
         }
-        for (const battler of this.battlers) {
-            if (battler == this.player) {
-                continue;
-            }
-            if (battler.battlerActive && battler.position.distanceTo(midpoint) <= 15 && this.player.animation.isPlaying("ATTACKING")) {
-                this.emitter.fireEvent(BattlerEvents.MONSTER_DEAD, { id: battler.id });
-            }
-            if (battler.battlerActive && battler.position.distanceTo(this.player.position) < 10) {
-                if (!this.player._ai['isInvincible'])
-                    this.emitter.fireEvent(BattlerEvents.PRINCE_HIT, {id: battler.id});
-            }
-        }
+        return midpoint;
     }
-
     protected isPlayerAtItems() {
         for (const gameItems of this.gameItemsMap.values()) {
             gameItems.forEach(gameItem => {

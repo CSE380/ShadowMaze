@@ -86,6 +86,7 @@ export default class PlayerController{
 
     public get shielding(): boolean { return Input.isJustPressed(PlayerInput.SHIELDING); }
 
+    public get ultimate(): boolean { return Input.isJustPressed(PlayerInput.ULTIMATE); }
 
     /** 
      * Checks if the player is attempting to drop their held item or not.

@@ -4,6 +4,7 @@ import { PlayerAnimationType, PlayerStateType } from "./PlayerState";
 import { PlayerAnimations } from "../PlayerController";
 import PlayerState from "./PlayerState";
 import { MessageBoxEvents } from "../../../ProjectEvents";
+import { PlayerInput } from "../PlayerController";
 export default class Idle extends PlayerState {
 
     public override onEnter(options: Record<string, any>): void {
@@ -27,6 +28,9 @@ export default class Idle extends PlayerState {
             else{
                 this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.SKILL_ON_CD})
             }
+        }
+        if(this.parent.controller.ultimate){
+            this.emitter.fireEvent(PlayerInput.ULTIMATE)
         }
         if (this.parent.controller.attacking) {
             this.finished(PlayerStateType.ATTACKING);
