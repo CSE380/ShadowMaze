@@ -48,7 +48,7 @@ export default class StartScene extends HW4Scene {
         this.addButtons(buttonOption);
     }
 
-    public updateScene() {
+    public updateScene(deltaT: number) {
         while (this.receiver.hasNextEvent()) {
             const gameEvent = this.receiver.getNextEvent()
             this.handleEvent(gameEvent);

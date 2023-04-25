@@ -55,10 +55,10 @@ import CheatCodeMenuScene from "./demoGame/Scenes/CheatCodeMenuScene";
     // Create a game with the options specified
     const game = new Game(options);
     // Start our game
-    // game.start(IntroLevelScene, {});
+    game.start(IntroLevelScene, {});
     // game.start(HelpScene, {});
     // game.start(ControlScene,{});
-    game.start(StartScene, {});
+    // game.start(StartScene, {});
     // game.start(CheatCodeMenuScene,{});
     // game.start(SelectLevelMenuScene,{});
     // game.start(MainMenu, {});

@@ -66,7 +66,7 @@ export default class MainMenu extends Scene {
         newButton.onClickEventId = options.text;
         this.receiver.subscribe(options.text);
     }
-    public updateScene(){
+    public updateScene(deltaT: number){
         while(this.receiver.hasNextEvent()){
             this.handleEvent(this.receiver.getNextEvent());
         }

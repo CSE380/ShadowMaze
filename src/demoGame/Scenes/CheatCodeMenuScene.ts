@@ -90,7 +90,7 @@ export default class CheatCodeMenuScene extends HW4Scene {
         }
         return this.addLabel(aStarCheckOption);
     }
-    public updateScene() {
+    public updateScene(deltaT: number) {
         while (this.receiver.hasNextEvent()) {
             this.handleEvent(this.receiver.getNextEvent());
         }
