@@ -1,4 +1,4 @@
-export enum BattlerEvent {
+export enum BattlerEvents {
     MONSTER_DEAD = "MONSTER_DEAD",
     MONSTER_HIT= "MONSTER_HIT",
     MONSTER_ATTACK = "MONSTER_ATTACK",
@@ -13,14 +13,14 @@ export enum PlayerEvents {
     PLAYER_ENTERED_LEVEL_END= "PLAYER_ENTERED_LEVEL_END",
 } 
 
-export enum MessageBox {
+export enum MessageBoxEvents {
     SHOW="SHOW",
     HIDDEN = "HIDDEN",
     INVALID_ACTION = "You can not perform that action.",
     ITEM_NOT_FOUND = "That item cannot be found in your inventory.",
     SKILL_ON_CD = "That skill is on cooldown.",
 }
-export type AllGameEventType= BattlerEvent | PlayerEvents | MessageBox;
+export type AllGameEventType= BattlerEvents | PlayerEvents | MessageBoxEvents;
 
 export enum ItemEvent {
     ITEM_REQUEST = "ITEM_REQUEST",

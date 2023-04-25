@@ -2,7 +2,7 @@ import Timer from "../../../../Wolfie2D/Timing/Timer";
 import NPCActor from "../../../Actors/NPCActor";
 import { TargetableEntity } from "../../../GameSystems/Targeting/TargetableEntity";
 import NPCAction from "./NPCAction";
-import { BattlerEvent } from "../../../ProjectEvents";
+import { BattlerEvents } from "../../../ProjectEvents";
 import GameEvent from "../../../../Wolfie2D/Events/GameEvent";
 
 export default class AttackEnemy extends NPCAction {
@@ -16,7 +16,7 @@ export default class AttackEnemy extends NPCAction {
     public performAction(target: TargetableEntity): void {
         this.timer.isStopped() ? console.log("weapon cooling down!") : console.log("weapon ready");
         if (this.timer.isStopped()) {
-            this.emitter.fireEvent(BattlerEvent.MONSTER_ATTACK);
+            this.emitter.fireEvent(BattlerEvents.MONSTER_ATTACK);
             this.timer.start();
         }
         this.finished();
