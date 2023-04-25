@@ -82,7 +82,7 @@ export default abstract class ProjectScene extends Scene {
     protected levelEndTransitionLabel: Label;
     protected messageBoxLabel: Label;
     protected playerInitPosition = new Vec2(260, 235);
-    protected levelEndPosition = new Vec2(20, 490);
+    protected levelEndPosition = new Vec2(260, 490);
     protected levelEndHalfSize = new Vec2(25, 25)
     protected levelEndColor = new Color(255, 0, 0, 0.5);
     protected levelEndTimer: Timer;
