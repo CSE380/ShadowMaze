@@ -58,7 +58,7 @@ export default class IntroLevelScene extends ProjectScene {
     }
     protected handleInGameButtonEvent(event:GameEvent){
         let nextScene;
-        console.log(event)
+        // console.log(event)
         switch (event.type) {
             case MainMenuButtonEvent.Restart: {
                 nextScene = IntroLevelScene

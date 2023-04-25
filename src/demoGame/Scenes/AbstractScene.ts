@@ -643,7 +643,7 @@ export default abstract class ProjectScene extends Scene {
     }
     protected showLevelEndPosition() {
         const label = <Array<Label>>this.getSceneGraph().getNodesAt(this.levelEndPosition);
-        label.forEach(label => { this.updateColor(label) })
+        label.forEach(label =>   label.backgroundColor = Color.TRANSPARENT);
     }
     public initCurrLabel() {
         this.currLabels = <Array<Label>>this.getSceneGraph().getNodesAt(this.player.position)
@@ -676,6 +676,7 @@ export default abstract class ProjectScene extends Scene {
         this.nextLabels = this.transparentLabels();
         this.currLabels.forEach(label => { this.updateColor(label) })
         this.nextLabels.forEach(label => this.updateColor(label))
+        // console.log(this.nextLabels.length)
         this.currLabels = this.nextLabels;
     }
     public transparentLabels(): Array<Label> {
@@ -864,7 +865,7 @@ export default abstract class ProjectScene extends Scene {
                 position: new Vec2(position.x - 320, yInitPosition),
                 text: text,
                 align: "left",
-                backgroundColor: Color.FOG_OF_WAR_TRANSPARENT,
+                backgroundColor: Color.TRANSPARENT,
                 fontSize: option.fontSize,
                 layerName: option.layerName,
             }
