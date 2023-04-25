@@ -7,7 +7,7 @@ import Inventory from "../../GameSystems/ItemSystem/Inventory";
 import Item from "../../GameSystems/ItemSystem/Item";
 import PlayerController from "./PlayerController";
 import { Idle, Shielding, Moving, Dead, PlayerStateType, Attacking } from "./PlayerStates/PlayerState";
-import { BattlerEvent } from "../../ProjectEvents";
+import { BattlerEvents } from "../../ProjectEvents";
 import Timer from "../../../Wolfie2D/Timing/Timer";
 import { PlayerStatsArray } from "../../PlayerStatsArray";
 import MathUtils from "../../../Wolfie2D/Utils/MathUtils";
@@ -47,8 +47,8 @@ export default class PlayerAI extends StateMachineAI implements AI {
 
         // Initialize the players state to Idle
         this.initialize(PlayerStateType.IDLE);
-        this.receiver.subscribe(BattlerEvent.PRINCE_DEAD);
-        this.receiver.subscribe(BattlerEvent.PRINCE_HIT);
+        this.receiver.subscribe(BattlerEvents.PRINCE_DEAD);
+        this.receiver.subscribe(BattlerEvents.PRINCE_HIT);
         this.invincibleTime = new Timer(1000, this.handleinvincibleTimeEnd, false);
         this.activate(null)
     }
@@ -81,11 +81,11 @@ export default class PlayerAI extends StateMachineAI implements AI {
 
     public handleEvent(event: GameEvent): void {
         switch (event.type) {
-            case BattlerEvent.PRINCE_HIT: {
+            case BattlerEvents.PRINCE_HIT: {
                 this.handlePrinceHit();
                 break;
             }
-            case BattlerEvent.PRINCE_DEAD: {
+            case BattlerEvents.PRINCE_DEAD: {
                 console.log("dead");
                 break;
             }
@@ -98,7 +98,7 @@ export default class PlayerAI extends StateMachineAI implements AI {
             this.isInvincible = true;
             this.invincibleTime.start();
             if ( this.currentStat["currentHealth"] <= this.minStatValue) {
-                this.emitter.fireEvent(BattlerEvent.PRINCE_DEAD);
+                this.emitter.fireEvent(BattlerEvents.PRINCE_DEAD);
                 return;
             }
         }

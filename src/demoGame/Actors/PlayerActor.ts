@@ -1,6 +1,6 @@
 import Spritesheet from "../../Wolfie2D/DataTypes/Spritesheet";
 import AnimatedSprite from "../../Wolfie2D/Nodes/Sprites/AnimatedSprite";
-import { BattlerEvent, ItemEvent } from "../ProjectEvents";
+import { BattlerEvents, ItemEvent } from "../ProjectEvents";
 import BasicBattler from "../GameSystems/BattleSystem/BasicBattler";
 import Battler from "../GameSystems/BattleSystem/Battler";
 import Inventory from "../GameSystems/ItemSystem/Inventory";
@@ -63,7 +63,7 @@ export default class PlayerActor extends AnimatedSprite implements Battler {
     set health(value: number) {
         this.battler.health = value;
         if (this.health <= 0) {
-            this.emitter.fireEvent(BattlerEvent.MONSTER_DEAD, {id: this.id});
+            this.emitter.fireEvent(BattlerEvents.MONSTER_DEAD, {id: this.id});
         }
     }
     get speed(): number {

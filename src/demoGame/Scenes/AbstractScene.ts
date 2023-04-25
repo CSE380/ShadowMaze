@@ -18,7 +18,7 @@ import Viewport from "../../Wolfie2D/SceneGraph/Viewport";
 import RenderingManager from "../../Wolfie2D/Rendering/RenderingManager";
 import Rect from "../../Wolfie2D/Nodes/Graphics/Rect";
 import { GraphicType } from "../../Wolfie2D/Nodes/Graphics/GraphicTypes";
-import { PlayerEvents, BattlerEvent, MessageBox, AllGameEventType } from "../ProjectEvents";
+import { PlayerEvents, BattlerEvents,MessageBoxEvents, AllGameEventType } from "../ProjectEvents";
 
 import Actor from "../../Wolfie2D/DataTypes/Interfaces/Actor";
 
@@ -132,7 +132,7 @@ export default abstract class ProjectScene extends Scene {
 
     //Li
     protected battlers: (Battler & Actor)[];
-    protected BattlerEvent = BattlerEvent;
+    protected BattlerEvent = BattlerEvents;
     protected option: Record<string, any>;
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, {
@@ -168,7 +168,7 @@ export default abstract class ProjectScene extends Scene {
         this.isLevelEndEnetered = false;
         this.initLayers();
         this.levelEndTransitionLabel = this.addTweenLabel(this.levelEndTransitionLabel, PlayerEvents.LEVEL_END);
-        this.messageBoxLabel = this.addTweenLabel(this.messageBoxLabel, MessageBox.HIDDEN);
+        this.messageBoxLabel = this.addTweenLabel(this.messageBoxLabel, MessageBoxEvents.HIDDEN);
     }
     protected loadGameItems(key: string) {
         this.load.object(key, `${this.pathToItems}${key}.json`);
@@ -293,10 +293,11 @@ export default abstract class ProjectScene extends Scene {
 
 
     protected initSubscribe() {
+        
         this.initGameEventSubscribe([
-            ...Object.values(BattlerEvent),
+            ...Object.values(BattlerEvents),
             ...Object.values(PlayerEvents),
-            ...Object.values(MessageBox),
+            ...Object.values(MessageBoxEvents),
         ]);
         this.initGameItemEventSubscribe();
     }
@@ -463,14 +464,14 @@ export default abstract class ProjectScene extends Scene {
         }
         else {
             this.handlePlayerStatChange("currentShield");
+            this.isPlayerAtItems();
+            this.isPlayerAttacking();
+            this.isPlayerUseItem();
         }
 
         this.updateLabel();
         this.isPlayerAtLevelEnd();
-        this.isPlayerAtItems();
-        this.isPlayerAttacking();
-        this.isPlayerUseItem();
-
+       
     }
     protected sceneChange(nextScene){
         this.viewport.setZoomLevel(1);
@@ -489,7 +490,7 @@ export default abstract class ProjectScene extends Scene {
                         return;
                     }
                     else {
-                        this.emitter.fireEvent(MessageBox.SHOW, { message: MessageBox.ITEM_NOT_FOUND });
+                        this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.ITEM_NOT_FOUND });
                     }
                 }
 
@@ -513,18 +514,18 @@ export default abstract class ProjectScene extends Scene {
     }
     protected handleInGameMessageBox(event: GameEvent) {
         switch (event.type) {
-            case MessageBox.SHOW:
+            case MessageBoxEvents.SHOW:
                 this.messageBoxLabel.text = event.data.get("message");
                 this.messageBoxLabel.tweens.play(tweensEffect.SLIDEIN);
                 break;
-            case MessageBox.HIDDEN:
+            case MessageBoxEvents.HIDDEN:
                 this.messageBoxLabel.tweens.play(tweensEffect.SLIDEOUT);
 
         }
     }
     protected handleBattlerEvents(event: GameEvent) {
         switch (event.type) {
-            case BattlerEvent.MONSTER_DEAD: {
+            case BattlerEvents.MONSTER_DEAD: {
                 this.handleBattlerKilled(event);
                 console.log(this.player._ai["currentStat"]["currentEnergy"])
                 if (this.player._ai["currentStat"]["currentEnergy"] < this.playerMaxStatValue) {
@@ -534,14 +535,14 @@ export default abstract class ProjectScene extends Scene {
 
                 break;
             }
-            case BattlerEvent.PRINCE_HIT: {
+            case BattlerEvents.PRINCE_HIT: {
                 if (!this.player._ai["isInvincible"]) {
                     this.player._ai["currentStat"]["currentHealth"]--;
                     this.handlePlayerStatChange("currentHealth");
                 }
                 break;
             }
-            case BattlerEvent.PRINCE_DEAD: {
+            case BattlerEvents.PRINCE_DEAD: {
                 setTimeout(() => {
                     this.viewport.setZoomLevel(1);
                     this.sceneManager.changeToScene(SelectLevelMenuScene, this.option);
@@ -758,11 +759,11 @@ export default abstract class ProjectScene extends Scene {
                 continue;
             }
             if (battler.battlerActive && battler.position.distanceTo(midpoint) <= 15 && this.player.animation.isPlaying("ATTACKING")) {
-                this.emitter.fireEvent(BattlerEvent.MONSTER_DEAD, { id: battler.id });
+                this.emitter.fireEvent(BattlerEvents.MONSTER_DEAD, { id: battler.id });
             }
             if (battler.battlerActive && battler.position.distanceTo(this.player.position) < 10) {
                 if (!this.player._ai['isInvincible'])
-                    this.emitter.fireEvent(BattlerEvent.PRINCE_HIT, {id: battler.id});
+                    this.emitter.fireEvent(BattlerEvents.PRINCE_HIT, {id: battler.id});
                 // this.emitter.fireEvent(BattlerEvent.BATTLER_KILLED, {id: battler.id});
             }
         }

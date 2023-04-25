@@ -2,7 +2,7 @@ import Spritesheet from "../../Wolfie2D/DataTypes/Spritesheet";
 import Vec2 from "../../Wolfie2D/DataTypes/Vec2";
 import AnimatedSprite from "../../Wolfie2D/Nodes/Sprites/AnimatedSprite"
 import NavigationPath from "../../Wolfie2D/Pathfinding/NavigationPath";
-import { BattlerEvent, HudEvent } from "../ProjectEvents";
+import { BattlerEvents, HudEvent } from "../ProjectEvents";
 import Inventory from "../GameSystems/ItemSystem/Inventory";
 import HW4Scene from "../Scenes/AbstractScene";
 import BasicTargetable from "../GameSystems/Targeting/BasicTargetable";
@@ -78,7 +78,7 @@ export default class NPCActor extends AnimatedSprite implements Battler, Targeti
     public set health(health: number) { 
         this.battler.health = health; 
         if (this.health <= 0 && this.battlerActive) {
-            this.emitter.fireEvent(BattlerEvent.MONSTER_DEAD, {id: this.id});
+            this.emitter.fireEvent(BattlerEvents.MONSTER_DEAD, {id: this.id});
         }
     }
 
