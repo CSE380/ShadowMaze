@@ -169,7 +169,7 @@ export default abstract class ProjectScene extends Scene {
         this.levelEndTimer = new Timer(1000)
         this.isLevelEndEnetered = false;
         this.initLayers();
-        this.initUltimateWave();
+        
         this.levelEndTransitionLabel = this.addTweenLabel(this.levelEndTransitionLabel, PlayerEvents.LEVEL_END);
         this.messageBoxLabel = this.addTweenLabel(this.messageBoxLabel, MessageBoxEvents.HIDDEN);
     }
@@ -183,9 +183,10 @@ export default abstract class ProjectScene extends Scene {
     }
     protected initUltimateWave(){
         this.ultimateWave = this.add.sprite(this.ultimateWaveKey,GameLayers.BASE);
-        // this.ultimateWave.position.set(this.player.position.x,this.player.position.y+50);
+        this.ultimateWave.visible = false
+        this.ultimateWave.position.set(this.player.position.x,this.player.position.y);
     }
-   
+    
     protected loadAllGameItems() {
         for (let key of this.gameItemsArray) {
             this.loadGameItems(key);
@@ -247,7 +248,7 @@ export default abstract class ProjectScene extends Scene {
         this.initInventorySlotsMap();
         // create screen first 
         if (!this.option.isfogOfWarChecked)
-            this.initFogOfWar();
+            // this.initFogOfWar();
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
@@ -478,19 +479,29 @@ export default abstract class ProjectScene extends Scene {
             this.isPlayerAttacking();
             this.isPlayerUseItem();
         }
+        this.player.position.toString();
         if(this.ultimateWave.visible){
-            
+            this.updateUltimateWave(deltaT);
         }
         this.updateLabel();
         this.isPlayerAtLevelEnd();
     }
     protected updateUltimateWave(deltaT: number){
-        
-       
-        this.ultimateWave.position.set(this.ultimateWave.position.x+60*deltaT,this.ultimateWave.position.y);
-
+        console.log(this.ultimateWave.position.toString());
+        let oldPosition = this.ultimateWave.position;
+        let travellingDirectionVec = this.ultimateWaveDirection
+        this.ultimateWave.position.set(oldPosition.x+travellingDirectionVec.x/10,oldPosition.y+travellingDirectionVec.y/10);
+        // this.ultimateWave.position.set(this.ultimateWave.position.x+60*deltaT,this.ultimateWave.position.y);
+        if(this.hasVecOutOfBound(this.ultimateWave.position.x) ||
+        this.hasVecOutOfBound(this.ultimateWave.position.y)){
+            this.ultimateWave.visible = false;
+            console.log("out of bound")
+        }
     }
-
+    protected hasVecOutOfBound(x:number){
+        if(x<0||x>512) return true;
+        else return false;
+    }
     protected isPlayerUseItem() {
         ItemButtonKeyArray.forEach(key => {
             if (Input.isKeyJustPressed(key)) {
@@ -562,10 +573,19 @@ export default abstract class ProjectScene extends Scene {
                 }, 2000)
             }
             case PlayerInput.ULTIMATE:{
-                this.initUltimateWave();
-                
+                console.log("fire")
+                if(!this.ultimateWave.visible)
+                this.handleFireUltimate();
             }
         }
+    }
+    protected handleFireUltimate(){
+        this.ultimateWave.visible = true;
+        let faceDirectionVec  = this.getFaceDirectionVec();
+        this.ultimateWave.position.set(faceDirectionVec.x,faceDirectionVec.y)
+        this.ultimateWaveDirection = faceDirectionVec.sub(this.player.position);
+
+
     }
     protected handleBattlerKilled(event: GameEvent) {
         let id: number = event.data.get("id");
@@ -690,13 +710,13 @@ export default abstract class ProjectScene extends Scene {
         label.backgroundColor = Color.FOG_OF_WAR_BLACK;
     }
     public updateLabel() {
-        this.nextLabels = this.transparentLabels();
+        this.nextLabels = this.getTransparentLabels();
         this.currLabels.forEach(label => { this.updateColor(label) })
         this.nextLabels.forEach(label => this.updateColor(label))
         // console.log(this.nextLabels.length)
         this.currLabels = this.nextLabels;
     }
-    public transparentLabels(): Array<Label> {
+    public getTransparentLabels(): Array<Label> {
         let labels: Array<Label>
         if (!this.lightDuration) {
             labels = <Array<Label>>this.getSceneGraph().getNodesAt(this.player.position);
@@ -741,7 +761,7 @@ export default abstract class ProjectScene extends Scene {
 
 
     protected isPlayerAttacking() {
-        let midpoint = this.getFaceDirection();
+        let midpoint = this.getFaceDirectionVec();
         
         for (const battler of this.battlers) {
             if (battler == this.player) {
@@ -756,7 +776,7 @@ export default abstract class ProjectScene extends Scene {
             }
         }
     }
-    protected getFaceDirection(){
+    protected getFaceDirectionVec():Vec2{
         let midpoint = null;
         switch (this.player.rotation) {
             case 0:
@@ -825,6 +845,7 @@ export default abstract class ProjectScene extends Scene {
         }
         else {
             player.addAI(PlayerAI);
+            this.initUltimateWave();
         }
         // 
         player.animation.play("IDLE");

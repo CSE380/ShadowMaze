@@ -26,7 +26,7 @@ export default class IntroLevelScene extends ProjectScene {
     public override loadScene() {
         this.levelMusicKey = IntroLevelScene.LEVEL_MUSIC_KEY
 
-        this.load.audio(this.levelMusicKey, IntroLevelScene.LEVEL_MUSIC_PATH);
+        // this.load.audio(this.levelMusicKey, IntroLevelScene.LEVEL_MUSIC_PATH);
 
         this.loadAllGameItems();
         this.loadUltimateWave();
