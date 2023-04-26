@@ -98,7 +98,7 @@ export default abstract class ProjectScene extends Scene {
     protected playerMaxStatValue = 10;
     protected ultimateWave: Sprite;
     protected ultimateWaveKey = "ultimateWave"
-    protected ultimateWaveDirection=new Vec2(0,0);
+    protected ultimateWaveDirection:Vec2;
     //ui
     protected inGameControlTextBackground = "inGameControlTextBackground"
     protected inGameHelpTextBackground = "inGameHelpTextBackground"
@@ -466,7 +466,7 @@ export default abstract class ProjectScene extends Scene {
         if (Input.isKeyJustPressed("escape")) {
             this.emitter.fireEvent(PauseButtonEvent.PAUSE);
         }
-        console.log(this.player.rotation)
+
         if (this.option.isAstarChecked) {
             this.player.moveOnPath(1, this.path)
             if (this.path.isDone()) {
@@ -479,7 +479,7 @@ export default abstract class ProjectScene extends Scene {
             this.isPlayerAttacking();
             this.isPlayerUseItem();
         }
-      
+        this.player.position.toString();
         if(this.ultimateWave.visible){
             this.updateUltimateWave(deltaT);
         }
@@ -487,9 +487,11 @@ export default abstract class ProjectScene extends Scene {
         this.isPlayerAtLevelEnd();
     }
     protected updateUltimateWave(deltaT: number){
-        console.log( this.ultimateWaveDirection.toString())
-        let travellingDirectionVec = this.ultimateWaveDirection.scale(1);
-        this.ultimateWave.position.add(travellingDirectionVec );
+        console.log(this.ultimateWave.position.toString());
+        let oldPosition = this.ultimateWave.position;
+        let travellingDirectionVec = this.ultimateWaveDirection
+        this.ultimateWave.position.set(oldPosition.x+travellingDirectionVec.x/10,oldPosition.y+travellingDirectionVec.y/10);
+        // this.ultimateWave.position.set(this.ultimateWave.position.x+60*deltaT,this.ultimateWave.position.y);
         if(this.hasVecOutOfBound(this.ultimateWave.position.x) ||
         this.hasVecOutOfBound(this.ultimateWave.position.y)){
             this.ultimateWave.visible = false;
@@ -581,9 +583,8 @@ export default abstract class ProjectScene extends Scene {
         this.ultimateWave.visible = true;
         let faceDirectionVec  = this.getFaceDirectionVec();
         this.ultimateWave.position.set(faceDirectionVec.x,faceDirectionVec.y)
-        this.ultimateWaveDirection.x= faceDirectionVec.x - this.player.position.x;
-        this.ultimateWaveDirection.y= faceDirectionVec.y - this.player.position.y;
-       
+        this.ultimateWaveDirection = faceDirectionVec.sub(this.player.position);
+
 
     }
     protected handleBattlerKilled(event: GameEvent) {
@@ -779,32 +780,28 @@ export default abstract class ProjectScene extends Scene {
         let midpoint = this.player.position;
         switch (this.player.rotation) {
             case 0:
-                midpoint.y -= 15;
+                midpoint = new Vec2(this.player.position.x, this.player.position.y - 15);
                 break;
             case 3.15:
-                midpoint.y += 15;
+                midpoint = new Vec2(this.player.position.x, this.player.position.y + 15);
                 break;
             case 1.15:
-                midpoint.x -= 15;
+                midpoint = new Vec2(this.player.position.x - 15, this.player.position.y);
                 break;
             case 4.75:
-                midpoint.x += 15;
+                midpoint = new Vec2(this.player.position.x + 15, this.player.position.y);
                 break;
             case 5.25:
-                midpoint.x += 10;
-                midpoint.y -= 10
+                midpoint = new Vec2(this.player.position.x + 10, this.player.position.y - 10);
                 break;
             case 0.75:
-                midpoint.x -= 10;
-                midpoint.y -= 10
+                midpoint = new Vec2(this.player.position.x - 10, this.player.position.y - 10);
                 break;
             case 3.75:
-                midpoint.x += 10;
-                midpoint.y += 10
+                midpoint = new Vec2(this.player.position.x + 10, this.player.position.y + 10);
                 break;
             case 2.25:
-                midpoint.x -= 10;
-                midpoint.y += 10
+                midpoint = new Vec2(this.player.position.x - 10, this.player.position.y + 10);
                 break;
             default:
                 midpoint = this.player.position;
