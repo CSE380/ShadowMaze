@@ -777,31 +777,35 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected getFaceDirectionVec():Vec2{
-        let midpoint = null;
+        let midpoint = this.player.position;
         switch (this.player.rotation) {
             case 0:
-                midpoint = new Vec2(this.player.position.x, this.player.position.y - 15);
+                midpoint.y -= 15;
                 break;
             case 3.15:
-                midpoint = new Vec2(this.player.position.x, this.player.position.y + 15);
+                midpoint.y += 15;
                 break;
             case 1.15:
-                midpoint = new Vec2(this.player.position.x - 15, this.player.position.y);
+                midpoint.x -= 15;
                 break;
             case 4.75:
-                midpoint = new Vec2(this.player.position.x + 15, this.player.position.y);
+                midpoint.x += 15;
                 break;
             case 5.25:
-                midpoint = new Vec2(this.player.position.x + 10, this.player.position.y - 10);
+                midpoint.x += 10;
+                midpoint.y -= 10
                 break;
             case 0.75:
-                midpoint = new Vec2(this.player.position.x - 10, this.player.position.y - 10);
+                midpoint.x -= 10;
+                midpoint.y -= 10
                 break;
             case 3.75:
-                midpoint = new Vec2(this.player.position.x + 10, this.player.position.y + 10);
+                midpoint.x += 10;
+                midpoint.y += 10
                 break;
             case 2.25:
-                midpoint = new Vec2(this.player.position.x - 10, this.player.position.y + 10);
+                midpoint.x -= 10;
+                midpoint.y += 10
                 break;
             default:
                 midpoint = this.player.position;
