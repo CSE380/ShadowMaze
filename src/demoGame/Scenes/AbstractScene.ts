@@ -98,7 +98,7 @@ export default abstract class ProjectScene extends Scene {
     protected playerMaxStatValue = 10;
     protected ultimateWave: Sprite;
     protected ultimateWaveKey = "ultimateWave"
-    protected ultimateWaveDirection:Vec2;
+    protected ultimateWaveDirection=new Vec2(0,0);
     //ui
     protected inGameControlTextBackground = "inGameControlTextBackground"
     protected inGameHelpTextBackground = "inGameHelpTextBackground"
@@ -466,7 +466,7 @@ export default abstract class ProjectScene extends Scene {
         if (Input.isKeyJustPressed("escape")) {
             this.emitter.fireEvent(PauseButtonEvent.PAUSE);
         }
-
+        console.log(this.player.rotation)
         if (this.option.isAstarChecked) {
             this.player.moveOnPath(1, this.path)
             if (this.path.isDone()) {
@@ -479,7 +479,7 @@ export default abstract class ProjectScene extends Scene {
             this.isPlayerAttacking();
             this.isPlayerUseItem();
         }
-        this.player.position.toString();
+      
         if(this.ultimateWave.visible){
             this.updateUltimateWave(deltaT);
         }
@@ -487,11 +487,9 @@ export default abstract class ProjectScene extends Scene {
         this.isPlayerAtLevelEnd();
     }
     protected updateUltimateWave(deltaT: number){
-        console.log(this.ultimateWave.position.toString());
-        let oldPosition = this.ultimateWave.position;
-        let travellingDirectionVec = this.ultimateWaveDirection
-        this.ultimateWave.position.set(oldPosition.x+travellingDirectionVec.x/10,oldPosition.y+travellingDirectionVec.y/10);
-        // this.ultimateWave.position.set(this.ultimateWave.position.x+60*deltaT,this.ultimateWave.position.y);
+        console.log( this.ultimateWaveDirection.toString())
+        let travellingDirectionVec = this.ultimateWaveDirection.scale(1);
+        this.ultimateWave.position.add(travellingDirectionVec );
         if(this.hasVecOutOfBound(this.ultimateWave.position.x) ||
         this.hasVecOutOfBound(this.ultimateWave.position.y)){
             this.ultimateWave.visible = false;
@@ -583,8 +581,9 @@ export default abstract class ProjectScene extends Scene {
         this.ultimateWave.visible = true;
         let faceDirectionVec  = this.getFaceDirectionVec();
         this.ultimateWave.position.set(faceDirectionVec.x,faceDirectionVec.y)
-        this.ultimateWaveDirection = faceDirectionVec.sub(this.player.position);
-
+        this.ultimateWaveDirection.x= faceDirectionVec.x - this.player.position.x;
+        this.ultimateWaveDirection.y= faceDirectionVec.y - this.player.position.y;
+       
 
     }
     protected handleBattlerKilled(event: GameEvent) {
