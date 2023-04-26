@@ -584,8 +584,7 @@ export default abstract class ProjectScene extends Scene {
         let faceDirectionVec  = this.getFaceDirectionVec();
         this.ultimateWave.position.set(faceDirectionVec.x,faceDirectionVec.y)
         this.ultimateWaveDirection = faceDirectionVec.sub(this.player.position);
-
-
+        this.ultimateWave.rotation = this.player.rotation;
     }
     protected handleBattlerKilled(event: GameEvent) {
         let id: number = event.data.get("id");
@@ -777,31 +776,36 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected getFaceDirectionVec():Vec2{
-        let midpoint = this.player.position;
+        let midpoint = new Vec2(this.player.position.x, this.player.position.y);
         switch (this.player.rotation) {
             case 0:
-                midpoint = new Vec2(this.player.position.x, this.player.position.y - 15);
+                // midpoint = new Vec2(this.player.position.x, this.player.position.y - 15);
+                midpoint.y = this.player.position.y - 15;
                 break;
             case 3.15:
-                midpoint = new Vec2(this.player.position.x, this.player.position.y + 15);
+                midpoint.y = this.player.position.y + 15;
                 break;
-            case 1.15:
-                midpoint = new Vec2(this.player.position.x - 15, this.player.position.y);
+            case 1.5:
+                midpoint.x = this.player.position.x - 15;
                 break;
             case 4.75:
-                midpoint = new Vec2(this.player.position.x + 15, this.player.position.y);
+                midpoint.x = this.player.position.x + 15;
                 break;
             case 5.25:
-                midpoint = new Vec2(this.player.position.x + 10, this.player.position.y - 10);
+                midpoint.x = this.player.position.x + 10;
+                midpoint.y = this.player.position.y - 10;
                 break;
             case 0.75:
-                midpoint = new Vec2(this.player.position.x - 10, this.player.position.y - 10);
+                midpoint.x = this.player.position.x - 10;
+                midpoint.y = this.player.position.y - 10;
                 break;
             case 3.75:
-                midpoint = new Vec2(this.player.position.x + 10, this.player.position.y + 10);
+                midpoint.x  = this.player.position.x + 10;
+                midpoint.y = this.player.position.y + 10;
                 break;
             case 2.25:
-                midpoint = new Vec2(this.player.position.x - 10, this.player.position.y + 10);
+                midpoint.x = this.player.position.x - 10;
+                midpoint.y = this.player.position.y + 10;
                 break;
             default:
                 midpoint = this.player.position;
