@@ -1,10 +1,7 @@
 import GameEvent from "../../../../Wolfie2D/Events/GameEvent";
 import Timer from "../../../../Wolfie2D/Timing/Timer";
-import PlayerActor from "../../../Actors/PlayerActor";
-import PlayerAI from "../PlayerAI";
 import { PlayerAnimations } from "../PlayerController";
 import PlayerState, { PlayerStateType } from "./PlayerState";
-import Vec2 from "../../../../Wolfie2D/DataTypes/Vec2";
 
 
 export default class Attacking extends PlayerState {

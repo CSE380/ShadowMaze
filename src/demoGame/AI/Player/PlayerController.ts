@@ -29,8 +29,20 @@ export const PlayerAnimations = {
     IDLE : "IDLE",
     ATTACKING: "ATTACKING",
     MOVING : "MOVING",
-    SHIELDING: "SHIELDING"
+    SHIELDING: "SHIELDING",
+    DYING: "DYING",
+    DEAD: "DEAD",
+    HIT: "HIT"
 } as const
+
+export const MonsterAnimations = {
+    IDLE: "IDLE",
+    ATTACKING: "ATTACKING",
+    MOVING: "MOVING",
+    DYING: "DYING:",
+    DEAD: "DEAD",
+    HIT: "HIT"
+}
 
 /**
  * The PlayerController class handles processing the input recieved from the user and exposes  

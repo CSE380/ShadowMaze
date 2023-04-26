@@ -30,7 +30,7 @@ export default class IntroLevelScene extends ProjectScene {
 
         this.loadAllGameItems();
         this.loadUltimateWave();
-        this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince_v4.json");
+        this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince.json");
 
         this.load.spritesheet("black_pudding", "shadowMaze_assets/spritesheets/black_pudding.json");
         this.load.spritesheet("troll", "shadowMaze_assets/spritesheets/troll.json");

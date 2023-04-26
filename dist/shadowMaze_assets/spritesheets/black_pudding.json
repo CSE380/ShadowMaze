@@ -154,127 +154,127 @@
       ]
     },
     {
-      "name": "Attack Left",
+      "name": "ATTACK",
       "frames": [
         {
           "index": 90,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 91,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 92,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 93,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 94,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 95,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 96,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 97,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 98,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 99,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 100,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 101,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 102,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 103,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 104,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 105,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 106,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 107,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 108,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 109,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 110,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 111,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 112,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 113,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 114,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 115,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 116,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 117,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 118,
-          "duration": 4
+          "duration": 1
         },
         {
           "index": 119,
-          "duration": 4
+          "duration": 1
         }
       ]
     },

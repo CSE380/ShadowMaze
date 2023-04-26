@@ -4,7 +4,7 @@ import { TargetableEntity } from "../../../GameSystems/Targeting/TargetableEntit
 import NPCAction from "./NPCAction";
 import { BattlerEvents } from "../../../ProjectEvents";
 import GameEvent from "../../../../Wolfie2D/Events/GameEvent";
-
+import { MonsterAnimations } from "../../Player/PlayerController";
 export default class AttackEnemy extends NPCAction {
     protected timer: Timer;
 
@@ -16,6 +16,8 @@ export default class AttackEnemy extends NPCAction {
     public performAction(target: TargetableEntity): void {
         this.timer.isStopped() ? console.log("weapon cooling down!") : console.log("weapon ready");
         if (this.timer.isStopped()) {
+            if (this.actor.isColliding)
+            this.actor.animation.play("ATTACK");
             this.emitter.fireEvent(BattlerEvents.MONSTER_ATTACK);
             this.timer.start();
         }
