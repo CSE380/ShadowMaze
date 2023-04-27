@@ -47,7 +47,7 @@ export default class ControlScene extends HW4Scene {
         let controlTextOption = {
             position: center,
             text: controlTextArray,
-            margin:100,
+            margin:70,
             backgroundColor:Color.TRANSPARENT,
         }
         this.addControlTextLayer(controlTextOption);

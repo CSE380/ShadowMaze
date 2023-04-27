@@ -96,8 +96,11 @@ export default abstract class ProjectScene extends Scene {
     protected door: Sprite
     protected backgroundImageKey: string;
     protected playerMaxStatValue = 10;
+    //ultimate
     protected ultimateWave: Sprite;
     protected ultimateWaveKey = "ultimateWave"
+    protected currentUltimateWavePositionLabels:Array<Label>
+    protected nextUltimateWavePositionLabels:Array<Label>
     protected ultimateWaveDirection:Vec2;
     //ui
     protected inGameControlTextBackground = "inGameControlTextBackground"
@@ -119,8 +122,8 @@ export default abstract class ProjectScene extends Scene {
     protected inventorySlotsMap = new Map<number, Map<Vec2, Array<gameItems>>>();
     // protected test = new Map<number,Vec2>()
     //ui display
-    protected currLabels: Array<Label>;
-    protected nextLabels: Array<Label>;
+    protected currentPlayerPositionLabels: Array<Label>;
+    protected nextPlayerPositonLabels: Array<Label>;
 
     //audio and music
     protected levelMusicKey: string;
@@ -248,7 +251,7 @@ export default abstract class ProjectScene extends Scene {
         this.initInventorySlotsMap();
         // create screen first 
         if (!this.option.isfogOfWarChecked)
-            // this.initFogOfWar();
+            this.initFogOfWar();
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
@@ -483,7 +486,7 @@ export default abstract class ProjectScene extends Scene {
         if(this.ultimateWave.visible){
             this.updateUltimateWave(deltaT);
         }
-        this.updateLabel();
+        this.updateTranparentLabels();
         this.isPlayerAtLevelEnd();
     }
     protected updateUltimateWave(deltaT: number){
@@ -681,9 +684,10 @@ export default abstract class ProjectScene extends Scene {
         const label = <Array<Label>>this.getSceneGraph().getNodesAt(this.levelEndPosition);
         label.forEach(label =>   label.backgroundColor = Color.TRANSPARENT);
     }
-    public initCurrLabel() {
-        this.currLabels = <Array<Label>>this.getSceneGraph().getNodesAt(this.player.position)
-        this.currLabels.forEach(label => { this.updateColor(label) })
+    public initTransparentLabelByPosition(position:Vec2):Array<Label> {
+        const labels = <Array<Label>>this.getSceneGraph().getNodesAt(position)
+        labels.forEach(label => { this.updateTranparentLablesColor(label) })
+        return labels;
     }
 
     public initFogOfWar() {
@@ -708,26 +712,24 @@ export default abstract class ProjectScene extends Scene {
         label.borderColor = Color.TRANSPARENT;
         label.backgroundColor = Color.FOG_OF_WAR_BLACK;
     }
-    public updateLabel() {
-        this.nextLabels = this.getTransparentLabels();
-        this.currLabels.forEach(label => { this.updateColor(label) })
-        this.nextLabels.forEach(label => this.updateColor(label))
-        // console.log(this.nextLabels.length)
-        this.currLabels = this.nextLabels;
+    public updateTranparentLabels() {
+        this.nextPlayerPositonLabels = this.getTransparentLabelsByPosition(this.player.position);
+        this.currentPlayerPositionLabels.forEach(label => { this.updateTranparentLablesColor(label) })
+        this.nextPlayerPositonLabels.forEach(label => this.updateTranparentLablesColor(label))
+        this.currentPlayerPositionLabels = this.nextPlayerPositonLabels;
     }
-    public getTransparentLabels(): Array<Label> {
+    public getTransparentLabelsByPosition(postion:Vec2): Array<Label> {
         let labels: Array<Label>
         if (!this.lightDuration) {
-            labels = <Array<Label>>this.getSceneGraph().getNodesAt(this.player.position);
+            labels = <Array<Label>>this.getSceneGraph().getNodesAt(postion);
         }
         else {
             // labels = <Array<Label>>this.getSceneGraph().getNodesInRegion(this.lightShape);
             labels = <Array<Label>>this.getSceneGraph().getNodesInRegion(this.lightShape);
-
         }
         return labels;
     }
-    public updateColor(label: Label) {
+    public updateTranparentLablesColor(label: Label) {
         if (label.backgroundColor) {
             if (label.backgroundColor.isEqual(Color.FOG_OF_WAR_BLACK)) {
                 label.backgroundColor = Color.FOG_OF_WAR_TRANSPARENT;
@@ -839,7 +841,7 @@ export default abstract class ProjectScene extends Scene {
         player.addPhysics(new AABB(Vec2.ZERO, new Vec2(8, 8)), null, false);
         // player.setGroup(PhysicsGroups.PLAYER);
         this.buildLightShape();
-        this.initCurrLabel();
+        this.currentPlayerPositionLabels=this.initTransparentLabelByPosition(this.player.position);
 
         // Give the player PlayerAI
         

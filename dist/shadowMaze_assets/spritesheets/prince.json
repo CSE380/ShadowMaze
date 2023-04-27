@@ -18,6 +18,14 @@
           "duration": 5
         }
       ]
+    },{
+      "name": "HURT",
+      "frames": [
+        {
+          "index": 17,
+          "duration": 5
+        }
+      ]
     },
     {
       "name": "MOVING",
