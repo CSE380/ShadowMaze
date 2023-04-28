@@ -260,12 +260,12 @@ export default abstract class ProjectScene extends Scene {
         this.initAllGameItems();
         if (!this.option.isAstarChecked) {
             this.initPlayerStatUI();
-            // this.initializeNPCs();
+            this.initNPCs();
         }
         this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: this.levelMusicKey, loop: true, holdReference: true });
     }
 
-    protected initializeNPCs(): void {
+    protected initNPCs(): void {
         let monster = this.load.getObject("monster");
         for (let i = 0; i < monster.slime.length; i++) {
             let npc = this.add.animatedSprite(NPCActor, "black_pudding", this.GameLayers.BASE);
@@ -282,6 +282,8 @@ export default abstract class ProjectScene extends Scene {
             npc.position.set(monster.troll[i][0], monster.troll[i][1]);
             npc.addPhysics(new AABB(Vec2.ZERO, new Vec2(7, 7)), null, false);
             npc.scale = new Vec2(1.5, 1.5);
+            const halfSize = this.player.sizeWithZoom.scale(0.125);
+            npc.setCollisionShape(new AABB(npc.position,halfSize));
             npc.navkey = "navmesh";
             npc.addAI(SlimeBehavior, { target: new BasicTargetable(new Position(npc.position.x, npc.position.y)), range: 100 });
             npc.animation.play("IDLE", true);
@@ -512,6 +514,7 @@ export default abstract class ProjectScene extends Scene {
         let oldPosition = this.ultimateWave.position;
         let travellingDirectionVec = this.ultimateWaveDirection
         this.ultimateWave.position.set(oldPosition.x + travellingDirectionVec.x / 10, oldPosition.y + travellingDirectionVec.y / 10);
+        
         if (this.hasVecOutOfBound(this.ultimateWave.position.x) ||
             this.hasVecOutOfBound(this.ultimateWave.position.y)) {
             this.ultimateWave.visible = false;
@@ -519,6 +522,20 @@ export default abstract class ProjectScene extends Scene {
                 this.updateTranparentLablesColor(label);
             })
         }
+        this.checkUltimateMonstersCollision();
+        // this.battlers.forEach(battler=>)
+    }
+    protected checkUltimateMonstersCollision(){
+        this.battlers.forEach(battler=>{
+            if( battler.battlerActive&& !(battler == this.player)){
+                if(battler.position.distanceTo(this.ultimateWave.position)<10){
+                    this.emitter.fireEvent(BattlerEvents.MONSTER_DEAD, { id: battler.id });
+                }
+            }
+        }
+         
+            
+    )
     }
     protected hasVecOutOfBound(x: number) {
         if (x < -15 || x > 540) return true;
@@ -730,7 +747,6 @@ export default abstract class ProjectScene extends Scene {
             labels = <Array<Label>>this.getSceneGraph().getNodesAt(postion);
         }
         else {
-
             labels = <Array<Label>>this.getSceneGraph().getNodesInRegion(this.buildLanternShape(postion));
         }
         return labels;
@@ -861,7 +877,6 @@ export default abstract class ProjectScene extends Scene {
         }
         // 
         player.animation.play("IDLE");
-        this.battlers.push(player);
 
 
 
