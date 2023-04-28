@@ -299,10 +299,10 @@ export default abstract class ProjectScene extends Scene {
         this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
 
     }
-    protected buildLanternShape() {
+    protected buildLanternShape(position:Vec2) {
         const lightDistance = 1 * this.labelSize;
         const centerToEdge = new Vec2(lightDistance, lightDistance);
-        this.lanternShape = new AABB(this.player.position, centerToEdge);
+        this.lanternShape = new AABB(position, centerToEdge);
         return this.lanternShape;
     }
 
@@ -698,8 +698,6 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected showPositionByColor(position: Vec2,color:Color) {
-        // console.log(position.toString());
-        // console.log(color)
         const label = this.getLabelsByPosition(position);
         label.forEach(label => label.backgroundColor = color);
     }
@@ -720,7 +718,8 @@ export default abstract class ProjectScene extends Scene {
             labels = <Array<Label>>this.getSceneGraph().getNodesAt(postion);
         }
         else {
-            labels = <Array<Label>>this.getSceneGraph().getNodesInRegion(this.lanternShape);
+
+            labels = <Array<Label>>this.getSceneGraph().getNodesInRegion(this.buildLanternShape(postion));
         }
         return labels;
     }
@@ -835,7 +834,7 @@ export default abstract class ProjectScene extends Scene {
         const halfSize = this.player.sizeWithZoom.scale(0.125);
         player.setCollisionShape(new AABB(this.player.position,halfSize))
         player.currentTransparentLabels = this.initTransparentLabelByPosition(this.player.position);
-        this.buildLanternShape()
+        this.buildLanternShape(this.player.position);
         this.visibleGroup.push(player);
 
         // Give the player PlayerAI
