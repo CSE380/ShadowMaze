@@ -283,7 +283,7 @@ export default abstract class ProjectScene extends Scene {
             npc.addPhysics(new AABB(Vec2.ZERO, new Vec2(7, 7)), null, false);
             npc.scale = new Vec2(1.5, 1.5);
             const halfSize = this.player.sizeWithZoom.scale(0.125);
-            npc.setCollisionShape(new AABB(npc.position,halfSize));
+            npc.setCollisionShape(new AABB(npc.position, halfSize));
             npc.navkey = "navmesh";
             npc.addAI(SlimeBehavior, { target: new BasicTargetable(new Position(npc.position.x, npc.position.y)), range: 100 });
             npc.animation.play("IDLE", true);
@@ -472,7 +472,7 @@ export default abstract class ProjectScene extends Scene {
         if (Input.isKeyJustPressed("escape")) {
             this.emitter.fireEvent(PauseButtonEvent.PAUSE);
         }
-
+        this.updateVisibleGroup();
         if (this.option.isAstarChecked) {
             this.player.moveOnPath(1, this.path)
             if (this.path.isDone()) {
@@ -488,54 +488,43 @@ export default abstract class ProjectScene extends Scene {
                 this.updateUltimateWave(deltaT);
             }
         }
-        this.player.position.toString();
-       
-        this.updateVisibleGroup();
+
         this.isPlayerAtLevelEnd();
     }
     protected updateVisibleGroup() {
         this.visibleGroup.forEach(sprite => {
             if (sprite.visible) {
-                if (sprite.imageId == this.ultimateWaveKey) {
-                    this.showPositionByColor(this.player.position, Color.TRANSPARENT);
-                    this.updateTranparentLabels(sprite);
-                    if (!this.player.collisionShape.overlaps(this.ultimateWave.collisionShape)) {
-                        this.showPositionByColor(this.player.position, Color.FOG_OF_WAR_TRANSPARENT);
-                    }
-                }
-                else {
-                    this.updateTranparentLabels(sprite);
-                }
+                this.updateTranparentLabels(sprite);
             }
-
         })
     }
     protected updateUltimateWave(deltaT: number) {
         let oldPosition = this.ultimateWave.position;
         let travellingDirectionVec = this.ultimateWaveDirection
-        this.ultimateWave.position.set(oldPosition.x + travellingDirectionVec.x / 10, oldPosition.y + travellingDirectionVec.y / 10);
-        
+        const ratio = 8;
+        this.ultimateWave.position.set(oldPosition.x + travellingDirectionVec.x / ratio, oldPosition.y + travellingDirectionVec.y / ratio);
         if (this.hasVecOutOfBound(this.ultimateWave.position.x) ||
             this.hasVecOutOfBound(this.ultimateWave.position.y)) {
             this.ultimateWave.visible = false;
             this.ultimateWave.currentTransparentLabels.forEach(label => {
                 this.updateTranparentLablesColor(label);
             })
+            this.showPositionByColor(this.player.position, Color.FOG_OF_WAR_TRANSPARENT);
+        }
+        if (!this.player.collisionShape.overlaps(this.ultimateWave.collisionShape)) {           
+            this.showPositionByColor(this.player.position, Color.FOG_OF_WAR_TRANSPARENT);
         }
         this.checkUltimateMonstersCollision();
-        // this.battlers.forEach(battler=>)
     }
-    protected checkUltimateMonstersCollision(){
-        this.battlers.forEach(battler=>{
-            if( battler.battlerActive&& !(battler == this.player)){
-                if(battler.position.distanceTo(this.ultimateWave.position)<10){
+    protected checkUltimateMonstersCollision() {
+        this.battlers.forEach(battler => {
+            if (battler.battlerActive && !(battler == this.player)) {
+                if (battler.position.distanceTo(this.ultimateWave.position) < 10) {
                     this.emitter.fireEvent(BattlerEvents.MONSTER_DEAD, { id: battler.id });
                 }
             }
         }
-         
-            
-    )
+        )
     }
     protected hasVecOutOfBound(x: number) {
         if (x < -15 || x > 540) return true;
@@ -621,6 +610,7 @@ export default abstract class ProjectScene extends Scene {
         this.ultimateWave.currentTransparentLabels = this.initTransparentLabelByPosition(this.ultimateWave.position);
         this.ultimateWaveDirection = faceDirectionVec.sub(this.player.position);
         this.ultimateWave.rotation = this.player.rotation;
+        this.showPositionByColor(this.player.position, Color.TRANSPARENT);
     }
     protected handleBattlerKilled(event: GameEvent) {
         let id: number = event.data.get("id");
@@ -714,17 +704,18 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected showPositionByColor(position: Vec2, color: Color) {
-        const label = this.getLabelsByPosition(position);
-        // console.log("player")
-        // console.log(this.player.position.toString())
-        label.forEach(label => {
-            if (label.backgroundColor)
+        const labels = this.getLabelsByPosition(position);
+
+        labels.forEach(label => {
+            if (label.backgroundColor) {
                 if (label.backgroundColor.isEqual(Color.FOG_OF_WAR_BLACK)) {
                     label.backgroundColor = color
                 }
                 else if (label.backgroundColor.isEqual(Color.TRANSPARENT)) {
                     label.backgroundColor = color
                 }
+            }
+
         }
         );
     }
@@ -732,7 +723,7 @@ export default abstract class ProjectScene extends Scene {
 
     public initTransparentLabelByPosition(position: Vec2): Array<Label> {
         const labels = this.getLabelsByPosition(position)
-        labels.forEach(label => { this.updateTranparentLablesColor(label); })
+        labels.forEach(label => { this.updateTranparentLablesColor(label) })
         return labels;
     }
     public updateTranparentLabels(sprite: Sprite) {
@@ -749,6 +740,7 @@ export default abstract class ProjectScene extends Scene {
         else {
             labels = <Array<Label>>this.getSceneGraph().getNodesInRegion(this.buildLanternShape(postion));
         }
+        labels = labels.filter(label => label.getLayer().getName() == GameLayers.FOG_OF_WAR)
         return labels;
     }
     public updateTranparentLablesColor(label: Label) {
