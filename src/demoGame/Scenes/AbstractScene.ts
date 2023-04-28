@@ -84,8 +84,8 @@ export default abstract class ProjectScene extends Scene {
     protected levelEndArea: Rect;
     protected levelEndTransitionLabel: Label;
     protected messageBoxLabel: Label;
-    // protected playerInitPosition = new Vec2(260, 235);
-    protected playerInitPosition = new Vec2(100, 90);
+    protected playerInitPosition = new Vec2(260, 235);
+    // protected playerInitPosition = new Vec2(100, 90);
     protected levelEndPosition = new Vec2(260, 490);
     protected levelEndHalfSize = new Vec2(25, 25)
     protected levelEndColor = new Color(255, 0, 0, 0.5);
@@ -188,7 +188,7 @@ export default abstract class ProjectScene extends Scene {
         this.ultimateWave.visible = false
         const halfSize = this.player.sizeWithZoom.scale(0.25);
         this.ultimateWave.position.set(this.player.position.x, this.player.position.y);
-        this.ultimateWave.setCollisionShape(new AABB(this.player.position,halfSize));
+        this.ultimateWave.setCollisionShape(new AABB(this.player.position, halfSize));
         this.visibleGroup.push(this.ultimateWave);
     }
 
@@ -299,7 +299,7 @@ export default abstract class ProjectScene extends Scene {
         this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
 
     }
-    protected buildLanternShape(position:Vec2) {
+    protected buildLanternShape(position: Vec2) {
         const lightDistance = 1 * this.labelSize;
         const centerToEdge = new Vec2(lightDistance, lightDistance);
         this.lanternShape = new AABB(position, centerToEdge);
@@ -389,7 +389,6 @@ export default abstract class ProjectScene extends Scene {
     protected handleEnteredLevelEnd(): void {
         if (!this.isLevelEndEnetered) {
             this.isLevelEndEnetered = true;
-
             this.levelEndTransitionLabel.tweens.play(tweensEffect.SLIDEIN);
         }
 
@@ -495,12 +494,11 @@ export default abstract class ProjectScene extends Scene {
         this.visibleGroup.forEach(sprite => {
             if (sprite.visible) {
                 if (sprite.imageId == this.ultimateWaveKey) {
-                    this.showPositionByColor(this.player.position,Color.TRANSPARENT);
+                    this.showPositionByColor(this.player.position, Color.TRANSPARENT);
                     this.updateTranparentLabels(sprite);
-                    if(!this.player.collisionShape.overlaps(this.ultimateWave.collisionShape)){
-                        this.showPositionByColor(this.player.position,Color.FOG_OF_WAR_TRANSPARENT);
+                    if (!this.player.collisionShape.overlaps(this.ultimateWave.collisionShape)) {
+                        this.showPositionByColor(this.player.position, Color.FOG_OF_WAR_TRANSPARENT);
                     }
-                    // 
                 }
                 else {
                     this.updateTranparentLabels(sprite);
@@ -516,7 +514,7 @@ export default abstract class ProjectScene extends Scene {
         if (this.hasVecOutOfBound(this.ultimateWave.position.x) ||
             this.hasVecOutOfBound(this.ultimateWave.position.y)) {
             this.ultimateWave.visible = false;
-            this.ultimateWave.currentTransparentLabels.forEach(label=>{
+            this.ultimateWave.currentTransparentLabels.forEach(label => {
                 this.updateTranparentLablesColor(label);
             })
         }
@@ -621,7 +619,7 @@ export default abstract class ProjectScene extends Scene {
                 break;
             }
             case GameItems.DOOR: {
-                this.showPositionByColor(this.levelEndPosition,Color.TRANSPARENT);
+                this.showPositionByColor(this.levelEndPosition, Color.TRANSPARENT);
                 break;
             }
             case GameItems.HEALTH_PACKS: {
@@ -697,13 +695,26 @@ export default abstract class ProjectScene extends Scene {
             }
         }
     }
-    protected showPositionByColor(position: Vec2,color:Color) {
+    protected showPositionByColor(position: Vec2, color: Color) {
         const label = this.getLabelsByPosition(position);
-        label.forEach(label => label.backgroundColor = color);
+        // console.log("player")
+        // console.log(this.player.position.toString())
+        label.forEach(label => {
+            if (label.backgroundColor)
+                if (label.backgroundColor.isEqual(Color.FOG_OF_WAR_BLACK)) {
+                    label.backgroundColor = color
+                }
+                else if (label.backgroundColor.isEqual(Color.TRANSPARENT)) {
+                    label.backgroundColor = color
+                }
+        }
+        );
     }
+
+
     public initTransparentLabelByPosition(position: Vec2): Array<Label> {
         const labels = this.getLabelsByPosition(position)
-        labels.forEach(label => {this.updateTranparentLablesColor(label);})
+        labels.forEach(label => { this.updateTranparentLablesColor(label); })
         return labels;
     }
     public updateTranparentLabels(sprite: Sprite) {
@@ -832,7 +843,7 @@ export default abstract class ProjectScene extends Scene {
         this.battlers.push(this.player);
         player.addPhysics(new AABB(Vec2.ZERO, new Vec2(8, 8)), null, false);
         const halfSize = this.player.sizeWithZoom.scale(0.125);
-        player.setCollisionShape(new AABB(this.player.position,halfSize))
+        player.setCollisionShape(new AABB(this.player.position, halfSize))
         player.currentTransparentLabels = this.initTransparentLabelByPosition(this.player.position);
         this.buildLanternShape(this.player.position);
         this.visibleGroup.push(player);
