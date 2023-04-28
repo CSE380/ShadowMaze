@@ -84,8 +84,8 @@ export default abstract class ProjectScene extends Scene {
     protected levelEndArea: Rect;
     protected levelEndTransitionLabel: Label;
     protected messageBoxLabel: Label;
-    protected playerInitPosition = new Vec2(260, 235);
-    // protected playerInitPosition = new Vec2(100, 90);
+    // protected playerInitPosition = new Vec2(260, 235);
+    protected playerInitPosition = new Vec2(100, 90);
     protected levelEndPosition = new Vec2(260, 490);
     protected levelEndHalfSize = new Vec2(25, 25)
     protected levelEndColor = new Color(255, 0, 0, 0.5);
@@ -282,7 +282,7 @@ export default abstract class ProjectScene extends Scene {
             npc.position.set(monster.troll[i][0], monster.troll[i][1]);
             npc.addPhysics(new AABB(Vec2.ZERO, new Vec2(7, 7)), null, false);
             npc.scale = new Vec2(1.5, 1.5);
-            const halfSize = this.player.sizeWithZoom.scale(0.125);
+            const halfSize = this.player.sizeWithZoom.scale(0.1);
             npc.setCollisionShape(new AABB(npc.position, halfSize));
             npc.navkey = "navmesh";
             npc.addAI(SlimeBehavior, { target: new BasicTargetable(new Position(npc.position.x, npc.position.y)), range: 100 });
