@@ -482,11 +482,12 @@ export default abstract class ProjectScene extends Scene {
             this.isPlayerAtItems();
             this.isPlayerAttacking();
             this.isPlayerUseItem();
+            if (this.ultimateWave.visible) {
+                this.updateUltimateWave(deltaT);
+            }
         }
         this.player.position.toString();
-        if (this.ultimateWave.visible) {
-            this.updateUltimateWave(deltaT);
-        }
+       
         this.updateVisibleGroup();
         this.isPlayerAtLevelEnd();
     }
