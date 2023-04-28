@@ -5,6 +5,7 @@ import AABB from "../DataTypes/Shapes/AABB";
 import Debug from "../Debug/Debug";
 import Color from "../Utils/Color";
 import Circle from "../DataTypes/Shapes/Circle";
+import Label from "./UIElements/Label";
 /**
  * The representation of an object in the game world that can be drawn to the screen
  */
@@ -15,7 +16,7 @@ export default abstract class CanvasNode extends GameNode implements Region {
 	private _hasCustomShader: boolean;
 	private _customShaderKey: string;
 	private _alpha: number;
-
+	
 	/** A flag for whether or not the CanvasNode is visible */
 	visible: boolean = true;
 	

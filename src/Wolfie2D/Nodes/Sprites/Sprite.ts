@@ -1,7 +1,7 @@
 import CanvasNode from "../CanvasNode";
 import ResourceManager from "../../ResourceManager/ResourceManager";
 import Vec2 from "../../DataTypes/Vec2";
-
+import Label from "../UIElements/Label";
 /**
  * The representation of a sprite - an in-game image
  */
@@ -14,7 +14,7 @@ export default class Sprite extends CanvasNode {
     invertX: boolean;
     /** Whether or not the y-axis should be inverted on render */
     invertY: boolean;
-
+    public currentTransparentLabels:Array<Label>;
     constructor(imageId: string){
         super();
         this.imageId = imageId;

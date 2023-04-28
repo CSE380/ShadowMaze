@@ -2,12 +2,12 @@ import Sprite from "./Sprite";
 import AnimationManager from "../../Rendering/Animations/AnimationManager";
 import Spritesheet from "../../DataTypes/Spritesheet";
 import Vec2 from "../../DataTypes/Vec2";
-
+import Label from "../UIElements/Label";
 /** An sprite with specified animation frames. */
 export default class AnimatedSprite extends Sprite {
     /** The number of columns in this sprite sheet */
     protected numCols: number;
-
+   
     get cols(): number {
         return this.numCols;
     }

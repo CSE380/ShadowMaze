@@ -18,7 +18,7 @@ import Viewport from "../../Wolfie2D/SceneGraph/Viewport";
 import RenderingManager from "../../Wolfie2D/Rendering/RenderingManager";
 import Rect from "../../Wolfie2D/Nodes/Graphics/Rect";
 import { GraphicType } from "../../Wolfie2D/Nodes/Graphics/GraphicTypes";
-import { PlayerEvents, BattlerEvents,MessageBoxEvents, AllGameEventType } from "../ProjectEvents";
+import { PlayerEvents, BattlerEvents, MessageBoxEvents, AllGameEventType } from "../ProjectEvents";
 
 import Actor from "../../Wolfie2D/DataTypes/Interfaces/Actor";
 
@@ -74,7 +74,7 @@ export default abstract class ProjectScene extends Scene {
     protected backgroundImage: Sprite;
     protected GameLayers = GameLayers;
     protected backButtonPosition = new Vec2(50, 50);
-   
+
     //message box to display invalid action
     // level transtion
     protected levelTransitionTimer: Timer;
@@ -84,7 +84,8 @@ export default abstract class ProjectScene extends Scene {
     protected levelEndArea: Rect;
     protected levelEndTransitionLabel: Label;
     protected messageBoxLabel: Label;
-    protected playerInitPosition = new Vec2(260, 235);
+    // protected playerInitPosition = new Vec2(260, 235);
+    protected playerInitPosition = new Vec2(100, 90);
     protected levelEndPosition = new Vec2(260, 490);
     protected levelEndHalfSize = new Vec2(25, 25)
     protected levelEndColor = new Color(255, 0, 0, 0.5);
@@ -96,12 +97,11 @@ export default abstract class ProjectScene extends Scene {
     protected door: Sprite
     protected backgroundImageKey: string;
     protected playerMaxStatValue = 10;
+
     //ultimate
     protected ultimateWave: Sprite;
-    protected ultimateWaveKey = "ultimateWave"
-    protected currentUltimateWavePositionLabels:Array<Label>
-    protected nextUltimateWavePositionLabels:Array<Label>
-    protected ultimateWaveDirection:Vec2;
+    protected ultimateWaveKey = "ultimateWave";
+    protected ultimateWaveDirection: Vec2;
     //ui
     protected inGameControlTextBackground = "inGameControlTextBackground"
     protected inGameHelpTextBackground = "inGameHelpTextBackground"
@@ -117,8 +117,8 @@ export default abstract class ProjectScene extends Scene {
     protected gameItemsArray = GameItemsArray;
     protected gameItemsMap = new Map<string, Array<gameItems>>();
     protected laserGunsKey = "laserGuns";
-    protected lightShape: AABB;
-    protected lightDuration: boolean;
+    protected lanternShape: AABB;
+    protected lanternDuration = false;
     protected inventorySlotsMap = new Map<number, Map<Vec2, Array<gameItems>>>();
     // protected test = new Map<number,Vec2>()
     //ui display
@@ -138,7 +138,7 @@ export default abstract class ProjectScene extends Scene {
     //Li
     protected battlers: (Battler & Actor)[];
     protected option: Record<string, any>;
-
+    protected visibleGroup: (PlayerActor | NPCActor | Sprite)[] = [];
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, {
             ...options, physics: {
@@ -158,7 +158,6 @@ export default abstract class ProjectScene extends Scene {
         // }
 
         this.battlers = new Array<Battler & Actor>();
-
     }
     public initScene(option: Record<string, any>): void {
         if (option !== undefined)
@@ -172,7 +171,7 @@ export default abstract class ProjectScene extends Scene {
         this.levelEndTimer = new Timer(1000)
         this.isLevelEndEnetered = false;
         this.initLayers();
-        
+
         this.levelEndTransitionLabel = this.addTweenLabel(this.levelEndTransitionLabel, PlayerEvents.LEVEL_END);
         this.messageBoxLabel = this.addTweenLabel(this.messageBoxLabel, MessageBoxEvents.HIDDEN);
     }
@@ -180,16 +179,19 @@ export default abstract class ProjectScene extends Scene {
         this.load.object(key, `${this.pathToItems}${key}.json`);
         this.load.image(key, `${this.pathToSprite}${key}.png`);
     }
-    protected loadUltimateWave(){
+    protected loadUltimateWave() {
         let key = this.ultimateWaveKey;
         this.load.image(key, `${this.pathToSprite}${key}.png`);
     }
-    protected initUltimateWave(){
-        this.ultimateWave = this.add.sprite(this.ultimateWaveKey,GameLayers.BASE);
+    protected initUltimateWave() {
+        this.ultimateWave = this.add.sprite(this.ultimateWaveKey, this.GameLayers.BASE);
         this.ultimateWave.visible = false
-        this.ultimateWave.position.set(this.player.position.x,this.player.position.y);
+        const halfSize = this.player.sizeWithZoom.scale(0.25);
+        this.ultimateWave.position.set(this.player.position.x, this.player.position.y);
+        this.ultimateWave.setCollisionShape(new AABB(this.player.position,halfSize));
+        this.visibleGroup.push(this.ultimateWave);
     }
-    
+
     protected loadAllGameItems() {
         for (let key of this.gameItemsArray) {
             this.loadGameItems(key);
@@ -207,7 +209,7 @@ export default abstract class ProjectScene extends Scene {
     }
     protected initAllGameItems() {
         for (let key of this.gameItemsArray) {
-            let gameItem = this.load.getObject(key); 
+            let gameItem = this.load.getObject(key);
             const items = new Array<gameItems>(gameItem.position.length);
             for (let i = 0; i < items.length; i++) {
                 let sprite, line;
@@ -258,9 +260,9 @@ export default abstract class ProjectScene extends Scene {
         this.initAllGameItems();
         if (!this.option.isAstarChecked) {
             this.initPlayerStatUI();
-            this.initializeNPCs();
+            // this.initializeNPCs();
         }
-        this.emitter.fireEvent(GameEventType.PLAY_SOUND, {key: this.levelMusicKey, loop: true, holdReference: true});
+        this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: this.levelMusicKey, loop: true, holdReference: true });
     }
 
     protected initializeNPCs(): void {
@@ -271,7 +273,7 @@ export default abstract class ProjectScene extends Scene {
             npc.addPhysics(new AABB(Vec2.ZERO, new Vec2(7, 7)), null, false);
             npc.scale = new Vec2(0.15, 0.15);
             npc.navkey = "navmesh";
-            npc.addAI(SlimeBehavior, {target: new BasicTargetable(new Position(npc.position.x, npc.position.y)), range: 100});
+            npc.addAI(SlimeBehavior, { target: new BasicTargetable(new Position(npc.position.x, npc.position.y)), range: 100 });
             npc.animation.play("IDLE", true);
             this.battlers.push(npc);
         }
@@ -281,7 +283,7 @@ export default abstract class ProjectScene extends Scene {
             npc.addPhysics(new AABB(Vec2.ZERO, new Vec2(7, 7)), null, false);
             npc.scale = new Vec2(1.5, 1.5);
             npc.navkey = "navmesh";
-            npc.addAI(SlimeBehavior, {target: new BasicTargetable(new Position(npc.position.x, npc.position.y)), range: 100});
+            npc.addAI(SlimeBehavior, { target: new BasicTargetable(new Position(npc.position.x, npc.position.y)), range: 100 });
             npc.animation.play("IDLE", true);
             this.battlers.push(npc);
         }
@@ -297,16 +299,16 @@ export default abstract class ProjectScene extends Scene {
         this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
 
     }
-    protected buildLightShape() {
+    protected buildLanternShape() {
         const lightDistance = 1 * this.labelSize;
         const centerToEdge = new Vec2(lightDistance, lightDistance);
-        this.lightShape = new AABB(this.player.position, centerToEdge);
-        return this.lightShape;
+        this.lanternShape = new AABB(this.player.position, centerToEdge);
+        return this.lanternShape;
     }
 
 
     protected initSubscribe() {
-        
+
         this.initGameEventSubscribe([
             ...Object.values(BattlerEvents),
             ...Object.values(PlayerEvents),
@@ -483,26 +485,44 @@ export default abstract class ProjectScene extends Scene {
             this.isPlayerUseItem();
         }
         this.player.position.toString();
-        if(this.ultimateWave.visible){
+        if (this.ultimateWave.visible) {
             this.updateUltimateWave(deltaT);
         }
-        this.updateTranparentLabels();
+        this.updateVisibleGroup();
         this.isPlayerAtLevelEnd();
     }
-    protected updateUltimateWave(deltaT: number){
-        console.log(this.ultimateWave.position.toString());
+    protected updateVisibleGroup() {
+        this.visibleGroup.forEach(sprite => {
+            if (sprite.visible) {
+                if (sprite.imageId == this.ultimateWaveKey) {
+                    this.showPositionByColor(this.player.position,Color.TRANSPARENT);
+                    this.updateTranparentLabels(sprite);
+                    if(!this.player.collisionShape.overlaps(this.ultimateWave.collisionShape)){
+                        this.showPositionByColor(this.player.position,Color.FOG_OF_WAR_TRANSPARENT);
+                    }
+                    // 
+                }
+                else {
+                    this.updateTranparentLabels(sprite);
+                }
+            }
+
+        })
+    }
+    protected updateUltimateWave(deltaT: number) {
         let oldPosition = this.ultimateWave.position;
         let travellingDirectionVec = this.ultimateWaveDirection
-        this.ultimateWave.position.set(oldPosition.x+travellingDirectionVec.x/10,oldPosition.y+travellingDirectionVec.y/10);
-        // this.ultimateWave.position.set(this.ultimateWave.position.x+60*deltaT,this.ultimateWave.position.y);
-        if(this.hasVecOutOfBound(this.ultimateWave.position.x) ||
-        this.hasVecOutOfBound(this.ultimateWave.position.y)){
+        this.ultimateWave.position.set(oldPosition.x + travellingDirectionVec.x / 10, oldPosition.y + travellingDirectionVec.y / 10);
+        if (this.hasVecOutOfBound(this.ultimateWave.position.x) ||
+            this.hasVecOutOfBound(this.ultimateWave.position.y)) {
             this.ultimateWave.visible = false;
-            console.log("out of bound")
+            this.ultimateWave.currentTransparentLabels.forEach(label=>{
+                this.updateTranparentLablesColor(label);
+            })
         }
     }
-    protected hasVecOutOfBound(x:number){
-        if(x<0||x>512) return true;
+    protected hasVecOutOfBound(x: number) {
+        if (x < -15 || x > 540) return true;
         else return false;
     }
     protected isPlayerUseItem() {
@@ -530,12 +550,10 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected handleEvent(event: GameEvent): void {
-
         if (event.data.get(this.action) == ACTIONTYPE.PICK)
             this.handlePickGameItemsEvent(event);
         if (event.data.get(this.action) == ACTIONTYPE.USE)
             this.handleUseGameItemsEvent(event);
-       
         this.handleBattlerEvents(event);
         this.handleInGameMessageBox(event);
     }
@@ -554,7 +572,6 @@ export default abstract class ProjectScene extends Scene {
         switch (event.type) {
             case BattlerEvents.MONSTER_DEAD: {
                 this.handleBattlerKilled(event);
-                console.log(this.player._ai["currentStat"]["currentEnergy"])
                 if (this.player._ai["currentStat"]["currentEnergy"] < this.playerMaxStatValue) {
                     this.player._ai["currentStat"]["currentEnergy"]++;
                     this.handlePlayerStatChange("currentEnergy");
@@ -575,17 +592,17 @@ export default abstract class ProjectScene extends Scene {
                     this.sceneManager.changeToScene(SelectLevelMenuScene, this.option);
                 }, 2000)
             }
-            case PlayerInput.ULTIMATE:{
-                console.log("fire")
-                if(!this.ultimateWave.visible)
-                this.handleFireUltimate();
+            case PlayerInput.ULTIMATE: {
+                if (!this.ultimateWave.visible)
+                    this.handleFireUltimate();
             }
         }
     }
-    protected handleFireUltimate(){
+    protected handleFireUltimate() {
         this.ultimateWave.visible = true;
-        let faceDirectionVec  = this.getFaceDirectionVec();
-        this.ultimateWave.position.set(faceDirectionVec.x,faceDirectionVec.y)
+        let faceDirectionVec = this.getFaceDirectionVec();
+        this.ultimateWave.position.set(faceDirectionVec.x, faceDirectionVec.y);
+        this.ultimateWave.currentTransparentLabels = this.initTransparentLabelByPosition(this.ultimateWave.position);
         this.ultimateWaveDirection = faceDirectionVec.sub(this.player.position);
         this.ultimateWave.rotation = this.player.rotation;
     }
@@ -600,11 +617,11 @@ export default abstract class ProjectScene extends Scene {
         this.RemoveItemFromInventory(event)
         switch (event.type) {
             case GameItems.LANTERNS: {
-                this.lightDuration = !this.lightDuration;
+                this.lanternDuration = !this.lanternDuration;
                 break;
             }
             case GameItems.DOOR: {
-                this.showLevelEndPosition();
+                this.showPositionByColor(this.levelEndPosition,Color.TRANSPARENT);
                 break;
             }
             case GameItems.HEALTH_PACKS: {
@@ -680,52 +697,30 @@ export default abstract class ProjectScene extends Scene {
             }
         }
     }
-    protected showLevelEndPosition() {
-        const label = <Array<Label>>this.getSceneGraph().getNodesAt(this.levelEndPosition);
-        label.forEach(label =>   label.backgroundColor = Color.TRANSPARENT);
+    protected showPositionByColor(position: Vec2,color:Color) {
+        // console.log(position.toString());
+        // console.log(color)
+        const label = this.getLabelsByPosition(position);
+        label.forEach(label => label.backgroundColor = color);
     }
-    public initTransparentLabelByPosition(position:Vec2):Array<Label> {
-        const labels = <Array<Label>>this.getSceneGraph().getNodesAt(position)
-        labels.forEach(label => { this.updateTranparentLablesColor(label) })
+    public initTransparentLabelByPosition(position: Vec2): Array<Label> {
+        const labels = this.getLabelsByPosition(position)
+        labels.forEach(label => {this.updateTranparentLablesColor(label);})
         return labels;
     }
-
-    public initFogOfWar() {
-        const len = this.wallSize / this.labelSize;
-        for (let i = 0; i <= 2 * len; i++) {
-            for (let j = 6; j <= 2 * len; j++) {
-                let x = 0.5 * i * this.labelSize;
-                let y = 0.5 * j * this.labelSize;
-                let options = {
-                    position: new Vec2(x, y),
-                    text: "",
-                }
-                this.addBlackLabel(options);
-            }
-        }
+    public updateTranparentLabels(sprite: Sprite) {
+        let nextTransparentLabels = this.getLabelsByPosition(sprite.position);
+        sprite.currentTransparentLabels.forEach(label => { this.updateTranparentLablesColor(label) })
+        nextTransparentLabels.forEach(label => this.updateTranparentLablesColor(label))
+        sprite.currentTransparentLabels = nextTransparentLabels
     }
-    public addBlackLabel(options: Record<string, any>) {
-        const label = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.FOG_OF_WAR, options);
-        label.size.set(this.labelSize * 2, this.labelSize * 2);
-        label.borderWidth = 0;
-        label.borderRadius = 0;
-        label.borderColor = Color.TRANSPARENT;
-        label.backgroundColor = Color.FOG_OF_WAR_BLACK;
-    }
-    public updateTranparentLabels() {
-        this.nextPlayerPositonLabels = this.getTransparentLabelsByPosition(this.player.position);
-        this.currentPlayerPositionLabels.forEach(label => { this.updateTranparentLablesColor(label) })
-        this.nextPlayerPositonLabels.forEach(label => this.updateTranparentLablesColor(label))
-        this.currentPlayerPositionLabels = this.nextPlayerPositonLabels;
-    }
-    public getTransparentLabelsByPosition(postion:Vec2): Array<Label> {
+    public getLabelsByPosition(postion: Vec2): Array<Label> {
         let labels: Array<Label>
-        if (!this.lightDuration) {
+        if (!this.lanternDuration) {
             labels = <Array<Label>>this.getSceneGraph().getNodesAt(postion);
         }
         else {
-            // labels = <Array<Label>>this.getSceneGraph().getNodesInRegion(this.lightShape);
-            labels = <Array<Label>>this.getSceneGraph().getNodesInRegion(this.lightShape);
+            labels = <Array<Label>>this.getSceneGraph().getNodesInRegion(this.lanternShape);
         }
         return labels;
     }
@@ -763,7 +758,7 @@ export default abstract class ProjectScene extends Scene {
 
     protected isPlayerAttacking() {
         let midpoint = this.getFaceDirectionVec();
-        
+
         for (const battler of this.battlers) {
             if (battler == this.player) {
                 continue;
@@ -773,11 +768,11 @@ export default abstract class ProjectScene extends Scene {
             }
             if (battler.battlerActive && battler.position.distanceTo(this.player.position) < 10) {
                 if (!this.player._ai['isInvincible'])
-                    this.emitter.fireEvent(BattlerEvents.PRINCE_HIT, {id: battler.id});
+                    this.emitter.fireEvent(BattlerEvents.PRINCE_HIT, { id: battler.id });
             }
         }
     }
-    protected getFaceDirectionVec():Vec2{
+    protected getFaceDirectionVec(): Vec2 {
         let midpoint = new Vec2(this.player.position.x, this.player.position.y);
         switch (this.player.rotation) {
             case 0:
@@ -802,7 +797,7 @@ export default abstract class ProjectScene extends Scene {
                 midpoint.y = this.player.position.y - 10;
                 break;
             case 3.75:
-                midpoint.x  = this.player.position.x + 10;
+                midpoint.x = this.player.position.x + 10;
                 midpoint.y = this.player.position.y + 10;
                 break;
             case 2.25:
@@ -833,18 +828,18 @@ export default abstract class ProjectScene extends Scene {
         this.player = player
         player.position.set(this.playerInitPosition.x, this.playerInitPosition.y);
         player.battleGroup = 2;
-        player.health = 10;
-        player.maxHealth = 10;
         player.scale = new Vec2(2, 2);
-
         // Give the player physics
+        this.battlers.push(this.player);
         player.addPhysics(new AABB(Vec2.ZERO, new Vec2(8, 8)), null, false);
-        // player.setGroup(PhysicsGroups.PLAYER);
-        this.buildLightShape();
-        this.currentPlayerPositionLabels=this.initTransparentLabelByPosition(this.player.position);
+        const halfSize = this.player.sizeWithZoom.scale(0.125);
+        player.setCollisionShape(new AABB(this.player.position,halfSize))
+        player.currentTransparentLabels = this.initTransparentLabelByPosition(this.player.position);
+        this.buildLanternShape()
+        this.visibleGroup.push(player);
 
         // Give the player PlayerAI
-        
+
         if (this.option.isAstarChecked) {
             console.log("Auto Pilot");
             this.initAstarMode();
@@ -920,10 +915,10 @@ export default abstract class ProjectScene extends Scene {
             // this.add.uiElement(UIElementType.LABEL,option.layerName,textOption);
         }
     }
-    protected sceneChange(nextScene){
+    protected sceneChange(nextScene) {
         this.viewport.setZoomLevel(1);
-        this.sceneManager.changeToScene(nextScene,this.option);
-        this.emitter.fireEvent(GameEventType.STOP_SOUND, {key: this.levelMusicKey, loop: true, holdReference: true});
+        this.sceneManager.changeToScene(nextScene, this.option);
+        this.emitter.fireEvent(GameEventType.STOP_SOUND, { key: this.levelMusicKey, loop: true, holdReference: true });
     }
     public initPauseMenuLayer() {
         const pauseSign = "\u23F8";
@@ -935,16 +930,19 @@ export default abstract class ProjectScene extends Scene {
             backgroundColor: Color.TRANSPARENT,
         }
         this.addButtons(pauseSignbuttonOption);
-        let emptyMenuOption = {
-            position: this.center,
-            text: "",
-            size: new Vec2(300, 550),
-            layerName: GameLayers.PAUSE_MENU_CONTAINER,
-            backgroundColor: Color.WHITE,
-        }
-        this.addLabel(emptyMenuOption);
+
+        // let emptyMenuOption = {
+        //     position: this.center,
+        //     text: "",
+        //     size: new Vec2(300, 550),
+        //     layerName: GameLayers.PAUSE_MENU_CONTAINER,
+        //     backgroundColor: Color.WHITE,
+        // }
+        // this.addLabel(emptyMenuOption);
+        this.backgroundImage = this.add.sprite(this.inGameControlTextBackground, GameLayers.PAUSE_MENU_CONTAINER);
+        this.backgroundImage.position.set(this.center.x, this.center.y + 20);
         this.backgroundImage = this.add.sprite(this.inGameControlTextBackground, GameLayers.CONTROL_TEXT_MENU_CONTAINER);
-        this.backgroundImage.position.set(this.center.x, this.center.y + 10);
+        this.backgroundImage.position.set(this.center.x, this.center.y + 20);
         let controlTextOption = {
             position: new Vec2(400, 515),
             margin: 30,
@@ -986,7 +984,7 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected initializeNavmesh(graph: PositionGraph, walls: OrthogonalTilemap): Navmesh {
-        
+
 
         let dim: Vec2 = walls.getDimensions();
         for (let i = 0; i < dim.y; i++) {
@@ -1031,6 +1029,27 @@ export default abstract class ProjectScene extends Scene {
         return new Navmesh(graph);
 
     }
-
+    public initFogOfWar() {
+        const len = this.wallSize / this.labelSize;
+        for (let i = 0; i <= 2 * len; i++) {
+            for (let j = 6; j <= 2 * len; j++) {
+                let x = 0.5 * i * this.labelSize;
+                let y = 0.5 * j * this.labelSize;
+                let options = {
+                    position: new Vec2(x, y),
+                    text: "",
+                }
+                this.addBlackLabel(options);
+            }
+        }
+    }
+    public addBlackLabel(options: Record<string, any>) {
+        const label = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.FOG_OF_WAR, options);
+        label.size.set(this.labelSize * 2, this.labelSize * 2);
+        label.borderWidth = 0;
+        label.borderRadius = 0;
+        label.borderColor = Color.TRANSPARENT;
+        label.backgroundColor = Color.FOG_OF_WAR_BLACK;
+    }
     public abstract getBattlers(): Battler[];
 }

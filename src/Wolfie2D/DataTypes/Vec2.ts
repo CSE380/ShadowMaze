@@ -1,5 +1,5 @@
 import MathUtils from "../Utils/MathUtils";
-
+import Label from "../Nodes/UIElements/Label";
 /**
  * A two-dimensional vector (x, y)
  */
@@ -8,7 +8,7 @@ export default class Vec2 {
 	// Store x and y in an array
 	/** The array that stores the actual vector values x and y */
 	private vec: Float32Array;
-
+	public currentTransparentLabels:Array<Label>;
 	/**	
 	 * When this vector changes its value, do something
 	 */
