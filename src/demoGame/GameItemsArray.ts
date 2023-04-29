@@ -2,8 +2,12 @@ export enum GameItems {
     LANTERNS = "lantern",
     DOOR = "door",
     HEALTH_PACKS = "healthPacks",
-    INVENTORYSLOT = "inventorySlot",
-    PHASINGPOTION="phasingPotion"
+    INVENTORY_SLOT = "inventorySlot",
+    PHASING_POTION="phasingPotion",
+    TELEPORT_BOOT="teleportBoot",
+    MEDUSA="medusa",
+    ORACLE_ELIXIR="oracleElixir",
+    SEEING_STONE="seeingStone",
   }
 function createGameItemsArray(){
   let GameItemsArray = []

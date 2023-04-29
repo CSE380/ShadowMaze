@@ -56,7 +56,7 @@ import { MenuState } from "../MenuState";
 import SlimeBehavior from "../AI/NPC/NPCBehavior/SlimeBehavior";
 import BasicTargetable from "../GameSystems/Targeting/BasicTargetable";
 import Position from "../GameSystems/Targeting/Position";
-
+import AnimatedSprite from "../../Wolfie2D/Nodes/Sprites/AnimatedSprite";
 //
 import { GameEventType } from "../../Wolfie2D/Events/GameEventType";
 const enum tweensEffect {
@@ -142,6 +142,8 @@ export default abstract class ProjectScene extends Scene {
     protected battlers: (Battler & Actor)[];
     protected option: Record<string, any>;
     protected visibleGroup: (PlayerActor | NPCActor | Sprite)[] = [];
+    protected npcGroup  = [];
+    protected gameItemGroup :gameItems[] = [];
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, {
             ...options, physics: {
@@ -201,7 +203,7 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected initInventorySlotsMap() {
-        const inventorySlotsPosition = this.load.getObject(GameItems.INVENTORYSLOT)
+        const inventorySlotsPosition = this.load.getObject(GameItems.INVENTORY_SLOT)
         let i = 1;
         for (let position of inventorySlotsPosition.position) {
             const postionItemsMap = new Map<Vec2, Array<gameItems>>();
@@ -223,6 +225,7 @@ export default abstract class ProjectScene extends Scene {
                     numOfSlots.fontSize = 24;
                     numOfSlots.font = "Courier";
                     numOfSlots.textColor = Color.BLACK;
+                    // sprite.scale =new Vec2(45,45)
                     // numOfSlots.position.set(gameItem.position[i][0]-100, gameItem.position[i][1])
                 }
                 else {
@@ -232,6 +235,7 @@ export default abstract class ProjectScene extends Scene {
                 items[i] = gameItems.create(sprite, line);
                 items[i].position.set(gameItem.position[i][0], gameItem.position[i][1]);
                 items[i].name = key;
+                this.gameItemGroup.push(items[i]);
             }
             this.gameItemsMap.set(key, items);
         }
@@ -256,8 +260,8 @@ export default abstract class ProjectScene extends Scene {
         this.initInventorySlotsMap();
         // create screen first 
         if (!this.option.isfogOfWarChecked)
-            // this.initFogOfWar();
-            this.center = this.viewport.getHalfSize();
+            this.initFogOfWar();
+        this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
         this.initAllGameItems();
@@ -269,31 +273,33 @@ export default abstract class ProjectScene extends Scene {
     }
 
     protected initNPCs(): void {
-        let monster = this.load.getObject("monster");
-        for (let i = 0; i < monster.slime.length; i++) {
-            let npc = this.add.animatedSprite(NPCActor, "black_pudding", this.GameLayers.BASE);
-            npc.position.set(monster.slime[i][0], monster.slime[i][1]);
-            npc.addPhysics(new AABB(Vec2.ZERO, new Vec2(7, 7)), null, false);
-            npc.scale = new Vec2(0.15, 0.15);
-            npc.navkey = "navmesh";
-            npc.addAI(SlimeBehavior, { target: new BasicTargetable(new Position(npc.position.x, npc.position.y)), range: 100 });
-            npc.animation.play("IDLE", true);
-            this.battlers.push(npc);
-        }
-        for (let i = 0; i < monster.troll.length; i++) {
-            let npc = this.add.animatedSprite(NPCActor, "troll", this.GameLayers.BASE);
-            npc.position.set(monster.troll[i][0], monster.troll[i][1]);
-            npc.addPhysics(new AABB(Vec2.ZERO, new Vec2(7, 7)), null, false);
-            npc.scale = new Vec2(1.5, 1.5);
-            const halfSize = this.player.sizeWithZoom.scale(0.1);
-            npc.setCollisionShape(new AABB(npc.position, halfSize));
-            npc.navkey = "navmesh";
-            npc.addAI(SlimeBehavior, { target: new BasicTargetable(new Position(npc.position.x, npc.position.y)), range: 100 });
-            npc.animation.play("IDLE", true);
-            this.battlers.push(npc);
+        const monster = this.load.getObject("monster");
+        const npcData = [
+            { name:"slime",key: "black_pudding", scale: new Vec2(0.15, 0.15), behavior: SlimeBehavior },
+            { name:"troll",key: "troll", scale: new Vec2(1.5, 1.5), behavior: SlimeBehavior },
+        ];
+        for (const { name,key, scale, behavior } of npcData) {
+            const data = monster[name];
+            for (const [x, y] of data) {
+                const npc = this.add.animatedSprite(NPCActor, key, this.GameLayers.BASE);
+                npc.position.set(x, y);
+                npc.addPhysics(new AABB(Vec2.ZERO, new Vec2(7, 7)), null, false);
+                npc.scale = scale;
+                npc.navkey = "navmesh";
+                npc.addAI(behavior, { target: new BasicTargetable(new Position(npc.position.x, npc.position.y)), range: 100 });
+                npc.animation.play("IDLE", true);
+                this.battlers.push(npc);
+                this.npcGroup.push(npc);
+            }
         }
     }
 
+    
+    
+    
+    
+    
+    
     public loadScene(): void {
         this.loadAllGameItems();
         // this.loadGameItems(this.laserGunsKey);
@@ -692,10 +698,31 @@ export default abstract class ProjectScene extends Scene {
                 this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_HEALTH_PACK})
                 break;
             }
-            case GameItems.PHASINGPOTION: {
+            case GameItems.PHASING_POTION: {
                 const halfSize = this.player.sizeWithZoom.scale(0);
-                this.player.setCollisionShape(new AABB(this.player.position, halfSize))
-                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_PHASING_POTION})
+                this.player.setCollisionShape(new AABB(this.player.position, halfSize));
+                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_PHASING_POTION});
+                break;
+            }
+            case GameItems.TELEPORT_BOOT:{
+                this.player.position.set(90,150);
+                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_TElEPORT_BOOT});
+                break;
+            }
+            case GameItems.MEDUSA:{
+                this.npcGroup.forEach(npc=>npc.freeze())    
+                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_MEDUSA})
+                break;
+            }
+            case GameItems.ORACLE_ELIXIR:{
+                this.npcGroup.forEach(npc=>npc.visible&&this.showPositionByColor(npc.position,Color.TRANSPARENT))    
+                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_ORACLE_ELIXIR})
+                break;
+            }
+            case GameItems.SEEING_STONE:{
+                this.gameItemGroup.forEach(gameItem=>gameItem.visible&&this.showPositionByColor(gameItem.position,Color.TRANSPARENT))
+                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_SEEING_STONE})
+                break;
             }
         }
     }
