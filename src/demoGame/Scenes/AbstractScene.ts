@@ -84,8 +84,8 @@ export default abstract class ProjectScene extends Scene {
     protected levelEndArea: Rect;
     protected levelEndTransitionLabel: Label;
     protected messageBoxLabel: Label;
-    // protected playerInitPosition = new Vec2(260, 235);
-    protected playerInitPosition = new Vec2(100, 90);
+    protected playerInitPosition = new Vec2(260, 235);
+    // protected playerInitPosition = new Vec2(100, 90);
     protected levelEndPosition = new Vec2(260, 490);
     protected levelEndHalfSize = new Vec2(25, 25)
     protected levelEndColor = new Color(255, 0, 0, 0.5);
@@ -102,6 +102,7 @@ export default abstract class ProjectScene extends Scene {
     protected ultimateWave: Sprite;
     protected ultimateWaveKey = "ultimateWave";
     protected ultimateWaveDirection: Vec2;
+    protected ultimateWaveFiredposition =new Vec2(0,0);
     //ui
     protected inGameControlTextBackground = "inGameControlTextBackground"
     protected inGameHelpTextBackground = "inGameHelpTextBackground"
@@ -123,7 +124,6 @@ export default abstract class ProjectScene extends Scene {
     // protected test = new Map<number,Vec2>()
     //ui display
     protected currentPlayerPositionLabels: Array<Label>;
-    protected nextPlayerPositonLabels: Array<Label>;
 
     //audio and music
     protected levelMusicKey: string;
@@ -484,23 +484,36 @@ export default abstract class ProjectScene extends Scene {
             this.isPlayerAtItems();
             this.isPlayerAttacking();
             this.isPlayerUseItem();
-            if (this.ultimateWave.visible) {
-                this.updateUltimateWave(deltaT);
-            }
         }
 
         this.isPlayerAtLevelEnd();
     }
     protected updateVisibleGroup() {
-        this.visibleGroup.forEach(sprite => {
-            if (sprite.visible) {
-                this.updateTranparentLabels(sprite);
+        this.updateTranparentLabels(this.player);
+        if(this.ultimateWave.visible){
+            const distance = this.ultimateWave.position.distanceTo(this.player.position);
+            const f = this.ultimateWave.collisionShape.overlaps(this.player.collisionShape)
+            if(distance>60){
+                if( !this.ultimateWave.currentTransparentLabels){
+                    this.ultimateWave.currentTransparentLabels = this.initTransparentLabelByPosition(this.ultimateWave.position);
+                }
+                else
+                this.updateTranparentLabels(this.ultimateWave);
             }
-        })
+            this.updateUltimateWave();
+        }
     }
-    protected updateUltimateWave(deltaT: number) {
+    protected isUltimateLeftPlayer():boolean{
+        let lables = this.getLabelsByPosition(this.ultimateWave.position);
+        
+        lables = lables.filter(label=>label.backgroundColor == Color.FOG_OF_WAR_TRANSPARENT)
+        return lables.length == 0;
+    }
+    protected updateUltimateWave() {
         let oldPosition = this.ultimateWave.position;
-        let travellingDirectionVec = this.ultimateWaveDirection
+        let travellingDirectionVec = this.ultimateWaveDirection;
+        // this.ultimateWave.currentTransparentLabels = this.initTransparentLabelByPosition(this.ultimateWave.position);
+
         const ratio = 8;
         this.ultimateWave.position.set(oldPosition.x + travellingDirectionVec.x / ratio, oldPosition.y + travellingDirectionVec.y / ratio);
         if (this.hasVecOutOfBound(this.ultimateWave.position.x) ||
@@ -509,10 +522,7 @@ export default abstract class ProjectScene extends Scene {
             this.ultimateWave.currentTransparentLabels.forEach(label => {
                 this.updateTranparentLablesColor(label);
             })
-            this.showPositionByColor(this.player.position, Color.FOG_OF_WAR_TRANSPARENT);
-        }
-        if (!this.player.collisionShape.overlaps(this.ultimateWave.collisionShape)) {           
-            this.showPositionByColor(this.player.position, Color.FOG_OF_WAR_TRANSPARENT);
+            this.ultimateWave.currentTransparentLabels=undefined;
         }
         this.checkUltimateMonstersCollision();
     }
@@ -607,10 +617,12 @@ export default abstract class ProjectScene extends Scene {
         this.ultimateWave.visible = true;
         let faceDirectionVec = this.getFaceDirectionVec();
         this.ultimateWave.position.set(faceDirectionVec.x, faceDirectionVec.y);
-        this.ultimateWave.currentTransparentLabels = this.initTransparentLabelByPosition(this.ultimateWave.position);
         this.ultimateWaveDirection = faceDirectionVec.sub(this.player.position);
+        // this.ultimateWave.currentTransparentLabels = this.initTransparentLabelByPosition(this.ultimateWave.position);
+    
         this.ultimateWave.rotation = this.player.rotation;
-        this.showPositionByColor(this.player.position, Color.TRANSPARENT);
+        this.ultimateWaveFiredposition.x = this.player.position.x;
+        this.ultimateWaveFiredposition.y = this.player.position.y;
     }
     protected handleBattlerKilled(event: GameEvent) {
         let id: number = event.data.get("id");
@@ -705,7 +717,6 @@ export default abstract class ProjectScene extends Scene {
     }
     protected showPositionByColor(position: Vec2, color: Color) {
         const labels = this.getLabelsByPosition(position);
-
         labels.forEach(label => {
             if (label.backgroundColor) {
                 if (label.backgroundColor.isEqual(Color.FOG_OF_WAR_BLACK)) {
