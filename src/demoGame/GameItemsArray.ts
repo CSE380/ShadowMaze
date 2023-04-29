@@ -3,6 +3,7 @@ export enum GameItems {
     DOOR = "door",
     HEALTH_PACKS = "healthPacks",
     INVENTORYSLOT = "inventorySlot",
+    PHASINGPOTION="phasingPotion"
   }
 function createGameItemsArray(){
   let GameItemsArray = []

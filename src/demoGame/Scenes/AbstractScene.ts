@@ -62,6 +62,8 @@ import { GameEventType } from "../../Wolfie2D/Events/GameEventType";
 const enum tweensEffect {
     SLIDEIN = "slideIn",
     SLIDEOUT = "slideOut",
+    FADEIN = "fadeIn",
+    FADEOUT = "fadeOut",
 }
 export default abstract class ProjectScene extends Scene {
     protected walls: OrthogonalTilemap;
@@ -102,7 +104,8 @@ export default abstract class ProjectScene extends Scene {
     protected ultimateWave: Sprite;
     protected ultimateWaveKey = "ultimateWave";
     protected ultimateWaveDirection: Vec2;
-    protected ultimateWaveFiredposition =new Vec2(0,0);
+    protected ultimateWaveFiredposition = new Vec2(0, 0);
+    protected ultimateWavePlayerDistance = 40;
     //ui
     protected inGameControlTextBackground = "inGameControlTextBackground"
     protected inGameHelpTextBackground = "inGameHelpTextBackground"
@@ -172,8 +175,8 @@ export default abstract class ProjectScene extends Scene {
         this.isLevelEndEnetered = false;
         this.initLayers();
 
-        this.levelEndTransitionLabel = this.addTweenLabel(this.levelEndTransitionLabel, PlayerEvents.LEVEL_END);
-        this.messageBoxLabel = this.addTweenLabel(this.messageBoxLabel, MessageBoxEvents.HIDDEN);
+        this.levelEndTransitionLabel = this.addTweenLabel(this.levelEndTransitionLabel, PlayerEvents.LEVEL_END, tweensEffect.SLIDEIN);
+        this.messageBoxLabel = this.addTweenLabel(this.messageBoxLabel, MessageBoxEvents.HIDDEN, tweensEffect.SLIDEIN);
     }
     protected loadGameItems(key: string) {
         this.load.object(key, `${this.pathToItems}${key}.json`);
@@ -253,8 +256,8 @@ export default abstract class ProjectScene extends Scene {
         this.initInventorySlotsMap();
         // create screen first 
         if (!this.option.isfogOfWarChecked)
-            this.initFogOfWar();
-        this.center = this.viewport.getHalfSize();
+            // this.initFogOfWar();
+            this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
         this.initAllGameItems();
@@ -403,40 +406,76 @@ export default abstract class ProjectScene extends Scene {
         this.levelEndArea.color = this.levelEndColor;
 
     }
-    protected addTweenLabel(label: Label, onEndEvent: string): Label {
-        label = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.UI, { position: new Vec2(-500, 96), text: "Level Complete" });
-        label.size.set(1200, 60);
-        label.borderRadius = 0;
-        label.backgroundColor = new Color(34, 32, 52);
-        label.textColor = Color.WHITE;
-        label.fontSize = 48;
-        label.font = "PixelSimple";
-        label.tweens.add(tweensEffect.SLIDEIN, {
-            startDelay: 0,
-            duration: 2000,
-            effects: [
-                {
-                    property: TweenableProperties.posX,
-                    start: 0,
-                    end: 270,
-                    ease: EaseFunctionType.OUT_SINE
-                }
-            ],
-            onEnd: onEndEvent,
-        });
-        label.tweens.add(tweensEffect.SLIDEOUT, {
-            startDelay: 4000,
-            duration: 2000,
-            effects: [
-                {
-                    property: TweenableProperties.posX,
-                    start: 270,
-                    end: 1000,
-                    ease: EaseFunctionType.OUT_SINE
-                }
-            ],
-            // onEnd: onEndEvent,
-        });
+    protected addTweenLabel(label: Label, onEndEvent: string, effect: string): Label {
+        if (effect == tweensEffect.SLIDEIN) {
+            label = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.UI, { position: new Vec2(-500, 96), text: "Level Complete" });
+            label.tweens.add(tweensEffect.SLIDEIN, {
+                startDelay: 0,
+                duration: 1000,
+                effects: [
+                    {
+                        property: TweenableProperties.posX,
+                        start: 0,
+                        end: 270,
+                        ease: EaseFunctionType.OUT_SINE
+                    }
+                ],
+                onEnd: onEndEvent,
+            });
+            label.tweens.add(tweensEffect.SLIDEOUT, {
+                startDelay: 1000,
+                duration: 1000,
+                effects: [
+                    {
+                        property: TweenableProperties.posX,
+                        start: 270,
+                        end: 1000,
+                        ease: EaseFunctionType.OUT_SINE
+                    }
+                ],
+
+                // onEnd: onEndEvent,
+            });
+            label.size.set(1200, 60);
+            label.borderRadius = 0;
+            label.backgroundColor = new Color(34, 32, 52);
+            label.textColor = Color.WHITE;
+            label.fontSize = 48;
+            label.font = "PixelSimple";
+        }
+        else {
+            label = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.UI, { position: new Vec2(300, 200), text: "" });
+            label.alpha = 1;
+            
+            label.tweens.add(tweensEffect.FADEIN, {
+                startDelay: 0,
+                duration: 1000,
+                effects: [
+                    {
+                        property: TweenableProperties.alpha,
+                        start: 0,
+                        end: 1,
+                        ease: EaseFunctionType.IN_OUT_QUAD
+                    }
+                ],
+                onEnd: onEndEvent,
+            });
+            label.tweens.add(tweensEffect.FADEOUT, {
+                startDelay: 0,
+                duration: 1000,
+                effects: [
+                    {
+                        property: TweenableProperties.alpha,
+                        start: 1,
+                        end: 0,
+                        ease: EaseFunctionType.IN_OUT_QUAD
+                    }
+                ],
+
+            });
+        }
+
+
         return label;
     }
     protected addButtons(option: Record<string, any>) {
@@ -490,23 +529,23 @@ export default abstract class ProjectScene extends Scene {
     }
     protected updateVisibleGroup() {
         this.updateTranparentLabels(this.player);
-        if(this.ultimateWave.visible){
+        if (this.ultimateWave.visible) {
             const distance = this.ultimateWave.position.distanceTo(this.player.position);
             const f = this.ultimateWave.collisionShape.overlaps(this.player.collisionShape)
-            if(distance>60){
-                if( !this.ultimateWave.currentTransparentLabels){
+            if (distance > this.ultimateWavePlayerDistance) {
+                if (!this.ultimateWave.currentTransparentLabels) {
                     this.ultimateWave.currentTransparentLabels = this.initTransparentLabelByPosition(this.ultimateWave.position);
                 }
                 else
-                this.updateTranparentLabels(this.ultimateWave);
+                    this.updateTranparentLabels(this.ultimateWave);
             }
             this.updateUltimateWave();
         }
     }
-    protected isUltimateLeftPlayer():boolean{
+    protected isUltimateLeftPlayer(): boolean {
         let lables = this.getLabelsByPosition(this.ultimateWave.position);
-        
-        lables = lables.filter(label=>label.backgroundColor == Color.FOG_OF_WAR_TRANSPARENT)
+
+        lables = lables.filter(label => label.backgroundColor == Color.FOG_OF_WAR_TRANSPARENT)
         return lables.length == 0;
     }
     protected updateUltimateWave() {
@@ -522,7 +561,7 @@ export default abstract class ProjectScene extends Scene {
             this.ultimateWave.currentTransparentLabels.forEach(label => {
                 this.updateTranparentLablesColor(label);
             })
-            this.ultimateWave.currentTransparentLabels=undefined;
+            this.ultimateWave.currentTransparentLabels = undefined;
         }
         this.checkUltimateMonstersCollision();
     }
@@ -579,6 +618,7 @@ export default abstract class ProjectScene extends Scene {
                 this.messageBoxLabel.tweens.play(tweensEffect.SLIDEIN);
                 break;
             case MessageBoxEvents.HIDDEN:
+                console.log("Fades out")
                 this.messageBoxLabel.tweens.play(tweensEffect.SLIDEOUT);
 
         }
@@ -619,7 +659,7 @@ export default abstract class ProjectScene extends Scene {
         this.ultimateWave.position.set(faceDirectionVec.x, faceDirectionVec.y);
         this.ultimateWaveDirection = faceDirectionVec.sub(this.player.position);
         // this.ultimateWave.currentTransparentLabels = this.initTransparentLabelByPosition(this.ultimateWave.position);
-    
+
         this.ultimateWave.rotation = this.player.rotation;
         this.ultimateWaveFiredposition.x = this.player.position.x;
         this.ultimateWaveFiredposition.y = this.player.position.y;
@@ -636,17 +676,26 @@ export default abstract class ProjectScene extends Scene {
         switch (event.type) {
             case GameItems.LANTERNS: {
                 this.lanternDuration = !this.lanternDuration;
+                this.ultimateWavePlayerDistance = 70;
+                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_LANTERN})
                 break;
             }
             case GameItems.DOOR: {
                 this.showPositionByColor(this.levelEndPosition, Color.TRANSPARENT);
+                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_DOOR})
                 break;
             }
             case GameItems.HEALTH_PACKS: {
                 if (this.player._ai["currentStat"]["currentHealth"] < this.playerMaxStatValue)
                     this.player._ai["currentStat"]["currentHealth"]++;
                 this.handlePlayerStatChange("currentHealth");
+                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_HEALTH_PACK})
                 break;
+            }
+            case GameItems.PHASINGPOTION: {
+                const halfSize = this.player.sizeWithZoom.scale(0);
+                this.player.setCollisionShape(new AABB(this.player.position, halfSize))
+                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_PHASING_POTION})
             }
         }
     }
