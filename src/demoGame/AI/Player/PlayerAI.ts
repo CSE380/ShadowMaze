@@ -34,7 +34,8 @@ export default class PlayerAI extends StateMachineAI implements AI {
     private statNames = PlayerStatsArray;
     private minStatValue = 0;
     private maxStatValue = 10;
-    private dmg = 1;
+    private dmg = 2;
+    private ultDmg = 5;
     private currentStat = {};
     public initializeAI(owner: PlayerActor, opts: Record<string, any>): void {
         this.owner = owner;
@@ -70,7 +71,6 @@ export default class PlayerAI extends StateMachineAI implements AI {
             this.handleEvent(this.receiver.getNextEvent());
         }
 
-        // If the player is out of hp - play the death animation
          this.currentStat['currentShield'] = MathUtils.clamp(
             this.currentStat['currentShield']  + deltaT*3,
             this.minStatValue,

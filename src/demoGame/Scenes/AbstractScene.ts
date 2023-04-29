@@ -584,7 +584,7 @@ export default abstract class ProjectScene extends Scene {
         this.battlers.forEach(battler => {
             if (battler.battlerActive && !(battler == this.player)) {
                 if (battler.position.distanceTo(this.ultimateWave.position) < 10) {
-                    this.emitter.fireEvent(BattlerEvents.MONSTER_DEAD, { id: battler.id });
+                    this.emitter.fireEvent(BattlerEvents.MONSTER_HIT, { id: battler.id,dmg: this.player._ai["ultDmg"]});
                 }
             }
         }
@@ -649,7 +649,7 @@ export default abstract class ProjectScene extends Scene {
                 }
                 break;
             }
-            
+
             case BattlerEvents.PRINCE_HIT: {
                 if (!this.player._ai["isInvincible"]) {
                     this.player._ai["currentStat"]["currentHealth"]--;
@@ -882,7 +882,7 @@ export default abstract class ProjectScene extends Scene {
             }
             if (battler.battlerActive && battler.position.distanceTo(midpoint) <= 15 && this.player.animation.isPlaying("ATTACKING")) {
                 // this.emitter.fireEvent(BattlerEvents.MONSTER_DEAD, { id: battler.id });
-                this.emitter.fireEvent(BattlerEvents.MONSTER_HIT, { id: battler.id ,dmg:this.player._ai["dmg"]});
+                this.emitter.fireEvent(BattlerEvents.MONSTER_HIT, { id: battler.id, dmg: this.player._ai["dmg"] });
 
             }
             if (battler.battlerActive && battler.position.distanceTo(this.player.position) < 10) {

@@ -57,7 +57,6 @@ export default class MainMenu extends AbstractScene  {
     }
 
     public handleEvent(event: GameEvent): void {
-        console.log(event.type)
         
         switch (event.type) {
             case BackButtonEvent.BACK:{
