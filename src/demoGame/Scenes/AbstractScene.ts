@@ -59,6 +59,7 @@ import Position from "../GameSystems/Targeting/Position";
 import AnimatedSprite from "../../Wolfie2D/Nodes/Sprites/AnimatedSprite";
 //
 import { GameEventType } from "../../Wolfie2D/Events/GameEventType";
+import HealthbarHUD from "../GameSystems/HUD/HealthbarHUD";
 const enum tweensEffect {
     SLIDEIN = "slideIn",
     SLIDEOUT = "slideOut",
@@ -139,11 +140,12 @@ export default abstract class ProjectScene extends Scene {
     protected pathToSprite = `shadowMaze_assets/sprites/`;
 
     //Li
+    protected healthbars: Map<number, HealthbarHUD>;
     protected battlers: (Battler & Actor)[];
     protected option: Record<string, any>;
     protected visibleGroup: (PlayerActor | NPCActor | Sprite)[] = [];
-    protected npcGroup  = [];
-    protected gameItemGroup :gameItems[] = [];
+    protected npcGroup = [];
+    protected gameItemGroup: gameItems[] = [];
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, {
             ...options, physics: {
@@ -157,6 +159,8 @@ export default abstract class ProjectScene extends Scene {
             isAstarChecked: false,
             isfogOfWarChecked: false,
         }
+        this.healthbars = new Map<number, HealthbarHUD>();
+
         // this.ButtonSelection = MainMenuButtonEvent;
         // for (const layerName of this.layerNames) {
         //     this[layerName] = layerName;
@@ -260,8 +264,8 @@ export default abstract class ProjectScene extends Scene {
         this.initInventorySlotsMap();
         // create screen first 
         if (!this.option.isfogOfWarChecked)
-            this.initFogOfWar();
-        this.center = this.viewport.getHalfSize();
+            // this.initFogOfWar();
+            this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
         this.initAllGameItems();
@@ -275,10 +279,10 @@ export default abstract class ProjectScene extends Scene {
     protected initNPCs(): void {
         const monster = this.load.getObject("monster");
         const npcData = [
-            { name:"slime",key: "black_pudding", scale: new Vec2(0.15, 0.15), behavior: SlimeBehavior },
-            { name:"troll",key: "troll", scale: new Vec2(1.5, 1.5), behavior: SlimeBehavior },
+            // { name: "slime", key: "black_pudding", scale: new Vec2(0.15, 0.15), behavior: SlimeBehavior },
+            { name: "troll", key: "troll", scale: new Vec2(1.5, 1.5), behavior: SlimeBehavior },
         ];
-        for (const { name,key, scale, behavior } of npcData) {
+        for (const { name, key, scale, behavior } of npcData) {
             const data = monster[name];
             for (const [x, y] of data) {
                 const npc = this.add.animatedSprite(NPCActor, key, this.GameLayers.BASE);
@@ -286,20 +290,24 @@ export default abstract class ProjectScene extends Scene {
                 npc.addPhysics(new AABB(Vec2.ZERO, new Vec2(7, 7)), null, false);
                 npc.scale = scale;
                 npc.navkey = "navmesh";
+                npc.health = 10;
+                npc.maxHealth = 10;
                 npc.addAI(behavior, { target: new BasicTargetable(new Position(npc.position.x, npc.position.y)), range: 100 });
                 npc.animation.play("IDLE", true);
                 this.battlers.push(npc);
                 this.npcGroup.push(npc);
+                let healthbar = new HealthbarHUD(this, npc, GameLayers.BASE, { size: npc.size.clone().scaled(2, 1 / 2), offset: npc.size.clone().scaled(0, -1 / 2) });
+                this.healthbars.set(npc.id, healthbar);
             }
         }
     }
 
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
     public loadScene(): void {
         this.loadAllGameItems();
         // this.loadGameItems(this.laserGunsKey);
@@ -452,7 +460,7 @@ export default abstract class ProjectScene extends Scene {
         else {
             label = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.UI, { position: new Vec2(300, 200), text: "" });
             label.alpha = 1;
-            
+
             label.tweens.add(tweensEffect.FADEIN, {
                 startDelay: 0,
                 duration: 1000,
@@ -530,6 +538,7 @@ export default abstract class ProjectScene extends Scene {
             this.isPlayerAttacking();
             this.isPlayerUseItem();
         }
+        this.healthbars.forEach(healthbar => healthbar.update(deltaT));
 
         this.isPlayerAtLevelEnd();
     }
@@ -632,14 +641,15 @@ export default abstract class ProjectScene extends Scene {
     protected handleBattlerEvents(event: GameEvent) {
         switch (event.type) {
             case BattlerEvents.MONSTER_DEAD: {
+                console.log("dead")
                 this.handleBattlerKilled(event);
                 if (this.player._ai["currentStat"]["currentEnergy"] < this.playerMaxStatValue) {
                     this.player._ai["currentStat"]["currentEnergy"]++;
                     this.handlePlayerStatChange("currentEnergy");
                 }
-
                 break;
             }
+            
             case BattlerEvents.PRINCE_HIT: {
                 if (!this.player._ai["isInvincible"]) {
                     this.player._ai["currentStat"]["currentHealth"]--;
@@ -675,6 +685,7 @@ export default abstract class ProjectScene extends Scene {
         let battler = this.battlers.find(b => b.id === id);
         if (battler) {
             battler.battlerActive = false;
+            this.healthbars.get(id).visible = false;
         }
     }
     protected handleUseGameItemsEvent(event: GameEvent) {
@@ -683,45 +694,45 @@ export default abstract class ProjectScene extends Scene {
             case GameItems.LANTERNS: {
                 this.lanternDuration = !this.lanternDuration;
                 this.ultimateWavePlayerDistance = 70;
-                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_LANTERN})
+                this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_LANTERN })
                 break;
             }
             case GameItems.DOOR: {
                 this.showPositionByColor(this.levelEndPosition, Color.TRANSPARENT);
-                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_DOOR})
+                this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_DOOR })
                 break;
             }
             case GameItems.HEALTH_PACKS: {
                 if (this.player._ai["currentStat"]["currentHealth"] < this.playerMaxStatValue)
                     this.player._ai["currentStat"]["currentHealth"]++;
                 this.handlePlayerStatChange("currentHealth");
-                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_HEALTH_PACK})
+                this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_HEALTH_PACK })
                 break;
             }
             case GameItems.PHASING_POTION: {
                 const halfSize = this.player.sizeWithZoom.scale(0);
                 this.player.setCollisionShape(new AABB(this.player.position, halfSize));
-                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_PHASING_POTION});
+                this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_PHASING_POTION });
                 break;
             }
-            case GameItems.TELEPORT_BOOT:{
-                this.player.position.set(90,150);
-                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_TElEPORT_BOOT});
+            case GameItems.TELEPORT_BOOT: {
+                this.player.position.set(90, 150);
+                this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_TElEPORT_BOOT });
                 break;
             }
-            case GameItems.MEDUSA:{
-                this.npcGroup.forEach(npc=>npc.freeze())    
-                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_MEDUSA})
+            case GameItems.MEDUSA: {
+                this.npcGroup.forEach(npc => npc.freeze())
+                this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_MEDUSA })
                 break;
             }
-            case GameItems.ORACLE_ELIXIR:{
-                this.npcGroup.forEach(npc=>npc.visible&&this.showPositionByColor(npc.position,Color.TRANSPARENT))    
-                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_ORACLE_ELIXIR})
+            case GameItems.ORACLE_ELIXIR: {
+                this.npcGroup.forEach(npc => npc.visible && this.showPositionByColor(npc.position, Color.TRANSPARENT))
+                this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_ORACLE_ELIXIR })
                 break;
             }
-            case GameItems.SEEING_STONE:{
-                this.gameItemGroup.forEach(gameItem=>gameItem.visible&&this.showPositionByColor(gameItem.position,Color.TRANSPARENT))
-                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.USE_SEEING_STONE})
+            case GameItems.SEEING_STONE: {
+                this.gameItemGroup.forEach(gameItem => gameItem.visible && this.showPositionByColor(gameItem.position, Color.TRANSPARENT))
+                this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_SEEING_STONE })
                 break;
             }
         }
@@ -870,7 +881,9 @@ export default abstract class ProjectScene extends Scene {
                 continue;
             }
             if (battler.battlerActive && battler.position.distanceTo(midpoint) <= 15 && this.player.animation.isPlaying("ATTACKING")) {
-                this.emitter.fireEvent(BattlerEvents.MONSTER_DEAD, { id: battler.id });
+                // this.emitter.fireEvent(BattlerEvents.MONSTER_DEAD, { id: battler.id });
+                this.emitter.fireEvent(BattlerEvents.MONSTER_HIT, { id: battler.id ,dmg:this.player._ai["dmg"]});
+
             }
             if (battler.battlerActive && battler.position.distanceTo(this.player.position) < 10) {
                 if (!this.player._ai['isInvincible'])

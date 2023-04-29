@@ -16,14 +16,19 @@ import { HudEvent } from "../../ProjectEvents";
 export default abstract class NPCBehavior extends StateMachineGoapAI<NPCAction>  {
 
     protected override owner: NPCActor;
-
+    private invincibleTime: Timer;
+    private isInvincible = false;
+    private minHealth = 0;
     public initializeAI(owner: NPCActor, options: Record<string, any>): void {
         this.owner = owner;
-        this.receiver.subscribe(ItemEvent.LASERGUN_FIRED);
+        // this.receiver.subscribe(ItemEvent.LASERGUN_FIRED);
         this.receiver.subscribe(BattlerEvents.MONSTER_ATTACK);
-    }
+        this.receiver.subscribe(BattlerEvents.MONSTER_HIT);
+        this.invincibleTime = new Timer(100, this.handleinvincibleTimeEnd, false);
 
-    public activate(options: Record<string, any>): void {}
+    }
+    
+    public activate(options: Record<string, any>): void { }
 
     public update(deltaT: number): void {
         super.update(deltaT);
@@ -33,14 +38,20 @@ export default abstract class NPCBehavior extends StateMachineGoapAI<NPCAction> 
      * @param event the game event
      */
     public handleEvent(event: GameEvent): void {
-        switch(event.type) {
-            case ItemEvent.LASERGUN_FIRED: {
-                console.log("Catching and handling lasergun fired event!!!");
-                this.handleLasergunFired(event.data.get("actorId"), event.data.get("to"), event.data.get("from"));
-                break;
-            }
+        console.log(event)
+        switch (event.type) {
+           
             case BattlerEvents.MONSTER_ATTACK: {
                 console.log("MONSTER ATTACK");
+                break;
+            }
+            case BattlerEvents.MONSTER_HIT: {
+                let id: number = event.data.get("id");
+                let dmg: number = event.data.get("dmg");
+                
+                if(id==this.owner.id){
+                    this.handleMonsterHit(dmg);
+                }
                 break;
             }
             default: {
@@ -49,11 +60,25 @@ export default abstract class NPCBehavior extends StateMachineGoapAI<NPCAction> 
             }
         }
     }
-
-    protected handleLasergunFired(actorId: number, to: Vec2, from: Vec2): void {
-        if (actorId !== this.owner.id) {
-            this.owner.health -= this.owner.collisionShape.getBoundingRect().intersectSegment(to, from) ? 1 : 0;
+    protected handleMonsterHit(dmg:number) {
+      
+        if (!this.isInvincible) {
+            this.isInvincible = true;
+            this.owner.health -=dmg;
+            this.invincibleTime.start();
+            
+            if ( this.owner.health <= 0) {
+                this.emitter.fireEvent(BattlerEvents.MONSTER_DEAD,{ id: this.owner.id });
+                return;
+            }
         }
     }
+    protected handleinvincibleTimeEnd = () => {
+        
+        this.isInvincible = false;
+        // TO DO
+        // Play Idle animation
+    };
+   
     
 }

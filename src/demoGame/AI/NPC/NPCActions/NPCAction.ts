@@ -99,6 +99,7 @@ export default abstract class NPCAction extends GoapAction {
     }
 
     public handleInput(event: GameEvent): void {
+        
         switch (event.type) {
             default: {
                 throw new Error(`Unhandled event caught in NPCAction! Event type: ${event.type}`);

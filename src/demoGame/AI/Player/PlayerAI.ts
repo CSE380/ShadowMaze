@@ -34,6 +34,7 @@ export default class PlayerAI extends StateMachineAI implements AI {
     private statNames = PlayerStatsArray;
     private minStatValue = 0;
     private maxStatValue = 10;
+    private dmg = 1;
     private currentStat = {};
     public initializeAI(owner: PlayerActor, opts: Record<string, any>): void {
         this.owner = owner;
