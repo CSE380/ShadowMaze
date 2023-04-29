@@ -23,7 +23,6 @@ export default abstract class NPCBehavior extends StateMachineGoapAI<NPCAction> 
     private currentHealth :number;
     public initializeAI(owner: NPCActor, options: Record<string, any>): void {
         this.owner = owner;
-        // this.receiver.subscribe(ItemEvent.LASERGUN_FIRED);
         this.receiver.subscribe(BattlerEvents.MONSTER_ATTACK);
         this.receiver.subscribe(BattlerEvents.MONSTER_HIT);
         this.invincibleTime = new Timer(200, this.handleinvincibleTimeEnd, false);

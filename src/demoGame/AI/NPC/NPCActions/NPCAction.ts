@@ -20,6 +20,10 @@ import Vec2 from "../../../../Wolfie2D/DataTypes/Vec2";
  * concrete implementations of the NPCAction will have to implement the abstract method performAction() which
  * gets called when the NPC reaches the target location.
  */
+export enum NPC_ANIMATION_TYPE{
+    IDLE="IDLE",
+    MOVING="MOVING",
+}
 export default abstract class NPCAction extends GoapAction {
 
     protected parent: NPCBehavior;
@@ -58,25 +62,24 @@ export default abstract class NPCAction extends GoapAction {
             // Construct a path from the actor to the target
             this.path = this.actor.getPath(this.actor.position, this.target.position);
             // console.log(this.target);
-            
         }
     }
 
     public update(deltaT: number): void {
-        // console.log(this.path.distance());
-        if (this.path.distance() > 50) {
-            this.onEnter(null);
-            return; 
-        }
-        if (this.path == null) {
-            this.onEnter(null);
-            return;
-        }
+        // if (this.path.distance() > 50 || this.path == null) {
+        //     console.log("too far")
+            
+        //     this.onEnter(null);
+        //     return; 
+        // }
+       
         if (this.path.isDone()) {
+            this.actor.animation.playIfNotAlready(NPC_ANIMATION_TYPE.IDLE,true);
             this.performAction(this.target);
             return;
         }
         else {
+            this.actor.animation.playIfNotAlready(NPC_ANIMATION_TYPE.MOVING,true);
             this.actor.moveOnPath(1, this.path);
             return;
         }

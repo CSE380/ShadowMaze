@@ -280,7 +280,7 @@ export default abstract class ProjectScene extends Scene {
     protected initNPCs(): void {
         const monster = this.load.getObject("monster");
         const npcData = [
-            // { name: "slime", key: "black_pudding", scale: new Vec2(0.15, 0.15), behavior: SlimeBehavior },
+            { name: "slime", key: "black_pudding", scale: new Vec2(0.15, 0.15), behavior: SlimeBehavior },
             { name: "troll", key: "troll", scale: new Vec2(1.5, 1.5), behavior: SlimeBehavior },
         ];
         for (const { name, key, scale, behavior } of npcData) {
@@ -297,7 +297,9 @@ export default abstract class ProjectScene extends Scene {
                 npc.animation.play("IDLE", true);
                 this.battlers.push(npc);
                 this.npcGroup.push(npc);
-                let healthbar = new HealthbarHUD(this, npc, GameLayers.BASE, { size: npc.size.clone().scaled(2, 1 / 2), offset: npc.size.clone().scaled(0, -1 / 2) });
+                console.log(npc.size.clone().scaled(2, 1 / 2).toString())
+                console.log(npc.size.clone().scaled(0, -1 / 2).toString())
+                let healthbar = new HealthbarHUD(this, npc, GameLayers.BASE, { size:new Vec2 (64.0, 16.0), offset: new Vec2(0.0, -16.0) });
                 this.healthbars.set(npc.id, healthbar);
             }
         }
