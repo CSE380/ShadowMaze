@@ -23,7 +23,7 @@ export default class Idle extends PlayerState {
     public override update(deltaT: number): void {
         super.update(deltaT);
         if (this.parent.controller.shielding ) {
-            if(this.parent.owner._ai["currentStat"]["currentShield"] == this.parent.owner._ai["maxStatValue"])
+            if(this.parent.owner._ai["currentStat"]["currentShield"]  ==this.parent.owner._ai["maxStatValue"])
                 this.finished(PlayerStateType.SHIELDING)
             else{
                 this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.SKILL_ON_CD})

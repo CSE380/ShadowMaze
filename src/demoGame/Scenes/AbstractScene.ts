@@ -33,6 +33,7 @@ import { EaseFunctionType } from "../../Wolfie2D/Utils/EaseFunctions";
 import Timer from "../../Wolfie2D/Timing/Timer";
 import Input from "../../Wolfie2D/Input/Input";
 import PlayerActor from "../Actors/PlayerActor";
+import { PlayerAnimationType } from "../AI/Player/PlayerStates/PlayerState";
 import Line from "../../Wolfie2D/Nodes/Graphics/Line";
 import BubbleShaderType from "../Shaders/BubbleShaderType";
 import LaserShaderType from "../Shaders/LaserShaderType";
@@ -534,11 +535,12 @@ export default abstract class ProjectScene extends Scene {
         }
         else {
             this.handlePlayerStatChange("currentShield");
+            this.handlePlayerStatChange("currentHealth");
             this.isPlayerAtItems();
             this.isPlayerAttacking();
             this.isPlayerUseItem();
+            this.healthbars.forEach(healthbar => healthbar.update(deltaT));
         }
-        this.healthbars.forEach(healthbar => healthbar.update(deltaT));
 
         this.isPlayerAtLevelEnd();
     }
@@ -584,7 +586,7 @@ export default abstract class ProjectScene extends Scene {
         this.battlers.forEach(battler => {
             if (battler.battlerActive && !(battler == this.player)) {
                 if (battler.position.distanceTo(this.ultimateWave.position) < 10) {
-                    this.emitter.fireEvent(BattlerEvents.MONSTER_HIT, { id: battler.id,dmg: this.player._ai["ultDmg"]});
+                    this.emitter.fireEvent(BattlerEvents.MONSTER_HIT, { id: battler.id, dmg: this.player._ai["ultDmg"] });
                 }
             }
         }
@@ -633,7 +635,6 @@ export default abstract class ProjectScene extends Scene {
                 this.messageBoxLabel.tweens.play(tweensEffect.SLIDEIN);
                 break;
             case MessageBoxEvents.HIDDEN:
-                console.log("Fades out")
                 this.messageBoxLabel.tweens.play(tweensEffect.SLIDEOUT);
 
         }
@@ -641,7 +642,7 @@ export default abstract class ProjectScene extends Scene {
     protected handleBattlerEvents(event: GameEvent) {
         switch (event.type) {
             case BattlerEvents.MONSTER_DEAD: {
-                console.log("dead")
+
                 this.handleBattlerKilled(event);
                 if (this.player._ai["currentStat"]["currentEnergy"] < this.playerMaxStatValue) {
                     this.player._ai["currentStat"]["currentEnergy"]++;
@@ -880,14 +881,19 @@ export default abstract class ProjectScene extends Scene {
             if (battler == this.player) {
                 continue;
             }
-            if (battler.battlerActive && battler.position.distanceTo(midpoint) <= 15 && this.player.animation.isPlaying("ATTACKING")) {
+            if (battler.battlerActive && battler.position.distanceTo(midpoint) <= 15 && this.player.animation.isPlaying(PlayerAnimationType.ATTACKING)) {
                 // this.emitter.fireEvent(BattlerEvents.MONSTER_DEAD, { id: battler.id });
                 this.emitter.fireEvent(BattlerEvents.MONSTER_HIT, { id: battler.id, dmg: this.player._ai["dmg"] });
 
             }
             if (battler.battlerActive && battler.position.distanceTo(this.player.position) < 10) {
-                if (!this.player._ai['isInvincible'])
-                    this.emitter.fireEvent(BattlerEvents.PRINCE_HIT, { id: battler.id });
+                if (!this.player.animation.isPlaying(PlayerAnimationType.SHIELDING)) {
+                    if (!this.player._ai['isInvincible']) {
+                        this.emitter.fireEvent(BattlerEvents.PRINCE_HIT, { id: battler.id });
+                    }
+                }
+
+
             }
         }
     }

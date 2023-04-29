@@ -35,6 +35,7 @@ export default abstract class NPCBehavior extends StateMachineGoapAI<NPCAction> 
     public update(deltaT: number): void {
         super.update(deltaT);
         if(this.owner.health != this.currentHealth){
+            
             this.owner.health = MathUtils.clamp(
                 this.owner.health  - deltaT*6,
                 this.currentHealth,
@@ -73,7 +74,9 @@ export default abstract class NPCBehavior extends StateMachineGoapAI<NPCAction> 
         if (!this.isInvincible) {
             this.isInvincible = true;
             this.currentHealth -=dmg;
-            
+            if(this.currentHealth<=0){
+                this.owner.freeze();
+            }
             this.invincibleTime.start();
             if ( this.owner.health <= 0) {
                 this.emitter.fireEvent(BattlerEvents.MONSTER_DEAD,{ id: this.owner.id });

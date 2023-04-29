@@ -1,5 +1,6 @@
 export enum BattlerEvents {
     MONSTER_DEAD = "MONSTER_DEAD",
+   
     MONSTER_HIT= "MONSTER_HIT",
     MONSTER_ATTACK = "MONSTER_ATTACK",
     PRINCE_HIT = "PRINCE_HIT",

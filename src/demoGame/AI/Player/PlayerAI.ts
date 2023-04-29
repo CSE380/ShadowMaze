@@ -58,10 +58,10 @@ export default class PlayerAI extends StateMachineAI implements AI {
     public activate(options: Record<string, any>): void {
         for (const name of this.statNames) {
             this.currentStat[name] = this.currentStatValue; // Set default value for each stat
-            if(name !=='currentHealth'){
-                this.currentStat[name] = 0;
-            }
-
+            // if(name !=='currentHealth'){
+            //     this.currentStat[name] = 0;
+            // }
+            this.currentStat[name]=10;
         }
     }
 
@@ -97,6 +97,7 @@ export default class PlayerAI extends StateMachineAI implements AI {
       
         if (!this.isInvincible) {
             this.isInvincible = true;
+            
             this.invincibleTime.start();
             if ( this.currentStat["currentHealth"] <= this.minStatValue) {
                 this.emitter.fireEvent(BattlerEvents.PRINCE_DEAD);
