@@ -27,7 +27,7 @@ import Actor from "../../Wolfie2D/DataTypes/Interfaces/Actor";
 // import IntroLevelScene from "./IntroLevelScene";
 // import StartScene from "./StartScene";
 import SelectLevelMenuScene from "./SelectLevelMenuScene";
-
+import { PlayerStatKey } from "../PlayerStatsArray";
 import { TweenableProperties } from "../../Wolfie2D/Nodes/GameNode";
 import { EaseFunctionType } from "../../Wolfie2D/Utils/EaseFunctions";
 import Timer from "../../Wolfie2D/Timing/Timer";
@@ -111,14 +111,15 @@ export default abstract class ProjectScene extends Scene {
     //ui
     protected inGameControlTextBackground = "inGameControlTextBackground"
     protected inGameHelpTextBackground = "inGameHelpTextBackground"
-    // Health labels
+    // player hud
     protected PlayerStatUI = {};
     protected oneStatUI = {
         label: Label,
         bar: Label,
         barBg: Label,
     }
-
+    protected dmgLabel:Label;
+    protected defLabel:Label;
     //items to game 
     protected gameItemsArray = GameItemsArray;
     protected gameItemsMap = new Map<string, Array<gameItems>>();
@@ -227,26 +228,23 @@ export default abstract class ProjectScene extends Scene {
                 if (key === GameItems.INVENTORY_SLOT) {
                     sprite = this.add.sprite(key, this.GameLayers.BEFORE_BASE);
                     line = <Line>this.add.graphic(GraphicType.LINE, this.GameLayers.BEFORE_BASE, { start: Vec2.ZERO, end: Vec2.ZERO });
-                    let numOfSlots = <Label>this.add.uiElement(UIElementType.LABEL, this.GameLayers.BEFORE_BASE, { position: new Vec2(gameItem.position[i][0] - 20, gameItem.position[i][1]), text: `${i + 1}` });
+                    let numOfSlots = <Label>this.add.uiElement(UIElementType.LABEL, this.GameLayers.BEFORE_BASE, { position: new Vec2(gameItem.position[i][0] - 22, gameItem.position[i][1]), text: `${i + 1}` });
                     numOfSlots.fontSize = 24;
                     numOfSlots.font = "Courier";
                     numOfSlots.textColor = Color.BLACK;
-                    isPickableFlag = false;
-
-                    // sprite.scale =new Vec2(45,45)
-                    // numOfSlots.position.set(gameItem.position[i][0]-100, gameItem.position[i][1])
+    
                 }
-                // else if (key == GameItems.IRON_SWORD){
-
-                // }
                 else {
                     sprite = this.add.sprite(key, this.GameLayers.BASE);
                     line = <Line>this.add.graphic(GraphicType.LINE, this.GameLayers.BASE, { start: Vec2.ZERO, end: Vec2.ZERO });
                     isPickableFlag = true;
-                    if(key == GameItems.IRON_SWORD){
-                        console.log(this.player._ai['dmg'])
-                        console.log(this.player._ai['shield'])
-                    }
+                    if (key == GameItems.IRON_SWORD) {
+                        isPickableFlag = false;
+                        this.dmgLabel=this.createDefDmgLabel(gameItem.position[i], PlayerStatKey.DMG);
+                      } else if (key == GameItems.IRON_SHIELD) {
+                        isPickableFlag = false;
+                        this.defLabel = this.createDefDmgLabel(gameItem.position[i], PlayerStatKey.DEF);
+                      }
                 }
                 items[i] = gameItems.create(sprite, line);
                 items[i].position.set(gameItem.position[i][0], gameItem.position[i][1]);
@@ -257,6 +255,15 @@ export default abstract class ProjectScene extends Scene {
             this.gameItemsMap.set(key, items);
         }
     }
+    private createDefDmgLabel(position: number[], statKey: PlayerStatKey): Label {
+        const stat = this.player._ai[statKey];
+        
+        return   <Label>this.add.uiElement(UIElementType.LABEL, this.GameLayers.BASE, {
+            position: new Vec2(position[0] + 22, position[1]),text:`${stat}`
+          });
+        
+       
+      }
     public startScene(): void {
         let tilemapLayers = this.add.tilemap("level");
 
@@ -315,13 +322,6 @@ export default abstract class ProjectScene extends Scene {
             }
         }
     }
-
-
-
-
-
-
-
     public loadScene(): void {
         this.loadAllGameItems();
         // this.loadGameItems(this.laserGunsKey);
@@ -644,12 +644,20 @@ export default abstract class ProjectScene extends Scene {
     }
     protected handleInGameMessageBox(event: GameEvent) {
         switch (event.type) {
-            case MessageBoxEvents.SHOW:
+            case MessageBoxEvents.SHOW:{
                 this.messageBoxLabel.text = event.data.get("message");
+                if(this.messageBoxLabel.text ==MessageBoxEvents.UNUSE_CURSED_SWORD)
+                    this.dmgLabel.text = this.player._ai[PlayerStatKey.DMG];
                 this.messageBoxLabel.tweens.play(tweensEffect.SLIDEIN);
                 break;
-            case MessageBoxEvents.HIDDEN:
+            }
+                
+            case MessageBoxEvents.HIDDEN:{
                 this.messageBoxLabel.tweens.play(tweensEffect.SLIDEOUT);
+                break;
+            }
+            
+
 
         }
     }
@@ -748,6 +756,13 @@ export default abstract class ProjectScene extends Scene {
             case GameItems.SEEING_STONE: {
                 this.gameItemGroup.forEach(gameItem => gameItem.visible && this.showPositionByColor(gameItem.position, Color.TRANSPARENT))
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_SEEING_STONE })
+                break;
+            }
+            case GameItems.WOODEN_SWORD: {
+                this.player._ai[PlayerStatKey.IS_CURSED] = true;
+                this.player._ai[PlayerStatKey.DMG] = parseInt(PlayerStatKey.CURSED_DMG);
+                this.dmgLabel.text = (PlayerStatKey.CURSED_DMG);
+                this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_CURSED_SWORD})
                 break;
             }
         }

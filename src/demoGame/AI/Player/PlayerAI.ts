@@ -7,9 +7,9 @@ import Inventory from "../../GameSystems/ItemSystem/Inventory";
 import Item from "../../GameSystems/ItemSystem/Item";
 import PlayerController from "./PlayerController";
 import { Idle, Shielding, Moving, Dead, PlayerStateType, Attacking } from "./PlayerStates/PlayerState";
-import { BattlerEvents } from "../../ProjectEvents";
+import { BattlerEvents, MessageBoxEvents } from "../../ProjectEvents";
 import Timer from "../../../Wolfie2D/Timing/Timer";
-import { PlayerStatsArray } from "../../PlayerStatsArray";
+import { PlayerStatsArray, PlayerStatKey } from "../../PlayerStatsArray";
 import MathUtils from "../../../Wolfie2D/Utils/MathUtils";
 /**
  * The AI that controls the player. The players AI has been configured as a Finite State Machine (FSM)
@@ -26,7 +26,7 @@ export default class PlayerAI extends StateMachineAI implements AI {
     public inventory: Inventory;
     /** The players held item */
     public item: Item | null;
- 
+
     // hit 
     private invincibleTime: Timer;
     private isInvincible = false;
@@ -35,13 +35,19 @@ export default class PlayerAI extends StateMachineAI implements AI {
     private statNames = PlayerStatsArray;
     private minStatValue = 0;
     private maxStatValue = 10;
+    //curse 
+    private isCursed: boolean;
+    private cursedRatio = -0.2;
+    private cursedThreshHold = 0.3*this.maxStatValue;
     private dmg = 2;
+
     private ultDmg = 5;
+    private def = 0;
     private currentStat = {};
     public initializeAI(owner: PlayerActor, opts: Record<string, any>): void {
         this.owner = owner;
         this.controller = new PlayerController(owner);
-
+        this.isCursed = false;
         // Add the players states to it's StateMachine
         this.addState(PlayerStateType.IDLE, new Idle(this, this.owner));
         this.addState(PlayerStateType.MOVING, new Moving(this, this.owner));
@@ -59,10 +65,10 @@ export default class PlayerAI extends StateMachineAI implements AI {
     public activate(options: Record<string, any>): void {
         for (const name of this.statNames) {
             this.currentStat[name] = this.currentStatValue; // Set default value for each stat
-            // if(name !=='currentHealth'){
-            //     this.currentStat[name] = 0;
-            // }
-            this.currentStat[name]=10;
+            if (name !== 'currentHealth') {
+                this.currentStat[name] = 0;
+            }
+            // this.currentStat[name]=10;
         }
     }
 
@@ -71,16 +77,30 @@ export default class PlayerAI extends StateMachineAI implements AI {
         while (this.receiver.hasNextEvent()) {
             this.handleEvent(this.receiver.getNextEvent());
         }
+      
+        this.updateCurseStat(deltaT);
+        this.dynamicUpdatePlayerStat(3 * deltaT, PlayerStatKey.CURRENT_SHIELD);
 
-         this.currentStat['currentShield'] = MathUtils.clamp(
-            this.currentStat['currentShield']  + deltaT*3,
-            this.minStatValue,
-            this.maxStatValue,
-          );
     }
 
     public destroy(): void { }
-
+    public updateCurseStat(deltaT: number){
+        if (this.isCursed) {
+            if(this.currentStat[PlayerStatKey.CURRENT_Health]<=this.cursedThreshHold){
+                this.dmg = 2;
+                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.UNUSE_CURSED_SWORD})
+                this.isCursed = false;
+            }
+            this.dynamicUpdatePlayerStat(this.cursedRatio * deltaT, PlayerStatKey.CURRENT_Health);
+        }
+    }
+    public dynamicUpdatePlayerStat(deltaT: number, stat: string) {
+        this.currentStat[stat] = MathUtils.clamp(
+            this.currentStat[stat] + deltaT * 3,
+            this.minStatValue,
+            this.maxStatValue,
+        );
+    }
     public handleEvent(event: GameEvent): void {
         switch (event.type) {
             case BattlerEvents.PRINCE_HIT: {
@@ -95,12 +115,12 @@ export default class PlayerAI extends StateMachineAI implements AI {
     }
     // TO DO play hit animation
     protected handlePrinceHit() {
-      
+
         if (!this.isInvincible) {
             this.isInvincible = true;
-            
+
             this.invincibleTime.start();
-            if ( this.currentStat["currentHealth"] <= this.minStatValue) {
+            if (this.currentStat["currentHealth"] <= this.minStatValue) {
                 this.emitter.fireEvent(BattlerEvents.PRINCE_DEAD);
                 return;
             }

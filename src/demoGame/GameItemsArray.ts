@@ -10,6 +10,8 @@ export enum GameItems {
     SEEING_STONE="seeingStone",
     IRON_SHIELD = "ironShield",
     IRON_SWORD =  "ironSword",
+    // WOODEN_SHIELD = "woodenShield",
+    WOODEN_SWORD =  "woodenSword",
   }
 function createGameItemsArray(){
   let GameItemsArray = []
