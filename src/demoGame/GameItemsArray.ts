@@ -8,6 +8,8 @@ export enum GameItems {
     MEDUSA="medusa",
     ORACLE_ELIXIR="oracleElixir",
     SEEING_STONE="seeingStone",
+    IRON_SHIELD = "ironShield",
+    IRON_SWORD =  "ironSword",
   }
 function createGameItemsArray(){
   let GameItemsArray = []

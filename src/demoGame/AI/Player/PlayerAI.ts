@@ -15,6 +15,7 @@ import MathUtils from "../../../Wolfie2D/Utils/MathUtils";
  * The AI that controls the player. The players AI has been configured as a Finite State Machine (FSM)
  * with 4 states; Idle, Moving, shielding, and Dead.
  */
+
 export default class PlayerAI extends StateMachineAI implements AI {
 
     /** The GameNode that owns this AI */

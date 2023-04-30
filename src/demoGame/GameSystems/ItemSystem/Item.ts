@@ -21,10 +21,11 @@ export default abstract class Item implements Unique, TargetableEntity {
     protected _inventory: Inventory | null;
     protected _targetable: TargetableEntity;
     protected itemName:string;
+    public isPickable:boolean;
     protected constructor(sprite: Sprite){ 
         this.sprite = sprite;
         this.emitter = new Emitter();
-
+        this.isPickable = true;
         this._inventory = null;
         this._targetable = new BasicTargetable(this.sprite);
     }
@@ -44,6 +45,8 @@ export default abstract class Item implements Unique, TargetableEntity {
     public get id(): number { return this.sprite.id; }
     public get name():string {return this.itemName};
     public set name(name:string){ this.itemName = name}
+    public get getPickable():boolean {return this.isPickable}
+    public set setPickable(flag:boolean) {this.isPickable = flag}
     public get position(): Vec2 { return this.sprite.position; }
 
     public get visible(): boolean { return this.sprite.visible; }

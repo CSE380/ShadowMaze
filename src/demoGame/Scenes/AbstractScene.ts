@@ -223,23 +223,35 @@ export default abstract class ProjectScene extends Scene {
             const items = new Array<gameItems>(gameItem.position.length);
             for (let i = 0; i < items.length; i++) {
                 let sprite, line;
-                if (key === "inventorySlot") {
+                let isPickableFlag = false;
+                if (key === GameItems.INVENTORY_SLOT) {
                     sprite = this.add.sprite(key, this.GameLayers.BEFORE_BASE);
                     line = <Line>this.add.graphic(GraphicType.LINE, this.GameLayers.BEFORE_BASE, { start: Vec2.ZERO, end: Vec2.ZERO });
-                    let numOfSlots = <Label>this.add.uiElement(UIElementType.LABEL, this.GameLayers.BEFORE_BASE, { position: new Vec2(gameItem.position[i][0] - 17, gameItem.position[i][1]), text: `${i + 1}` });
+                    let numOfSlots = <Label>this.add.uiElement(UIElementType.LABEL, this.GameLayers.BEFORE_BASE, { position: new Vec2(gameItem.position[i][0] - 20, gameItem.position[i][1]), text: `${i + 1}` });
                     numOfSlots.fontSize = 24;
                     numOfSlots.font = "Courier";
                     numOfSlots.textColor = Color.BLACK;
+                    isPickableFlag = false;
+
                     // sprite.scale =new Vec2(45,45)
                     // numOfSlots.position.set(gameItem.position[i][0]-100, gameItem.position[i][1])
                 }
+                // else if (key == GameItems.IRON_SWORD){
+
+                // }
                 else {
                     sprite = this.add.sprite(key, this.GameLayers.BASE);
                     line = <Line>this.add.graphic(GraphicType.LINE, this.GameLayers.BASE, { start: Vec2.ZERO, end: Vec2.ZERO });
+                    isPickableFlag = true;
+                    if(key == GameItems.IRON_SWORD){
+                        console.log(this.player._ai['dmg'])
+                        console.log(this.player._ai['shield'])
+                    }
                 }
                 items[i] = gameItems.create(sprite, line);
                 items[i].position.set(gameItem.position[i][0], gameItem.position[i][1]);
                 items[i].name = key;
+                items[i].isPickable = isPickableFlag;
                 this.gameItemGroup.push(items[i]);
             }
             this.gameItemsMap.set(key, items);
@@ -269,10 +281,11 @@ export default abstract class ProjectScene extends Scene {
             this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
-        this.initAllGameItems();
+        
         if (!this.option.isAstarChecked) {
-            this.initPlayerStatUI();
+            this.initPlayerStatHUD();
             this.initNPCs();
+            this.initAllGameItems();
         }
         this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: this.levelMusicKey, loop: true, holdReference: true });
     }
@@ -349,7 +362,7 @@ export default abstract class ProjectScene extends Scene {
         }
     }
 
-    protected initPlayerStatUI(): void {
+    protected initPlayerStatHUD(): void {
         // UILayer stuff
         // this.addUILayer(GAMELayers.UIlayer);
         // HP Label
@@ -526,7 +539,7 @@ export default abstract class ProjectScene extends Scene {
         if (Input.isKeyJustPressed("escape")) {
             this.emitter.fireEvent(PauseButtonEvent.PAUSE);
         }
-        this.updateVisibleGroup();
+       
         if (this.option.isAstarChecked) {
             this.player.moveOnPath(1, this.path)
             if (this.path.isDone()) {
@@ -539,6 +552,7 @@ export default abstract class ProjectScene extends Scene {
             this.isPlayerAtItems();
             this.isPlayerAttacking();
             this.isPlayerUseItem();
+            this.updateVisibleGroup();
             this.healthbars.forEach(healthbar => healthbar.update(deltaT));
         }
 
@@ -798,6 +812,7 @@ export default abstract class ProjectScene extends Scene {
                 if (value.length === 0) {
                     gameItem.position.set(key[0], key[1]);
                     postionItemsMap.set(key, [gameItem]);
+                    gameItem.isPickable = false;
                     return;
                 }
             }
@@ -936,7 +951,7 @@ export default abstract class ProjectScene extends Scene {
     protected isPlayerAtItems() {
         for (const gameItems of this.gameItemsMap.values()) {
             gameItems.forEach(gameItem => {
-                if (gameItem.visible && gameItem.position.distanceTo(this.player.position) < 10) {
+                if (gameItem.visible &&gameItem.isPickable && gameItem.position.distanceTo(this.player.position) < 10) {
                     // gameItem.visible = false;
                     this.emitter.fireEvent(gameItem.name, { action: ACTIONTYPE.PICK, gameItem: gameItem });
                 }

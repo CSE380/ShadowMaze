@@ -17,13 +17,14 @@ export default class LaserGun extends Item {
 
     protected _laser: Line
     protected _direction: Vec2;
-
+   
     public constructor(sprite: Sprite, laser: Line) {
         super(sprite);
         this._laser = laser;
         this._laser.start.copy(Vec2.ZERO_STATIC);
         this._laser.end.copy(Vec2.ZERO_STATIC);
         this._laser.color = Color.GREEN;
+       
         this._laser.tweens.add("fade", {
             startDelay: 0,
             duration: 300,
