@@ -13,11 +13,4 @@ export enum GameItems {
     // WOODEN_SHIELD = "woodenShield",
     WOODEN_SWORD =  "woodenSword",
   }
-function createGameItemsArray(){
-  let GameItemsArray = []
-  for (const key of Object.keys(GameItems)) {
-    GameItemsArray.push(GameItems[key]);
-  }
-  return GameItemsArray;
-}
-export const GameItemsArray = createGameItemsArray();
+

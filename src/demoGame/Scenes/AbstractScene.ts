@@ -41,7 +41,7 @@ import Graphic from "../../Wolfie2D/Nodes/Graphic";
 import { MainMenuButtonEvent, PauseButtonEvent } from "../CustomizedButton";
 import AABB from "../../Wolfie2D/DataTypes/Shapes/AABB";
 import PlayerAI from "../AI/Player/PlayerAI";
-import { GameItemsArray, GameItems } from "../GameItemsArray";
+import {  GameItems } from "../GameItemsArray";
 import { PlayerInput } from "../AI/Player/PlayerController";
 import LaserGun from "../GameSystems/ItemSystem/Items/LaserGuns";
 import { ACTIONTYPE } from "../ActionType";
@@ -121,7 +121,7 @@ export default abstract class ProjectScene extends Scene {
     protected dmgLabel:Label;
     protected defLabel:Label;
     //items to game 
-    protected gameItemsArray = GameItemsArray;
+    
     protected gameItemsMap = new Map<string, Array<gameItems>>();
     protected laserGunsKey = "laserGuns";
     protected lanternShape: AABB;
@@ -204,7 +204,8 @@ export default abstract class ProjectScene extends Scene {
     }
 
     protected loadAllGameItems() {
-        for (let key of this.gameItemsArray) {
+        
+        for (let key of Object.values(GameItems)) {
             this.loadGameItems(key);
         }
     }
@@ -219,7 +220,7 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected initAllGameItems() {
-        for (let key of this.gameItemsArray) {
+        for (let key of Object.values(GameItems)) {
             let gameItem = this.load.getObject(key);
             const items = new Array<gameItems>(gameItem.position.length);
             for (let i = 0; i < items.length; i++) {
@@ -357,7 +358,8 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected initGameItemEventSubscribe() {
-        for (let gameItemKey of GameItemsArray) {
+        
+        for (let gameItemKey of Object.values(GameItems)) {
             this.receiver.subscribe(gameItemKey);
         }
     }
