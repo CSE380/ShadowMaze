@@ -53,7 +53,7 @@ import NavigationPath from "../../Wolfie2D/Pathfinding/NavigationPath";
 import AstarStrategy from "../Pathfinding/AstarStrategy";
 import NPCActor from "../Actors/NPCActor";
 import { MenuState } from "../MenuState";
-import SlimeBehavior from "../AI/NPC/NPCBehavior/SlimeBehavior";
+import MonsterBehavior from "../AI/NPC/NPCBehavior/MonsterBehavior";
 import BasicTargetable from "../GameSystems/Targeting/BasicTargetable";
 import Position from "../GameSystems/Targeting/Position";
 import AnimatedSprite from "../../Wolfie2D/Nodes/Sprites/AnimatedSprite";
@@ -330,8 +330,8 @@ export default abstract class ProjectScene extends Scene {
     protected initNPCs(): void {
         const monster = this.load.getObject("monster");
         const npcData = [
-            { name: "slime", key: "black_pudding", scale: new Vec2(0.15, 0.15), behavior: SlimeBehavior },
-            // { name: "troll", key: "troll", scale: new Vec2(1.5, 1.5), behavior: SlimeBehavior },
+            { name: "slime", key: "black_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
+            // { name: "troll", key: "troll", scale: new Vec2(1.5, 1.5), behavior: monsterBehavior },
         ];
         for (const { name, key, scale, behavior } of npcData) {
             const data = monster[name];

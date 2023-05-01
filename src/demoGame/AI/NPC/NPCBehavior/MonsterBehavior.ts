@@ -13,7 +13,7 @@ import Idle from "../NPCActions/GotoAction";
 import GoapAction from "../../../../Wolfie2D/AI/Goap/GoapAction";
 import GoapState from "../../../../Wolfie2D/AI/Goap/GoapState";
 
-export default class SlimeBehavior extends NPCBehavior {
+export default class monsterBehavior extends NPCBehavior {
     protected target: TargetableEntity;
     protected range: number;
 
