@@ -154,7 +154,7 @@
       ]
     },
     {
-      "name": "ATTACK",
+      "name": "ATTACKING",
       "frames": [
         {
           "index": 90,
@@ -279,7 +279,7 @@
       ]
     },
     {
-      "name": "Attack Right",
+      "name": "HIT",
       "frames": [
         {
           "index": 120,
@@ -534,56 +534,59 @@
       ]
     },
     {
-      "name": "Dying",
+      "name": "DYING",
       "frames": [
         {
           "index": 210,
-          "duration": 4
+          "duration": 15
         },
         {
           "index": 211,
-          "duration": 4
+          "duration": 15
         },
         {
           "index": 212,
-          "duration": 4
+          "duration": 15
         },
         {
           "index": 213,
-          "duration": 4
+          "duration": 15
         },
         {
           "index": 214,
-          "duration": 4
+          "duration": 15
         },
         {
           "index": 215,
-          "duration": 4
+          "duration": 15
         },
         {
           "index": 216,
-          "duration": 4
+          "duration": 15
         },
         {
           "index": 217,
-          "duration": 4
+          "duration": 15
         },
         {
           "index": 218,
-          "duration": 4
+          "duration": 15
         },
         {
           "index": 219,
-          "duration": 4
+          "duration": 15
         }
       ]
     },
+    
     {
-      "name": "Dead",
+      "name": "DEAD",
+      "repeat":true,
       "frames": [
         {
           "index": 240,
-          "duration": 100
+          "duration": 1000
+          
         }
       ]
     },

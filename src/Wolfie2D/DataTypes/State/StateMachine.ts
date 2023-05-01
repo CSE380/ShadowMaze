@@ -128,6 +128,7 @@ export default class StateMachine implements Updateable {
         // Distribute events
         while(this.receiver.hasNextEvent()){
             let event = this.receiver.getNextEvent();
+            // console.log(event);
             this.handleEvent(event);
         }
 

@@ -20,9 +20,9 @@ import Vec2 from "../../../../Wolfie2D/DataTypes/Vec2";
  * concrete implementations of the NPCAction will have to implement the abstract method performAction() which
  * gets called when the NPC reaches the target location.
  */
-export enum NPC_ANIMATION_TYPE{
-    IDLE="IDLE",
-    MOVING="MOVING",
+export enum NPC_ANIMATION_TYPE {
+    IDLE = "IDLE",
+    MOVING = "MOVING",
 }
 export default abstract class NPCAction extends GoapAction {
 
@@ -38,54 +38,65 @@ export default abstract class NPCAction extends GoapAction {
     // The path from the NPC to the target
     protected _path: NavigationPath | null;
 
-
+    protected currentDistance: number;
     public constructor(parent: NPCBehavior, actor: NPCActor) {
         super(parent, actor);
         this.targetFinder = new BasicFinder();
         this.targets = [];
         this.target = null;
         this.path = null;
+        this.currentDistance = 0;
     }
-    
-    
+
+
 
     public onEnter(options: Record<string, any>): void {
         // Select the target location where the NPC should perform the action
         // console.log(this.actor.inventory);
         this.target = this.targetFinder.find(this.targets);
         // If we found a target, set the NPCs target to the target and find a path to the target
-        // console.log(this.target);
+        
         if (this.target !== null) {
             // Set the actors current target to be the target for this action
 
             this.actor.setTarget(this.target);
             // Construct a path from the actor to the target
             this.path = this.actor.getPath(this.actor.position, this.target.position);
-            // console.log(this.target);
+            this.currentDistance = this.actor.position.distanceTo(this.target.position)
         }
     }
 
     public update(deltaT: number): void {
-        // if (this.path.distance() > 50 || this.path == null) {
-        //     console.log("too far")
-            
-        //     this.onEnter(null);
-        //     return; 
-        // }
-       
-        if (this.path.isDone()) {
-            this.actor.animation.playIfNotAlready(NPC_ANIMATION_TYPE.IDLE,true);
-            this.performAction(this.target);
-            return;
+
+        if (this.target == null) {
+            this.target = this.targetFinder.find(this.targets);
+            return
         }
-        else {
-            this.actor.animation.playIfNotAlready(NPC_ANIMATION_TYPE.MOVING,true);
-            this.actor.moveOnPath(1, this.path);
-            return;
+        if (this.path != null) {
+            if (this.path.isDone()) {
+                if (this.actor.atTarget()) {
+                    this.performAction(this.target);
+                    this.finished()
+                }
+                else {
+                    this.path = this.actor.getPath(this.actor.position, this.target.position);
+
+                }
+
+            }
+            else {
+                this.actor.moveOnPath(0.7, this.path);
+                // if (this.currentDistance >= this.actor.position.distanceTo(this.target.position)) {
+                //     this.path = this.actor.getPath(this.actor.position, this.target.position);
+                // }
+                // else{
+                //     this.currentDistance = this.actor.position.distanceTo(this.target.position)
+                // }
+            }
         }
     }
 
-    public abstract performAction(target: TargetableEntity): void ;
+    public abstract performAction(target: TargetableEntity): void;
 
     public onExit(): Record<string, any> {
         // Clear the actor's current target
@@ -102,12 +113,12 @@ export default abstract class NPCAction extends GoapAction {
     }
 
     public handleInput(event: GameEvent): void {
-        
-        switch (event.type) {
-            default: {
-                throw new Error(`Unhandled event caught in NPCAction! Event type: ${event.type}`);
-            }
-        }
+        this.parent.handleEvent(event);
+        // switch (event.type) {
+        //     default: {
+        //         throw new Error(`Unhandled event caught in NPCAction! Event type: ${event.type}`);
+        //     }
+        // }
     }
 
     public get targetFinder(): Finder<TargetableEntity> { return this._targetFinder; }

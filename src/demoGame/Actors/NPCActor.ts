@@ -7,7 +7,7 @@ import Inventory from "../GameSystems/ItemSystem/Inventory";
 import HW4Scene from "../Scenes/AbstractScene";
 import BasicTargetable from "../GameSystems/Targeting/BasicTargetable";
 import BasicTargeting from "../GameSystems/Targeting/BasicTargeting";
-
+import { AnimationType } from "../AI/Player/PlayerStates/PlayerState";
 import Battler from "../GameSystems/BattleSystem/Battler";
 import { TargetableEntity } from "../GameSystems/Targeting/TargetableEntity";
 import { TargetingEntity } from "../GameSystems/Targeting/TargetingEntity";
@@ -55,7 +55,7 @@ export default class NPCActor extends AnimatedSprite implements Battler, Targeti
     public removeTargeting(targeting: TargetingEntity): void { this._battler.removeTargeting(targeting); }
 
     atTarget(): boolean {
-        return this._targeting.getTarget().position.distanceSqTo(this.position) < 625;
+        return this._targeting.getTarget().position.distanceSqTo(this.position) < 1000;
     }
 
     public get battlerActive(): boolean { return this.battler.battlerActive; }
@@ -78,6 +78,8 @@ export default class NPCActor extends AnimatedSprite implements Battler, Targeti
     public set health(health: number) { 
         this.battler.health = health; 
         if (this.health <= 0 && this.battlerActive) {
+            console.log(this.animation.isPlaying("DYING"));
+            this.animation.play(AnimationType.DEAD);
             this.emitter.fireEvent(BattlerEvents.MONSTER_DEAD, {id: this.id});
         }
     }

@@ -1,7 +1,7 @@
 import Vec2 from "../../../../Wolfie2D/DataTypes/Vec2";
 import GameEvent from "../../../../Wolfie2D/Events/GameEvent";
 import { PlayerAnimations } from "../PlayerController";
-import { PlayerAnimationType, PlayerStateType } from "./PlayerState";
+import { AnimationType, PlayerStateType } from "./PlayerState";
 import PlayerState from "./PlayerState";
 
 export default class Moving extends PlayerState {

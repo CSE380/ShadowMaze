@@ -6,7 +6,7 @@ import PlayerActor from "../../Actors/PlayerActor";
 import Inventory from "../../GameSystems/ItemSystem/Inventory";
 import Item from "../../GameSystems/ItemSystem/Item";
 import PlayerController from "./PlayerController";
-import { Idle, Shielding, Moving, Dead, PlayerStateType, Attacking } from "./PlayerStates/PlayerState";
+import { Idle, Shielding, Moving, Dead, PlayerStateType, Attacking, AnimationType } from "./PlayerStates/PlayerState";
 import { BattlerEvents, MessageBoxEvents } from "../../ProjectEvents";
 import Timer from "../../../Wolfie2D/Timing/Timer";
 import { PlayerStatsArray, PlayerStatKey } from "../../PlayerStatsArray";
@@ -28,6 +28,8 @@ export default class PlayerAI extends StateMachineAI implements AI {
     public item: Item | null;
 
     // hit 
+    private defendingTime:Timer
+    private isDefending =false;
     private invincibleTime: Timer;
     private isInvincible = false;
     //stats of AI
@@ -41,7 +43,7 @@ export default class PlayerAI extends StateMachineAI implements AI {
     private cursedThreshHold = 0.3*this.maxStatValue;
     private dmg = 2;
 
-    private ultDmg = 5;
+    private ultDmg = 10;
     private def = 0;
     private currentStat = {};
     public initializeAI(owner: PlayerActor, opts: Record<string, any>): void {
@@ -58,10 +60,12 @@ export default class PlayerAI extends StateMachineAI implements AI {
         this.initialize(PlayerStateType.IDLE);
         this.receiver.subscribe(BattlerEvents.PRINCE_DEAD);
         this.receiver.subscribe(BattlerEvents.PRINCE_HIT);
-        this.invincibleTime = new Timer(1000, this.handleinvincibleTimeEnd, false);
+        this.receiver.subscribe(BattlerEvents.MONSTER_ATTACK);
+        this.invincibleTime = new Timer(1000, ()=>this.isInvincible =this.resetFlag(this.isInvincible), false);
+        this.defendingTime= new Timer(300, ()=>this.isDefending = this.resetFlag(this.isDefending), false);
         this.activate(null)
     }
-
+    
     public activate(options: Record<string, any>): void {
         for (const name of this.statNames) {
             this.currentStat[name] = this.currentStatValue; // Set default value for each stat
@@ -77,10 +81,8 @@ export default class PlayerAI extends StateMachineAI implements AI {
         while (this.receiver.hasNextEvent()) {
             this.handleEvent(this.receiver.getNextEvent());
         }
-      
         this.updateCurseStat(deltaT);
         this.dynamicUpdatePlayerStat(3 * deltaT, PlayerStatKey.CURRENT_SHIELD);
-
     }
 
     public destroy(): void { }
@@ -103,22 +105,37 @@ export default class PlayerAI extends StateMachineAI implements AI {
     }
     public handleEvent(event: GameEvent): void {
         switch (event.type) {
+            case BattlerEvents.MONSTER_ATTACK:{
+                this.handleMonsterAttack();
+                break;
+            }
             case BattlerEvents.PRINCE_HIT: {
                 this.handlePrinceHit();
                 break;
             }
             case BattlerEvents.PRINCE_DEAD: {
-                console.log("dead");
                 break;
             }
         }
     }
     // TO DO play hit animation
+    protected handleMonsterAttack(){
+        if(this.owner.animation.isPlaying(AnimationType.SHIELDING)){
+            if(!this.isDefending){
+                this.isDefending = true;
+                this.defendingTime.start();
+                console.log("defending")
+            }
+        }
+        else{
+            this.emitter.fireEvent(BattlerEvents.PRINCE_HIT);
+
+        }
+    }
     protected handlePrinceHit() {
 
         if (!this.isInvincible) {
             this.isInvincible = true;
-
             this.invincibleTime.start();
             if (this.currentStat["currentHealth"] <= this.minStatValue) {
                 this.emitter.fireEvent(BattlerEvents.PRINCE_DEAD);
@@ -126,11 +143,8 @@ export default class PlayerAI extends StateMachineAI implements AI {
             }
         }
     }
-    protected handleinvincibleTimeEnd = () => {
-        this.isInvincible = false;
-        // TO DO
-        // Play Idle animation
+    protected resetFlag = (flag:boolean) => {
+        return !flag;
     };
-
 
 }

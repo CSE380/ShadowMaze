@@ -31,7 +31,9 @@ export default class NavigationPath implements Path<Vec2> {
 	isDone(): boolean {
 		return this.path.isEmpty();
 	}
-
+	isOneStepAway():boolean{
+		return this.path.size() == 2;
+	}
     next(): Vec2 | null { return this.path.isEmpty() ? null : this.path.peek(); }
 
 	/**

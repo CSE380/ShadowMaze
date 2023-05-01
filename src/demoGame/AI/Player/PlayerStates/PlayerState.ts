@@ -5,11 +5,14 @@ import Item from "../../../GameSystems/ItemSystem/Item";
 import PlayerAI from "../PlayerAI";
 
 
-export enum PlayerAnimationType {
+export enum AnimationType {
     IDLE = "IDLE",
     MOVING = "MOVING",
     ATTACKING = "ATTACKING",
-    SHIELDING = "SHIELDING"
+    SHIELDING = "SHIELDING",
+    HIT="HIT",
+    DYING="DYING",
+    DEAD="DEAD",
 }
 
 

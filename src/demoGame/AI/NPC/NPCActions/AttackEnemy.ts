@@ -5,6 +5,8 @@ import NPCAction from "./NPCAction";
 import { BattlerEvents } from "../../../ProjectEvents";
 import GameEvent from "../../../../Wolfie2D/Events/GameEvent";
 import { MonsterAnimations } from "../../Player/PlayerController";
+import { AnimationType } from "../../Player/PlayerStates/PlayerState";
+
 export default class AttackEnemy extends NPCAction {
     protected timer: Timer;
 
@@ -14,10 +16,9 @@ export default class AttackEnemy extends NPCAction {
         this.timer = new Timer(2000);
     }
     public performAction(target: TargetableEntity): void {
-        this.timer.isStopped() ? console.log("weapon cooling down!") : console.log("weapon ready");
+        // this.timer.isStopped() ? console.log("weapon cooling down!") : console.log("weapon ready");
         if (this.timer.isStopped()) {
-            if (this.actor.isColliding)
-            this.actor.animation.play("ATTACK");
+            this.actor.animation.play(AnimationType.ATTACKING);
             this.emitter.fireEvent(BattlerEvents.MONSTER_ATTACK);
             this.timer.start();
         }
@@ -25,11 +26,10 @@ export default class AttackEnemy extends NPCAction {
     }
     public onEnter(options: Record<string, any>): void {
         super.onEnter(options);
-        
-    }
 
+    }
     public handleInput(event: GameEvent): void {
-        switch(event.type) {
+        switch (event.type) {
             default: {
                 super.handleInput(event);
                 break;

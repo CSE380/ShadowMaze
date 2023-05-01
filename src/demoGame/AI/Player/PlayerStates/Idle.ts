@@ -1,6 +1,6 @@
 import Vec2 from "../../../../Wolfie2D/DataTypes/Vec2";
 import GameEvent from "../../../../Wolfie2D/Events/GameEvent";
-import { PlayerAnimationType, PlayerStateType } from "./PlayerState";
+import { AnimationType, PlayerStateType } from "./PlayerState";
 import { PlayerAnimations } from "../PlayerController";
 import PlayerState from "./PlayerState";
 import { MessageBoxEvents } from "../../../ProjectEvents";

@@ -33,7 +33,7 @@ import { EaseFunctionType } from "../../Wolfie2D/Utils/EaseFunctions";
 import Timer from "../../Wolfie2D/Timing/Timer";
 import Input from "../../Wolfie2D/Input/Input";
 import PlayerActor from "../Actors/PlayerActor";
-import { PlayerAnimationType } from "../AI/Player/PlayerStates/PlayerState";
+import { AnimationType } from "../AI/Player/PlayerStates/PlayerState";
 import Line from "../../Wolfie2D/Nodes/Graphics/Line";
 import BubbleShaderType from "../Shaders/BubbleShaderType";
 import LaserShaderType from "../Shaders/LaserShaderType";
@@ -88,8 +88,8 @@ export default abstract class ProjectScene extends Scene {
     protected levelEndArea: Rect;
     protected levelEndTransitionLabel: Label;
     protected messageBoxLabel: Label;
-    protected playerInitPosition = new Vec2(260, 235);
-    // protected playerInitPosition = new Vec2(100, 90);
+    // protected playerInitPosition = new Vec2(260, 235);
+    protected playerInitPosition = new Vec2(360, 200);
     protected levelEndPosition = new Vec2(260, 490);
     protected levelEndHalfSize = new Vec2(25, 25)
     protected levelEndColor = new Color(255, 0, 0, 0.5);
@@ -293,7 +293,7 @@ export default abstract class ProjectScene extends Scene {
         this.initInventorySlotsMap();
         // create screen first 
         if (!this.option.isfogOfWarChecked)
-            this.initFogOfWar();
+            // this.initFogOfWar();
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
@@ -611,7 +611,7 @@ export default abstract class ProjectScene extends Scene {
     protected checkUltimateMonstersCollision() {
         this.battlers.forEach(battler => {
             if (battler.battlerActive && !(battler == this.player)) {
-                if (battler.position.distanceTo(this.ultimateWave.position) < 10) {
+                if (battler.position.distanceTo(this.ultimateWave.position) < 30) {
                     this.emitter.fireEvent(BattlerEvents.MONSTER_HIT, { id: battler.id, dmg: this.player._ai["ultDmg"] });
                 }
             }
@@ -676,7 +676,6 @@ export default abstract class ProjectScene extends Scene {
     protected handleBattlerEvents(event: GameEvent) {
         switch (event.type) {
             case BattlerEvents.MONSTER_DEAD: {
-
                 this.handleBattlerKilled(event);
                 if (this.player._ai["currentStat"]["currentEnergy"] < this.playerMaxStatValue) {
                     this.player._ai["currentStat"]["currentEnergy"]++;
@@ -684,7 +683,6 @@ export default abstract class ProjectScene extends Scene {
                 }
                 break;
             }
-
             case BattlerEvents.PRINCE_HIT: {
                 if (!this.player._ai["isInvincible"]) {
                     this.player._ai["currentStat"]["currentHealth"]--;
@@ -718,9 +716,13 @@ export default abstract class ProjectScene extends Scene {
     protected handleBattlerKilled(event: GameEvent) {
         let id: number = event.data.get("id");
         let battler = this.battlers.find(b => b.id === id);
+        
         if (battler) {
-            battler.battlerActive = false;
             this.healthbars.get(id).visible = false;
+            setTimeout(()=>{
+                battler.battlerActive = false;
+            },1000)
+
         }
     }
     protected handleUseGameItemsEvent(event: GameEvent) {
@@ -923,17 +925,9 @@ export default abstract class ProjectScene extends Scene {
             if (battler == this.player) {
                 continue;
             }
-            if (battler.battlerActive && battler.position.distanceTo(midpoint) <= 15 && this.player.animation.isPlaying(PlayerAnimationType.ATTACKING)) {
+            if (battler.battlerActive && battler.position.distanceTo(midpoint) <= 15 && this.player.animation.isPlaying(AnimationType.ATTACKING)) {
                 // this.emitter.fireEvent(BattlerEvents.MONSTER_DEAD, { id: battler.id });
                 this.emitter.fireEvent(BattlerEvents.MONSTER_HIT, { id: battler.id, dmg: this.player._ai["dmg"] });
-
-            }
-            if (battler.battlerActive && battler.position.distanceTo(this.player.position) < 10) {
-                if (!this.player.animation.isPlaying(PlayerAnimationType.SHIELDING)) {
-                    if (!this.player._ai['isInvincible']) {
-                        this.emitter.fireEvent(BattlerEvents.PRINCE_HIT, { id: battler.id });
-                    }
-                }
             }
         }
     }
