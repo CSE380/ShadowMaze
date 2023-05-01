@@ -41,7 +41,7 @@ import Graphic from "../../Wolfie2D/Nodes/Graphic";
 import { MainMenuButtonEvent, PauseButtonEvent } from "../CustomizedButton";
 import AABB from "../../Wolfie2D/DataTypes/Shapes/AABB";
 import PlayerAI from "../AI/Player/PlayerAI";
-import {  GameItems } from "../GameItemsArray";
+import { AllLevelGameItems, Level1GameItems } from "../GameItems";
 import { PlayerInput } from "../AI/Player/PlayerController";
 import LaserGun from "../GameSystems/ItemSystem/Items/LaserGuns";
 import { ACTIONTYPE } from "../ActionType";
@@ -118,15 +118,16 @@ export default abstract class ProjectScene extends Scene {
         bar: Label,
         barBg: Label,
     }
-    protected dmgLabel:Label;
-    protected defLabel:Label;
+    protected dmgLabel: Label;
+    protected defLabel: Label;
     //items to game 
-    
+
     protected gameItemsMap = new Map<string, Array<gameItems>>();
     protected laserGunsKey = "laserGuns";
     protected lanternShape: AABB;
     protected lanternDuration = false;
     protected inventorySlotsMap = new Map<number, Map<Vec2, Array<gameItems>>>();
+    protected count=0;
     // protected test = new Map<number,Vec2>()
     //ui display
     protected currentPlayerPositionLabels: Array<Label>;
@@ -204,13 +205,12 @@ export default abstract class ProjectScene extends Scene {
     }
 
     protected loadAllGameItems() {
-        
-        for (let key of Object.values(GameItems)) {
+        for (let key of Object.values(AllLevelGameItems)) {
             this.loadGameItems(key);
         }
     }
     protected initInventorySlotsMap() {
-        const inventorySlotsPosition = this.load.getObject(GameItems.INVENTORY_SLOT)
+        const inventorySlotsPosition = this.load.getObject(AllLevelGameItems.INVENTORY_SLOT)
         let i = 1;
         for (let position of inventorySlotsPosition.position) {
             const postionItemsMap = new Map<Vec2, Array<gameItems>>();
@@ -220,51 +220,66 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected initAllGameItems() {
-        for (let key of Object.values(GameItems)) {
+        for (let key of Object.values(AllLevelGameItems)) {
             let gameItem = this.load.getObject(key);
             const items = new Array<gameItems>(gameItem.position.length);
             for (let i = 0; i < items.length; i++) {
                 let sprite, line;
                 let isPickableFlag = false;
-                if (key === GameItems.INVENTORY_SLOT) {
+                if (key === AllLevelGameItems.INVENTORY_SLOT) {
                     sprite = this.add.sprite(key, this.GameLayers.BEFORE_BASE);
                     line = <Line>this.add.graphic(GraphicType.LINE, this.GameLayers.BEFORE_BASE, { start: Vec2.ZERO, end: Vec2.ZERO });
                     let numOfSlots = <Label>this.add.uiElement(UIElementType.LABEL, this.GameLayers.BEFORE_BASE, { position: new Vec2(gameItem.position[i][0] - 22, gameItem.position[i][1]), text: `${i + 1}` });
                     numOfSlots.fontSize = 24;
                     numOfSlots.font = "Courier";
                     numOfSlots.textColor = Color.BLACK;
-    
+
                 }
                 else {
                     sprite = this.add.sprite(key, this.GameLayers.BASE);
                     line = <Line>this.add.graphic(GraphicType.LINE, this.GameLayers.BASE, { start: Vec2.ZERO, end: Vec2.ZERO });
                     isPickableFlag = true;
-                    if (key == GameItems.IRON_SWORD) {
+                    if (key == AllLevelGameItems.IRON_SWORD) {
                         isPickableFlag = false;
-                        this.dmgLabel=this.createDefDmgLabel(gameItem.position[i], PlayerStatKey.DMG);
-                      } else if (key == GameItems.IRON_SHIELD) {
+                        this.dmgLabel = this.createDefDmgLabel(gameItem.position[i], PlayerStatKey.DMG);
+                    } else if (key == AllLevelGameItems.IRON_SHIELD) {
                         isPickableFlag = false;
                         this.defLabel = this.createDefDmgLabel(gameItem.position[i], PlayerStatKey.DEF);
-                      }
+                    }
                 }
                 items[i] = gameItems.create(sprite, line);
                 items[i].position.set(gameItem.position[i][0], gameItem.position[i][1]);
                 items[i].name = key;
                 items[i].isPickable = isPickableFlag;
+                items[i].startY =  gameItem.position[i][1];
                 this.gameItemGroup.push(items[i]);
+
             }
             this.gameItemsMap.set(key, items);
+        }
+
+    }
+    private floatPickableItem(deltaT:number) {
+        this.count+=deltaT
+        for (let [key, gameItemArray] of (this.gameItemsMap)) {
+            gameItemArray.forEach(item => {
+                if (item.isPickable) {
+                    item.position.set(item.position.x,item.startY+item.floatDistance*Math.sin(this.count))
+                    console.log( Math.sin(deltaT))
+                }
+            }
+            )
         }
     }
     private createDefDmgLabel(position: number[], statKey: PlayerStatKey): Label {
         const stat = this.player._ai[statKey];
-        
-        return   <Label>this.add.uiElement(UIElementType.LABEL, this.GameLayers.BASE, {
-            position: new Vec2(position[0] + 22, position[1]),text:`${stat}`
-          });
-        
-       
-      }
+
+        return <Label>this.add.uiElement(UIElementType.LABEL, this.GameLayers.BASE, {
+            position: new Vec2(position[0] + 22, position[1]), text: `${stat}`
+        });
+
+
+    }
     public startScene(): void {
         let tilemapLayers = this.add.tilemap("level");
 
@@ -289,11 +304,12 @@ export default abstract class ProjectScene extends Scene {
             this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
-        
+
         if (!this.option.isAstarChecked) {
             this.initPlayerStatHUD();
             this.initNPCs();
             this.initAllGameItems();
+            
         }
         this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: this.levelMusicKey, loop: true, holdReference: true });
     }
@@ -318,7 +334,7 @@ export default abstract class ProjectScene extends Scene {
                 npc.animation.play("IDLE", true);
                 this.battlers.push(npc);
                 this.npcGroup.push(npc);
-                let healthbar = new HealthbarHUD(this, npc, GameLayers.BASE, { size:new Vec2 (64.0, 16.0), offset: new Vec2(0.0, -16.0) });
+                let healthbar = new HealthbarHUD(this, npc, GameLayers.BASE, { size: new Vec2(64.0, 16.0), offset: new Vec2(0.0, -16.0) });
                 this.healthbars.set(npc.id, healthbar);
             }
         }
@@ -358,8 +374,8 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected initGameItemEventSubscribe() {
-        
-        for (let gameItemKey of Object.values(GameItems)) {
+
+        for (let gameItemKey of Object.values(AllLevelGameItems)) {
             this.receiver.subscribe(gameItemKey);
         }
     }
@@ -541,7 +557,7 @@ export default abstract class ProjectScene extends Scene {
         if (Input.isKeyJustPressed("escape")) {
             this.emitter.fireEvent(PauseButtonEvent.PAUSE);
         }
-       
+
         if (this.option.isAstarChecked) {
             this.player.moveOnPath(1, this.path)
             if (this.path.isDone()) {
@@ -555,6 +571,7 @@ export default abstract class ProjectScene extends Scene {
             this.isPlayerAttacking();
             this.isPlayerUseItem();
             this.updateVisibleGroup();
+            this.floatPickableItem(deltaT);
             this.healthbars.forEach(healthbar => healthbar.update(deltaT));
         }
 
@@ -646,19 +663,19 @@ export default abstract class ProjectScene extends Scene {
     }
     protected handleInGameMessageBox(event: GameEvent) {
         switch (event.type) {
-            case MessageBoxEvents.SHOW:{
+            case MessageBoxEvents.SHOW: {
                 this.messageBoxLabel.text = event.data.get("message");
-                if(this.messageBoxLabel.text ==MessageBoxEvents.UNUSE_CURSED_SWORD)
+                if (this.messageBoxLabel.text == MessageBoxEvents.UNUSE_CURSED_SWORD)
                     this.dmgLabel.text = this.player._ai[PlayerStatKey.DMG];
                 this.messageBoxLabel.tweens.play(tweensEffect.SLIDEIN);
                 break;
             }
-                
-            case MessageBoxEvents.HIDDEN:{
+
+            case MessageBoxEvents.HIDDEN: {
                 this.messageBoxLabel.tweens.play(tweensEffect.SLIDEOUT);
                 break;
             }
-            
+
 
 
         }
@@ -716,55 +733,55 @@ export default abstract class ProjectScene extends Scene {
     protected handleUseGameItemsEvent(event: GameEvent) {
         this.RemoveItemFromInventory(event)
         switch (event.type) {
-            case GameItems.LANTERNS: {
+            case AllLevelGameItems.LANTERNS: {
                 this.lanternDuration = !this.lanternDuration;
                 this.ultimateWavePlayerDistance = 70;
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_LANTERN })
                 break;
             }
-            case GameItems.DOOR: {
+            case AllLevelGameItems.DOOR: {
                 this.showPositionByColor(this.levelEndPosition, Color.TRANSPARENT);
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_DOOR })
                 break;
             }
-            case GameItems.HEALTH_PACKS: {
+            case AllLevelGameItems.HEALTH_PACKS: {
                 if (this.player._ai["currentStat"]["currentHealth"] < this.playerMaxStatValue)
                     this.player._ai["currentStat"]["currentHealth"]++;
                 this.handlePlayerStatChange("currentHealth");
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_HEALTH_PACK })
                 break;
             }
-            case GameItems.PHASING_POTION: {
+            case AllLevelGameItems.PHASING_POTION: {
                 const halfSize = this.player.sizeWithZoom.scale(0);
                 this.player.setCollisionShape(new AABB(this.player.position, halfSize));
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_PHASING_POTION });
                 break;
             }
-            case GameItems.TELEPORT_BOOT: {
+            case AllLevelGameItems.TELEPORT_BOOT: {
                 this.player.position.set(90, 150);
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_TElEPORT_BOOT });
                 break;
             }
-            case GameItems.MEDUSA: {
+            case AllLevelGameItems.MEDUSA: {
                 this.npcGroup.forEach(npc => npc.freeze())
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_MEDUSA })
                 break;
             }
-            case GameItems.ORACLE_ELIXIR: {
+            case AllLevelGameItems.ORACLE_ELIXIR: {
                 this.npcGroup.forEach(npc => npc.visible && this.showPositionByColor(npc.position, Color.TRANSPARENT))
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_ORACLE_ELIXIR })
                 break;
             }
-            case GameItems.SEEING_STONE: {
+            case AllLevelGameItems.SEEING_STONE: {
                 this.gameItemGroup.forEach(gameItem => gameItem.visible && this.showPositionByColor(gameItem.position, Color.TRANSPARENT))
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_SEEING_STONE })
                 break;
             }
-            case GameItems.WOODEN_SWORD: {
+            case AllLevelGameItems.WOODEN_SWORD: {
                 this.player._ai[PlayerStatKey.IS_CURSED] = true;
                 this.player._ai[PlayerStatKey.DMG] = parseInt(PlayerStatKey.CURSED_DMG);
                 this.dmgLabel.text = (PlayerStatKey.CURSED_DMG);
-                this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_CURSED_SWORD})
+                this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_CURSED_SWORD })
                 break;
             }
         }
@@ -968,7 +985,7 @@ export default abstract class ProjectScene extends Scene {
     protected isPlayerAtItems() {
         for (const gameItems of this.gameItemsMap.values()) {
             gameItems.forEach(gameItem => {
-                if (gameItem.visible &&gameItem.isPickable && gameItem.position.distanceTo(this.player.position) < 10) {
+                if (gameItem.visible && gameItem.isPickable && gameItem.position.distanceTo(this.player.position) < 10) {
                     // gameItem.visible = false;
                     this.emitter.fireEvent(gameItem.name, { action: ACTIONTYPE.PICK, gameItem: gameItem });
                 }

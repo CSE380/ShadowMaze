@@ -22,11 +22,14 @@ export default abstract class Item implements Unique, TargetableEntity {
     protected _targetable: TargetableEntity;
     protected itemName:string;
     public isPickable:boolean;
+    public startY:number;
+    public floatDistance=10;
     protected constructor(sprite: Sprite){ 
         this.sprite = sprite;
         this.emitter = new Emitter();
         this.isPickable = true;
         this._inventory = null;
+        
         this._targetable = new BasicTargetable(this.sprite);
     }
 
@@ -48,7 +51,7 @@ export default abstract class Item implements Unique, TargetableEntity {
     public get getPickable():boolean {return this.isPickable}
     public set setPickable(flag:boolean) {this.isPickable = flag}
     public get position(): Vec2 { return this.sprite.position; }
-
+    public set setStartY(yInitPosition:number){this.startY=yInitPosition}
     public get visible(): boolean { return this.sprite.visible; }
     public set visible(value: boolean) { this.sprite.visible = value; }
 
