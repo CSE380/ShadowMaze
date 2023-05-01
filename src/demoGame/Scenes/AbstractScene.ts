@@ -320,11 +320,11 @@ export default abstract class ProjectScene extends Scene {
 
         if (!this.option.isAstarChecked) {
             this.initPlayerStatHUD();
-            // this.initNPCs();
+            this.initNPCs();
             this.initAllGameItems();
             
         }
-        this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.LEVEL_BGM_KEY, loop: true, holdReference: true });
+        // this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.LEVEL_BGM_KEY, loop: true, holdReference: true });
     }
 
     protected initNPCs(): void {
@@ -721,9 +721,11 @@ export default abstract class ProjectScene extends Scene {
                 }, 2000)
             }
             case PlayerInput.ULTIMATE: {
-                if (!this.ultimateWave.visible)
+                if (!this.ultimateWave.visible){
                     this.handleFireUltimate();
                     this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.ULT_KEY, loop: false, holdReference: true });
+                }
+
 
             }
         }
@@ -874,7 +876,7 @@ export default abstract class ProjectScene extends Scene {
                     return;
                 }
             }
-            
+
         }
     }
     protected showPositionByColor(position: Vec2, color: Color) {
