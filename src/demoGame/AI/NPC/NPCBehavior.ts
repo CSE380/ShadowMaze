@@ -58,6 +58,7 @@ export default abstract class NPCBehavior extends StateMachineGoapAI<NPCAction> 
             case BattlerEvents.MONSTER_DEAD: {
                 break;
             }
+            //when the MONSTER_HIT even has been called, we need to deal the appropriate damage
             case BattlerEvents.MONSTER_HIT: {
                 let id: number = event.data.get("id");
                 let dmg: number = event.data.get("dmg");
@@ -75,27 +76,25 @@ export default abstract class NPCBehavior extends StateMachineGoapAI<NPCAction> 
         }
     }
     protected handleMonsterHit(dmg: number,id:number) {
-        console.log(this.isInvincible)
         if (!this.isInvincible) {
-            console.log(id)
             this.isInvincible = true;
             this.currentHealth -= dmg;
             this.invincibleTime.start();
             this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.MONSTER_HIT, loop: false, holdReference: true });
-            console.log("hit")
             if (this.currentHealth<= 0) {
                 this.owner.animation.play(AnimationType.DYING,false);
                 this.owner.freeze();
                 return;
             }
             this.owner.animation.play(AnimationType.HIT);
+            this.owner.animation.queue(AnimationType.IDLE, true);
         }
     }
     protected handleinvincibleTimeEnd = () => {
-
         this.isInvincible = false;
-        // TO DO
-        // Play Idle animation
+        if (this.currentHealth > 0) {
+            this.owner.animation.play(AnimationType.IDLE, true);
+        }
     };
 
 

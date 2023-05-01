@@ -69,6 +69,9 @@ export default abstract class NPCAction extends GoapAction {
 
     public update(deltaT: number): void {
         // console.log(this.target)
+        if (this.actor.frozen) {
+            return;
+        }
         if (this.target == null) {
             this.target = this.targetFinder.find(this.targets);
             return

@@ -88,8 +88,8 @@ export default abstract class ProjectScene extends Scene {
     protected levelEndArea: Rect;
     protected levelEndTransitionLabel: Label;
     protected messageBoxLabel: Label;
-    // protected playerInitPosition = new Vec2(260, 235);
-    protected playerInitPosition = new Vec2(360, 180);
+    protected playerInitPosition = new Vec2(260, 235);
+    // protected playerInitPosition = new Vec2(360, 180);
     protected levelEndPosition = new Vec2(260, 490);
     protected levelEndHalfSize = new Vec2(25, 25)
     protected levelEndColor = new Color(255, 0, 0, 0.5);
@@ -949,16 +949,19 @@ export default abstract class ProjectScene extends Scene {
             oneStatUI["bar"].backgroundColor = currentStatValue < this.playerMaxStatValue * 1 / 4 ? Color.RED : currentStatValue < this.playerMaxStatValue * 3 / 4 ? Color.YELLOW : Color.GREEN;
     }
 
-
     protected isPlayerAttacking() {
+        //midpoint represents a few inches in front of the prince
         let midpoint = this.getFaceDirectionVec();
-
+        //check every battler(sprite) in the list
         for (const battler of this.battlers) {
+            //if the batter is the prince, then we can just ignore it
             if (battler == this.player) {
                 continue;
             }
+            //if the monster is active and is within a certain distance of the prince attack animation, then we can assume the monster has been hit
             if (battler.battlerActive && battler.position.distanceTo(midpoint) <= 15 && this.player.animation.isPlaying(AnimationType.ATTACKING)) {
-                // this.emitter.fireEvent(BattlerEvents.MONSTER_DEAD, { id: battler.id });
+                //fire an event that means the monster has been hit. we need to know which monster has been hit and provide the damage the prince has dealt
+                //in NPCbehaviour.ts, the event will be handleded
                 this.emitter.fireEvent(BattlerEvents.MONSTER_HIT, { id: battler.id, dmg: this.player._ai["dmg"] });
             }
         }
