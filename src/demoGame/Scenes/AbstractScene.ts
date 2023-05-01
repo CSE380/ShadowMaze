@@ -163,12 +163,6 @@ export default abstract class ProjectScene extends Scene {
             isfogOfWarChecked: false,
         }
         this.healthbars = new Map<number, HealthbarHUD>();
-
-        // this.ButtonSelection = MainMenuButtonEvent;
-        // for (const layerName of this.layerNames) {
-        //     this[layerName] = layerName;
-        // }
-
         this.battlers = new Array<Battler & Actor>();
     }
     public initScene(option: Record<string, any>): void {
@@ -251,7 +245,7 @@ export default abstract class ProjectScene extends Scene {
                 items[i].position.set(gameItem.position[i][0], gameItem.position[i][1]);
                 items[i].name = key;
                 items[i].isPickable = isPickableFlag;
-                items[i].startY =  gameItem.position[i][1];
+                items[i].floatInitPosition =  gameItem.position[i][1];
                 this.gameItemGroup.push(items[i]);
 
             }
@@ -264,8 +258,7 @@ export default abstract class ProjectScene extends Scene {
         for (let [key, gameItemArray] of (this.gameItemsMap)) {
             gameItemArray.forEach(item => {
                 if (item.isPickable) {
-                    item.position.set(item.position.x,item.startY+item.floatDistance*Math.sin(this.count))
-                    console.log( Math.sin(deltaT))
+                    item.position.set(item.position.x,item.floatInitPosition+item.floatDistance*Math.sin(this.count))
                 }
             }
             )
@@ -300,8 +293,8 @@ export default abstract class ProjectScene extends Scene {
         this.initInventorySlotsMap();
         // create screen first 
         if (!this.option.isfogOfWarChecked)
-            // this.initFogOfWar();
-            this.center = this.viewport.getHalfSize();
+            this.initFogOfWar();
+        this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         this.initializeLevelEnds();
 
