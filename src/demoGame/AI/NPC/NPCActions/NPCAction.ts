@@ -8,7 +8,7 @@ import { TargetableEntity } from "../../../GameSystems/Targeting/TargetableEntit
 import BasicFinder from "../../../GameSystems/Searching/BasicFinder";
 import NavigationPath from "../../../../Wolfie2D/Pathfinding/NavigationPath";
 import Vec2 from "../../../../Wolfie2D/DataTypes/Vec2";
-
+import { AnimationType } from "../../Player/PlayerStates/PlayerState";
 /**
  * An abstract GoapAction for an NPC. All NPC actions consist of doing three things:
  * 
@@ -55,19 +55,20 @@ export default abstract class NPCAction extends GoapAction {
         // console.log(this.actor.inventory);
         this.target = this.targetFinder.find(this.targets);
         // If we found a target, set the NPCs target to the target and find a path to the target
-        
+
         if (this.target !== null) {
             // Set the actors current target to be the target for this action
 
             this.actor.setTarget(this.target);
             // Construct a path from the actor to the target
             this.path = this.actor.getPath(this.actor.position, this.target.position);
-            this.currentDistance = this.actor.position.distanceTo(this.target.position)
+
+
         }
     }
 
     public update(deltaT: number): void {
-
+        // console.log(this.target)
         if (this.target == null) {
             this.target = this.targetFinder.find(this.targets);
             return
@@ -75,23 +76,26 @@ export default abstract class NPCAction extends GoapAction {
         if (this.path != null) {
             if (this.path.isDone()) {
                 if (this.actor.atTarget()) {
-                    this.performAction(this.target);
-                    this.finished()
-                }
-                else {
-                    this.path = this.actor.getPath(this.actor.position, this.target.position);
 
+                    this.performAction(this.target);
+                    this.finished();
+                    return;
                 }
+                if (this.target == null) {
+                    this.target = this.targetFinder.find(this.targets);
+                }
+                this.path = this.actor.getPath(this.actor.position, this.target.position);
+                this.currentDistance = this.actor.position.distanceTo(this.target.position);
 
             }
             else {
                 this.actor.moveOnPath(0.7, this.path);
-                // if (this.currentDistance >= this.actor.position.distanceTo(this.target.position)) {
-                //     this.path = this.actor.getPath(this.actor.position, this.target.position);
-                // }
-                // else{
-                //     this.currentDistance = this.actor.position.distanceTo(this.target.position)
-                // }
+                if (!this.actor.animation.isPlaying(AnimationType.MOVING)) {
+                    this.actor.animation.playIfNotAlready(AnimationType.MOVING, true);
+                }
+
+                
+
             }
         }
     }

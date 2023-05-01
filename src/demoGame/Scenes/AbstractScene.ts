@@ -2,7 +2,6 @@ import Vec2 from "../../Wolfie2D/DataTypes/Vec2";
 import Scene from "../../Wolfie2D/Scene/Scene";
 import OrthogonalTilemap from "../../Wolfie2D/Nodes/Tilemaps/OrthogonalTilemap";
 import gameItems from "../GameSystems/ItemSystem/Items/LaserGuns";
-import Healthpack from "../GameSystems/ItemSystem/Items/Healthpack";
 import Battler from "../GameSystems/BattleSystem/Battler";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import Color from "../../Wolfie2D/Utils/Color";
@@ -58,6 +57,7 @@ import SlimeBehavior from "../AI/NPC/NPCBehavior/SlimeBehavior";
 import BasicTargetable from "../GameSystems/Targeting/BasicTargetable";
 import Position from "../GameSystems/Targeting/Position";
 import AnimatedSprite from "../../Wolfie2D/Nodes/Sprites/AnimatedSprite";
+import { GameSound } from "../GameSound";
 //
 import { GameEventType } from "../../Wolfie2D/Events/GameEventType";
 import HealthbarHUD from "../GameSystems/HUD/HealthbarHUD";
@@ -89,7 +89,7 @@ export default abstract class ProjectScene extends Scene {
     protected levelEndTransitionLabel: Label;
     protected messageBoxLabel: Label;
     // protected playerInitPosition = new Vec2(260, 235);
-    protected playerInitPosition = new Vec2(360, 200);
+    protected playerInitPosition = new Vec2(360, 180);
     protected levelEndPosition = new Vec2(260, 490);
     protected levelEndHalfSize = new Vec2(25, 25)
     protected levelEndColor = new Color(255, 0, 0, 0.5);
@@ -133,15 +133,16 @@ export default abstract class ProjectScene extends Scene {
     protected currentPlayerPositionLabels: Array<Label>;
 
     //audio and music
-    protected levelMusicKey: string;
-
+    
+    public static readonly LEVEL_MUSIC_KEY = "LEVEL_MUSIC";
+    public static readonly LEVEL_MUSIC_PATH = "shadowMaze_assets/music/level_bgm.mp3";
     protected labelSize: number;
     protected isPauseMenuHidden: boolean;
     protected MenuCurentState: MenuState;
     // relative path to the assets
     protected pathToItems = `shadowMaze_assets/data/items/`;
     protected pathToSprite = `shadowMaze_assets/sprites/`;
-
+    protected pathToMusic = `shadowMaze_assets/music/`
     //Li
     protected healthbars: Map<number, HealthbarHUD>;
     protected battlers: (Battler & Actor)[];
@@ -202,6 +203,25 @@ export default abstract class ProjectScene extends Scene {
         for (let key of Object.values(AllLevelGameItems)) {
             this.loadGameItems(key);
         }
+    }
+    protected loadGameSound(key:string){
+        let format:string;
+        if(key == GameSound.LEVEL_BGM_KEY)
+            format = 'mp3';
+        else{
+            format = 'wav';
+        }
+        this.load.audio(key, `${this.pathToMusic}${key}.${format}`);
+
+    }
+    protected loadAllGameMusic(){
+        console.log(GameSound)
+        for (let key of Object.values(GameSound)) {
+            console.log(key)
+            this.loadGameSound(key);
+           
+        }
+    
     }
     protected initInventorySlotsMap() {
         const inventorySlotsPosition = this.load.getObject(AllLevelGameItems.INVENTORY_SLOT)
@@ -300,11 +320,11 @@ export default abstract class ProjectScene extends Scene {
 
         if (!this.option.isAstarChecked) {
             this.initPlayerStatHUD();
-            this.initNPCs();
+            // this.initNPCs();
             this.initAllGameItems();
             
         }
-        this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: this.levelMusicKey, loop: true, holdReference: true });
+        this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.LEVEL_BGM_KEY, loop: true, holdReference: true });
     }
 
     protected initNPCs(): void {
@@ -334,6 +354,8 @@ export default abstract class ProjectScene extends Scene {
     }
     public loadScene(): void {
         this.loadAllGameItems();
+        
+        this.loadAllGameMusic();
         // this.loadGameItems(this.laserGunsKey);
         this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince.json");
 
@@ -687,6 +709,8 @@ export default abstract class ProjectScene extends Scene {
                 if (!this.player._ai["isInvincible"]) {
                     this.player._ai["currentStat"]["currentHealth"]--;
                     this.handlePlayerStatChange("currentHealth");
+                    this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.PRINCE_HIT, loop: false, holdReference: true });
+
                 }
                 break;
             }
@@ -699,6 +723,8 @@ export default abstract class ProjectScene extends Scene {
             case PlayerInput.ULTIMATE: {
                 if (!this.ultimateWave.visible)
                     this.handleFireUltimate();
+                    this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.ULT_KEY, loop: false, holdReference: true });
+
             }
         }
     }
@@ -743,6 +769,7 @@ export default abstract class ProjectScene extends Scene {
                 if (this.player._ai["currentStat"]["currentHealth"] < this.playerMaxStatValue)
                     this.player._ai["currentStat"]["currentHealth"]++;
                 this.handlePlayerStatChange("currentHealth");
+                this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.HEALING_KEY, loop: false, holdReference: true });
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_HEALTH_PACK })
                 break;
             }
@@ -758,7 +785,7 @@ export default abstract class ProjectScene extends Scene {
                 break;
             }
             case AllLevelGameItems.MEDUSA: {
-                this.npcGroup.forEach(npc => npc.freeze())
+                this.npcGroup.forEach(npc => npc.freeze());
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_MEDUSA })
                 break;
             }
@@ -832,7 +859,8 @@ export default abstract class ProjectScene extends Scene {
         this.getLayer(menu).setHidden(flag);
     }
     protected handlePickGameItemsEvent(event: GameEvent) {
-        this.putItemToInventory(event)
+        this.putItemToInventory(event);
+
     }
     protected putItemToInventory(event: GameEvent) {
         const gameItem = <LaserGun>event.data.get("gameItem");
@@ -842,9 +870,11 @@ export default abstract class ProjectScene extends Scene {
                     gameItem.position.set(key[0], key[1]);
                     postionItemsMap.set(key, [gameItem]);
                     gameItem.isPickable = false;
+                    this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.PICK_ITEM, loop: false, holdReference: true });
                     return;
                 }
             }
+            
         }
     }
     protected showPositionByColor(position: Vec2, color: Color) {
@@ -1076,7 +1106,7 @@ export default abstract class ProjectScene extends Scene {
     protected sceneChange(nextScene) {
         this.viewport.setZoomLevel(1);
         this.sceneManager.changeToScene(nextScene, this.option);
-        this.emitter.fireEvent(GameEventType.STOP_SOUND, { key: this.levelMusicKey, loop: true, holdReference: true });
+        this.emitter.fireEvent(GameEventType.STOP_SOUND, { key: GameSound.LEVEL_BGM_KEY, loop: true, holdReference: true });
     }
     public initPauseMenuLayer() {
         const pauseSign = "\u23F8";
