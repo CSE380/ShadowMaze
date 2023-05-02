@@ -1,33 +1,47 @@
+import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import Scene from "../../Wolfie2D/Scene/Scene";
 import Timer from "../../Wolfie2D/Timing/Timer";
+import Color from "../../Wolfie2D/Utils/Color";
 import { GameLayers } from "../GameLayers";
 import ProjectScene from "../Scenes/AbstractScene";
+
 export default class Lighting {
-    private scene:Scene;
-    private isDark:boolean;
-    private darkTimer:Timer;
-    private lightTimer:Timer;
-    constructor(scene:ProjectScene){
-        this.scene =scene;
+    private scene: Scene;
+    private isDark: boolean;
+    private timers: Timer[];
+    private labels: Label[];
+    private timerIndex: number;
+    private colorLength = 7;
+    private colorArray: Color[];
+    constructor(scene: ProjectScene) {
+        this.scene = scene;
         this.isDark = true;
-        this.darkTimer=new Timer(1000,this.handledarkTimer.bind(this));
-        this.lightTimer=new Timer(500,this.handlelightTimer.bind(this));
-        this.darkTimer.start();
-    }
-    protected handledarkTimer(){
-       
-        if(this.isDark){
-            this.isDark =false;
-            this.scene.getLayer(GameLayers.FOG_OF_WAR).setHidden(true);
-            this.lightTimer.start();
+
+        // Create an array of timers and labels
+        this.timers = [];
+        this.colorArray = [];
+        this.labels = this.scene.getLayer(GameLayers.FOG_OF_WAR).getItems() as Label[];
+        for (let i = 0; i < this.colorLength; i++) {
+            const timer = new Timer(1000, this.handleTimer.bind(this, i));
+            const color = new Color(0, 0, 0, 1 / (i + 1));
+            console.log(this.colorArray)
+            this.colorArray.push(color);
+            this.timers.push(timer);
         }
+        // Start the first timer
+        this.timerIndex = 0;
+
+        this.timers[0].start();
     }
-    protected handlelightTimer(){
-        console.log(this.isDark)
-        if(!this.isDark){
-            this.isDark =true;
-            this.scene.getLayer(GameLayers.FOG_OF_WAR).setHidden(false);
-            this.darkTimer.start();
+
+    protected handleTimer(index: number) {
+        // Change the color of the label and start the next timer
+        console.log("runing")
+        this.labels.forEach(label =>label.backgroundColor = this.colorArray[this.timerIndex] );
+        this.timerIndex++;
+        if (this.timerIndex >= this.timers.length) {
+            this.timerIndex = 0;
         }
+        this.timers[this.timerIndex].start();
     }
 }
