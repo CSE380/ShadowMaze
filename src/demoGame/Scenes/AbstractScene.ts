@@ -58,6 +58,7 @@ import BasicTargetable from "../GameSystems/Targeting/BasicTargetable";
 import Position from "../GameSystems/Targeting/Position";
 import AnimatedSprite from "../../Wolfie2D/Nodes/Sprites/AnimatedSprite";
 import { GameSound } from "../GameSound";
+import { GameCharacters } from "../GameCharacters";
 //
 import { GameEventType } from "../../Wolfie2D/Events/GameEventType";
 import HealthbarHUD from "../GameSystems/HUD/HealthbarHUD";
@@ -142,7 +143,8 @@ export default abstract class ProjectScene extends Scene {
     // relative path to the assets
     protected pathToItems = `shadowMaze_assets/data/items/`;
     protected pathToSprite = `shadowMaze_assets/sprites/`;
-    protected pathToMusic = `shadowMaze_assets/music/`
+    protected pathToMusic = `shadowMaze_assets/music/`;
+    protected pathToSpriteSheets = `shadowMaze_assets/spritesheets/`;
     //Li
     protected healthbars: Map<number, HealthbarHUD>;
     protected battlers: (Battler & Actor)[];
@@ -169,7 +171,7 @@ export default abstract class ProjectScene extends Scene {
     public initScene(option: Record<string, any>): void {
         if (option !== undefined)
             this.option = option
-        this.option.isAstarChecked = true;
+        // this.option.isAstarChecked = true;
     }
     protected initLevelScene() {
         this.center = this.getViewport().getCenter();
@@ -178,10 +180,10 @@ export default abstract class ProjectScene extends Scene {
         this.levelEndTimer = new Timer(1000)
         this.isLevelEndEnetered = false;
         this.initLayers();
-
         this.levelEndTransitionLabel = this.addTweenLabel(this.levelEndTransitionLabel, PlayerEvents.LEVEL_END, tweensEffect.SLIDEIN);
         this.messageBoxLabel = this.addTweenLabel(this.messageBoxLabel, MessageBoxEvents.HIDDEN, tweensEffect.SLIDEIN);
     }
+    // load all resources
     protected loadGameItems(key: string) {
         this.load.object(key, `${this.pathToItems}${key}.json`);
         this.load.image(key, `${this.pathToSprite}${key}.png`);
@@ -190,14 +192,7 @@ export default abstract class ProjectScene extends Scene {
         let key = this.ultimateWaveKey;
         this.load.image(key, `${this.pathToSprite}${key}.png`);
     }
-    protected initUltimateWave() {
-        this.ultimateWave = this.add.sprite(this.ultimateWaveKey, this.GameLayers.BASE);
-        this.ultimateWave.visible = false
-        const halfSize = this.player.sizeWithZoom.scale(0.25);
-        this.ultimateWave.position.set(this.player.position.x, this.player.position.y);
-        this.ultimateWave.setCollisionShape(new AABB(this.player.position, halfSize));
-        this.visibleGroup.push(this.ultimateWave);
-    }
+
 
     protected loadAllGameItems() {
         for (let key of Object.values(AllLevelGameItems)) {
@@ -213,6 +208,15 @@ export default abstract class ProjectScene extends Scene {
         }
         this.load.audio(key, `${this.pathToMusic}${key}.${format}`);
 
+    }
+
+    protected loadGameCharacter(key:string){
+        this.load.spritesheet(key, `${this.pathToSpriteSheets}${key}.json`);
+    }
+    protected loadAllSpreadSheet(){
+        for (let key of Object.values(GameCharacters)) {
+            this.loadGameCharacter(key);
+        }
     }
     protected loadAllGameMusic(){
         for (let key of Object.values(GameSound)) {
@@ -269,6 +273,14 @@ export default abstract class ProjectScene extends Scene {
         }
 
     }
+    protected initUltimateWave() {
+        this.ultimateWave = this.add.sprite(this.ultimateWaveKey, this.GameLayers.BASE);
+        this.ultimateWave.visible = false
+        const halfSize = this.player.sizeWithZoom.scale(0.25);
+        this.ultimateWave.position.set(this.player.position.x, this.player.position.y);
+        this.ultimateWave.setCollisionShape(new AABB(this.player.position, halfSize));
+        this.visibleGroup.push(this.ultimateWave);
+    }
     private floatPickableItem(deltaT:number) {
         this.count+=deltaT
         for (let [key, gameItemArray] of (this.gameItemsMap)) {
@@ -301,6 +313,7 @@ export default abstract class ProjectScene extends Scene {
         // this.initLayers();
         this.initLevelScene();
         this.initPlayer();
+        this.initExit();
         let navmesh = this.initializeNavmesh(new PositionGraph(), this.walls);
         navmesh.registerStrategy("astar", new AstarStrategy(navmesh));
         navmesh.setStrategy("astar");
@@ -312,11 +325,10 @@ export default abstract class ProjectScene extends Scene {
             // this.initFogOfWar();
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
-        this.initializeLevelEnds();
 
         if (!this.option.isAstarChecked) {
             this.initPlayerStatHUD();
-            this.initNPCs();
+            // this.initNPCs();
             this.initAllGameItems();
             
         }
@@ -453,14 +465,6 @@ export default abstract class ProjectScene extends Scene {
             this.isLevelEndEnetered = true;
             this.levelEndTransitionLabel.tweens.play(tweensEffect.SLIDEIN);
         }
-
-    }
-    protected initializeLevelEnds() {
-        this.levelEndArea = <Rect>this.add.graphic(GraphicType.RECT, this.GameLayers.BASE, { position: this.levelEndPosition, size: this.levelEndHalfSize });
-        this.levelEndArea.addPhysics(undefined, undefined, false, true);
-        // this.levelEndArea.setTrigger(PhysicsGroups.PLAYER, PlayerEvents.PLAYER_ENTERED_LEVEL_END, null);
-        // this.levelEndArea.setTrigger(HW3PhysicsGroups.PLAYER, HW3Events.PLAYER_ENTERED_LEVEL_END, null);
-        this.levelEndArea.color = this.levelEndColor;
 
     }
     protected addTweenLabel(label: Label, onEndEvent: string, effect: string): Label {
@@ -1022,8 +1026,13 @@ export default abstract class ProjectScene extends Scene {
     /**
      * Initializes the player in the scene
      */
+    protected initExit():void{
+        let exit  = this.add.animatedSprite(PlayerActor, GameCharacters.EXIT, this.GameLayers.BASE);
+        exit.position.set(this.levelEndPosition.x,this.levelEndPosition.y);
+        exit.animation.playIfNotAlready(AnimationType.IDLE,true)
+    }
     protected initPlayer(): void {
-        let player = this.add.animatedSprite(PlayerActor, "prince", this.GameLayers.BASE);
+        let player = this.add.animatedSprite(PlayerActor, GameCharacters.PRINCE, this.GameLayers.BASE);
         this.player = player
         player.position.set(this.playerInitPosition.x, this.playerInitPosition.y);
         player.battleGroup = 2;
