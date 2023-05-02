@@ -169,7 +169,7 @@ export default abstract class ProjectScene extends Scene {
     public initScene(option: Record<string, any>): void {
         if (option !== undefined)
             this.option = option
-
+        this.option.isAstarChecked = true;
     }
     protected initLevelScene() {
         this.center = this.getViewport().getCenter();
@@ -215,13 +215,9 @@ export default abstract class ProjectScene extends Scene {
 
     }
     protected loadAllGameMusic(){
-        console.log(GameSound)
         for (let key of Object.values(GameSound)) {
-            console.log(key)
             this.loadGameSound(key);
-           
         }
-    
     }
     protected initInventorySlotsMap() {
         const inventorySlotsPosition = this.load.getObject(AllLevelGameItems.INVENTORY_SLOT)
@@ -578,10 +574,13 @@ export default abstract class ProjectScene extends Scene {
             if (this.path.isDone()) {
                 this.handleEnteredLevelEnd();
             }
+            else{
+               this.player.rotation = Vec2.UP.angleToCCW(this.path.getMoveDirection(this.player));
+            }
+
         }
         else {
-            this.handlePlayerStatChange("currentShield");
-            this.handlePlayerStatChange("currentHealth");
+            this.handleAllPlayStatChange();
             this.isPlayerAtItems();
             this.isPlayerAttacking();
             this.isPlayerUseItem();
@@ -589,8 +588,13 @@ export default abstract class ProjectScene extends Scene {
             this.floatPickableItem(deltaT);
             this.healthbars.forEach(healthbar => healthbar.update(deltaT));
         }
-
         this.isPlayerAtLevelEnd();
+    }
+    protected handleAllPlayStatChange(){
+        this.handlePlayerStatChange(PlayerStatKey.CURRENT_SHIELD);
+        this.handlePlayerStatChange(PlayerStatKey.CURRENT_HEALTH);
+        this.handlePlayerStatChange(PlayerStatKey.CURRENT_ENERGY);
+       
     }
     protected updateVisibleGroup() {
         this.updateTranparentLabels(this.player);
@@ -707,8 +711,8 @@ export default abstract class ProjectScene extends Scene {
             }
             case BattlerEvents.PRINCE_HIT: {
                 if (!this.player._ai["isInvincible"]) {
-                    this.player._ai["currentStat"]["currentHealth"]--;
-                    this.handlePlayerStatChange("currentHealth");
+                    this.player._ai["currentStat"][PlayerStatKey.CURRENT_HEALTH]--;
+                    this.handlePlayerStatChange(PlayerStatKey.CURRENT_HEALTH);
                     this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.PRINCE_HIT, loop: false, holdReference: true });
 
                 }
@@ -768,9 +772,9 @@ export default abstract class ProjectScene extends Scene {
                 break;
             }
             case AllLevelGameItems.HEALTH_PACKS: {
-                if (this.player._ai["currentStat"]["currentHealth"] < this.playerMaxStatValue)
-                    this.player._ai["currentStat"]["currentHealth"]++;
-                this.handlePlayerStatChange("currentHealth");
+                if (this.player._ai["currentStat"][PlayerStatKey.CURRENT_HEALTH] < this.playerMaxStatValue)
+                    this.player._ai["currentStat"][PlayerStatKey.CURRENT_HEALTH]++;
+                this.handlePlayerStatChange(PlayerStatKey.CURRENT_HEALTH);
                 this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.HEALING_KEY, loop: false, holdReference: true });
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_HEALTH_PACK })
                 break;
@@ -945,7 +949,7 @@ export default abstract class ProjectScene extends Scene {
         let unit = oneStatUI["barBg"].size.x / this.playerMaxStatValue;
         oneStatUI["bar"].size.set(oneStatUI["barBg"].size.x - unit * (this.playerMaxStatValue - currentStatValue), oneStatUI["barBg"].size.y);
         oneStatUI["bar"].position.set(oneStatUI["barBg"].position.x - (unit / 2 / this.getViewScale()) * (this.playerMaxStatValue - currentStatValue), oneStatUI["barBg"].position.y);
-        if (type == "currentHealth")
+        if (type == PlayerStatKey.CURRENT_HEALTH)
             oneStatUI["bar"].backgroundColor = currentStatValue < this.playerMaxStatValue * 1 / 4 ? Color.RED : currentStatValue < this.playerMaxStatValue * 3 / 4 ? Color.YELLOW : Color.GREEN;
     }
 

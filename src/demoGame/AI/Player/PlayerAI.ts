@@ -61,6 +61,7 @@ export default class PlayerAI extends StateMachineAI implements AI {
         this.receiver.subscribe(BattlerEvents.PRINCE_DEAD);
         this.receiver.subscribe(BattlerEvents.PRINCE_HIT);
         this.receiver.subscribe(BattlerEvents.MONSTER_ATTACK);
+        // this.receiver.subscribe(BattlerEvents.MONSTER_HIT);
         this.invincibleTime = new Timer(1000, ()=>this.isInvincible =this.resetFlag(this.isInvincible), false);
         this.defendingTime= new Timer(300, ()=>this.isDefending = this.resetFlag(this.isDefending), false);
         this.activate(null)
@@ -88,12 +89,12 @@ export default class PlayerAI extends StateMachineAI implements AI {
     public destroy(): void { }
     public updateCurseStat(deltaT: number){
         if (this.isCursed) {
-            if(this.currentStat[PlayerStatKey.CURRENT_Health]<=this.cursedThreshHold){
+            if(this.currentStat[PlayerStatKey.CURRENT_HEALTH]<=this.cursedThreshHold){
                 this.dmg = 2;
                 this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.UNUSE_CURSED_SWORD})
                 this.isCursed = false;
             }
-            this.dynamicUpdatePlayerStat(this.cursedRatio * deltaT, PlayerStatKey.CURRENT_Health);
+            this.dynamicUpdatePlayerStat(this.cursedRatio * deltaT, PlayerStatKey.CURRENT_HEALTH);
         }
     }
     public dynamicUpdatePlayerStat(deltaT: number, stat: string) {
@@ -116,9 +117,19 @@ export default class PlayerAI extends StateMachineAI implements AI {
             case BattlerEvents.PRINCE_DEAD: {
                 break;
             }
+            case BattlerEvents.MONSTER_HIT:{
+                
+                this.handleMonsterHit();
+            }
         }
     }
     // TO DO play hit animation
+    protected handleMonsterHit(){
+        
+        if(this.currentStat[PlayerStatKey.CURRENT_ENERGY]<this.maxStatValue){
+            this.currentStat[PlayerStatKey.CURRENT_ENERGY]++;
+        }
+    }
     protected handleMonsterAttack(){
         if(this.owner.animation.isPlaying(AnimationType.SHIELDING)){
             if(!this.isDefending){
