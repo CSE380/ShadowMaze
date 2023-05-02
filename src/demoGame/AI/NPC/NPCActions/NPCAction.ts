@@ -77,11 +77,13 @@ export default abstract class NPCAction extends GoapAction {
             return
         }
         if (this.path != null) {
-            if (this.path.isDone()) {
+            if (this.path.isAlmostDone()) {
                 if (this.actor.atTarget()) {
-
                     this.performAction(this.target);
                     this.finished();
+                    if (!this.actor.animation.isPlaying(AnimationType.ATTACKING) && !this.actor.animation.isPlaying(AnimationType.MOVING) && !this.actor.animation.isPlaying(AnimationType.IDLE)) {
+                        this.actor.animation.play(AnimationType.IDLE);
+                    }
                     return;
                 }
                 if (this.target == null) {
@@ -93,15 +95,12 @@ export default abstract class NPCAction extends GoapAction {
             }
             else {
                 this.actor.moveOnPath(0.7, this.path);
-                if (this.actor.animation.isPlaying(AnimationType.HIT)) {
+                if (this.actor.animation.isPlaying(AnimationType.HIT) || this.actor.animation.isPlaying(AnimationType.ATTACKING)) {
                     this.actor.moveOnPath(0, this.path);
                 }
                 if (!this.actor.animation.isPlaying(AnimationType.MOVING)) {
-                    this.actor.animation.queue(AnimationType.MOVING, true);
+                    this.actor.animation.queue(AnimationType.MOVING);
                 }
-
-                
-
             }
         }
     }

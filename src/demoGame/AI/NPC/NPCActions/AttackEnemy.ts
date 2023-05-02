@@ -16,10 +16,8 @@ export default class AttackEnemy extends NPCAction {
         this.timer = new Timer(2000);
     }
     public performAction(target: TargetableEntity): void {
-        // this.timer.isStopped() ? console.log("weapon cooling down!") : console.log("weapon ready");
         if (this.timer.isStopped()) {
             this.actor.animation.play(AnimationType.ATTACKING);
-            this.actor.animation.queue(AnimationType.IDLE, true);
             this.emitter.fireEvent(BattlerEvents.MONSTER_ATTACK);
             this.timer.start();
         }

@@ -24,6 +24,10 @@ export default class NavigationPath implements Path<Vec2> {
 		this.distanceThreshold = 4;
 	}
 
+	isAlmostDone(): boolean {
+		return this.path.size() < 5;
+	}
+
 	/**
 	 * Returns the status of navigation along this NavigationPath
 	 * @returns True if the node has reached the end of the path, false otherwise

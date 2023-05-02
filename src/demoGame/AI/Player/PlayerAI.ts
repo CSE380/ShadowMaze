@@ -84,6 +84,7 @@ export default class PlayerAI extends StateMachineAI implements AI {
         }
         this.updateCurseStat(deltaT);
         this.dynamicUpdatePlayerStat(3 * deltaT, PlayerStatKey.CURRENT_SHIELD);
+
     }
 
     public destroy(): void { }
@@ -140,14 +141,15 @@ export default class PlayerAI extends StateMachineAI implements AI {
         }
         else{
             this.emitter.fireEvent(BattlerEvents.PRINCE_HIT);
-
+            
         }
     }
     protected handlePrinceHit() {
-
+        
         if (!this.isInvincible) {
             this.isInvincible = true;
             this.invincibleTime.start();
+            // this.owner.animation.play(AnimationType.HIT);
             if (this.currentStat["currentHealth"] <= this.minStatValue) {
                 this.emitter.fireEvent(BattlerEvents.PRINCE_DEAD);
                 return;

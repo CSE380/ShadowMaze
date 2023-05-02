@@ -328,7 +328,7 @@ export default abstract class ProjectScene extends Scene {
 
         if (!this.option.isAstarChecked) {
             this.initPlayerStatHUD();
-            // this.initNPCs();
+            this.initNPCs();
             this.initAllGameItems();
             
         }
