@@ -576,6 +576,7 @@ export default abstract class ProjectScene extends Scene {
             }
             else{
                this.player.rotation = Vec2.UP.angleToCCW(this.path.getMoveDirection(this.player));
+               this.player.animation.playIfNotAlready(AnimationType.MOVING,true);
             }
 
         }
