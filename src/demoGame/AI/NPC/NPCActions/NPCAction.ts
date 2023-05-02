@@ -68,7 +68,6 @@ export default abstract class NPCAction extends GoapAction {
     }
 
     public update(deltaT: number): void {
-        // console.log(this.target)
         if (this.actor.frozen) {
             return;
         }
@@ -89,6 +88,7 @@ export default abstract class NPCAction extends GoapAction {
                 if (this.target == null) {
                     this.target = this.targetFinder.find(this.targets);
                 }
+                console.log("line 91")
                 this.path = this.actor.getPath(this.actor.position, this.target.position);
                 this.currentDistance = this.actor.position.distanceTo(this.target.position);
 
