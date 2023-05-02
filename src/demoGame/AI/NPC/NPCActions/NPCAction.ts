@@ -93,8 +93,11 @@ export default abstract class NPCAction extends GoapAction {
             }
             else {
                 this.actor.moveOnPath(0.7, this.path);
+                if (this.actor.animation.isPlaying(AnimationType.HIT)) {
+                    this.actor.moveOnPath(0, this.path);
+                }
                 if (!this.actor.animation.isPlaying(AnimationType.MOVING)) {
-                    this.actor.animation.playIfNotAlready(AnimationType.MOVING, true);
+                    this.actor.animation.queue(AnimationType.MOVING, true);
                 }
 
                 

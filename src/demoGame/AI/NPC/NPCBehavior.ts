@@ -87,7 +87,6 @@ export default abstract class NPCBehavior extends StateMachineGoapAI<NPCAction> 
                 return;
             }
             this.owner.animation.play(AnimationType.HIT);
-            this.owner.animation.queue(AnimationType.IDLE, true);
         }
     }
     protected handleinvincibleTimeEnd = () => {
