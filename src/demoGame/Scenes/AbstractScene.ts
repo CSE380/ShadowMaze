@@ -40,7 +40,7 @@ import Graphic from "../../Wolfie2D/Nodes/Graphic";
 import { MainMenuButtonEvent, PauseButtonEvent } from "../CustomizedButton";
 import AABB from "../../Wolfie2D/DataTypes/Shapes/AABB";
 import PlayerAI from "../AI/Player/PlayerAI";
-import { AllLevelGameItems, Level1GameItems } from "../GameItems";
+import { AllGameItemsType, AllLevelGameItems, Level1GameItems } from "../GameItems";
 import { PlayerInput } from "../AI/Player/PlayerController";
 import LaserGun from "../GameSystems/ItemSystem/Items/LaserGuns";
 import { ACTIONTYPE } from "../ActionType";
@@ -73,6 +73,7 @@ const enum tweensEffect {
 export default abstract class AbstractScene extends Scene {
     protected walls: OrthogonalTilemap;
     protected path: NavigationPath;
+    protected currentLevelGameItems:AllGameItemsType;
     //button event
     protected PauseButtonEvent = PauseButtonEvent;
     protected wallSize: number;
@@ -199,8 +200,8 @@ export default abstract class AbstractScene extends Scene {
     }
 
 
-    protected loadAllGameItems() {
-        for (let key of Object.values(AllLevelGameItems)) {
+    protected loadCurrentLevelGameItems() {
+        for (let key of Object.values(this.currentLevelGameItems)) {
             this.loadGameItems(key);
         }
     }
@@ -237,7 +238,7 @@ export default abstract class AbstractScene extends Scene {
         }
     }
     protected initAllGameItems() {
-        for (let key of Object.values(AllLevelGameItems)) {
+        for (let key of Object.values(this.currentLevelGameItems)) {
             let gameItem = this.load.getObject(key);
             const items = new Array<gameItems>(gameItem.position.length);
             for (let i = 0; i < items.length; i++) {
@@ -364,7 +365,7 @@ export default abstract class AbstractScene extends Scene {
         }
     }
     public loadScene(): void {
-        this.loadAllGameItems();
+        this.loadCurrentLevelGameItems();
 
         this.loadAllGameMusic();
         // this.loadGameItems(this.laserGunsKey);
@@ -686,8 +687,6 @@ export default abstract class AbstractScene extends Scene {
         // console.log(Input.getGlobalMousePosition().toString());
     }
     private createItemDescription(gameItem: gameItems) {
-        console.log(gameItem.name);
-        console.log(AllLevelGameItems[gameItem.name])
         this.itemDescriptionLabel = <Label>this.add.uiElement(UIElementType.LABEL,
             this.GameLayers.UI, { position: new Vec2(250, 96 - 50), text: `${gameItem.name}` });
     }

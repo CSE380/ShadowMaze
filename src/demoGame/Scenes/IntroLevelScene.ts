@@ -6,7 +6,6 @@ import AbstractScene from "./AbstractScene";
 import Battler from "../GameSystems/BattleSystem/Battler";
 
 import { MainMenuButtonEvent, PauseButtonEvent } from "../CustomizedButton";
-
 import { PlayerEvents } from "../ProjectEvents";
 import CheatCodeMenuScene from "./CheatCodeMenuScene";
 import { MenuState } from "../MenuState";
@@ -18,7 +17,7 @@ const ACTIONTYPE = {
 
 export default class IntroLevelScene extends AbstractScene {
 
-
+    protected currentLevelGameItems = Level1GameItems;
     /**
      * @see Scene.update()
      */
@@ -27,7 +26,7 @@ export default class IntroLevelScene extends AbstractScene {
 
         // this.load.audio(this.levelMusicKey, IntroLevelScene.LEVEL_MUSIC_PATH);
 
-        this.loadAllGameItems();
+        this.loadCurrentLevelGameItems();
         this.loadUltimateWave();
         this.loadAllGameMusic();
         this.loadAllSpreadSheet();

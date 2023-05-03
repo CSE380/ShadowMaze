@@ -14,8 +14,10 @@ export enum AllLevelGameItems {
 }
 
 export enum Level1GameItems {
-    INVENTORY_SLOT = AllLevelGameItems.INVENTORY_SLOT,
     LANTERNS = "lantern",
+    INVENTORY_SLOT = "inventorySlot",
+    IRON_SHIELD = "ironShield",
+    IRON_SWORD =  "ironSword",
 }
-export type AllGameItemsType= AllLevelGameItems | Level1GameItems;
+export type AllGameItemsType=typeof AllLevelGameItems | typeof Level1GameItems;
 
