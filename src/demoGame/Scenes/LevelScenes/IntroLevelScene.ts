@@ -17,7 +17,7 @@ const ACTIONTYPE = {
 
 export default class IntroLevelScene extends AbstractScene {
 
-    // protected currentLevelGameItems = Level1GameItems;
+    protected currentLevelGameItems = Level1GameItems;
     /**
      * @see Scene.update()
      */

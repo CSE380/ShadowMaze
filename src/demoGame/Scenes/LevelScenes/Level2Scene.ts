@@ -1,9 +1,9 @@
-import { AllLevelGameItems, Level1GameItems } from "../../GameItems";
+import { AllLevelGameItems, Level1GameItems, Level2GameItems } from "../../GameItems";
 import AbstractScene from "../AbstractScene";
 import IntroLevelScene from "./IntroLevelScene";
 
 export default class Level2Scene extends IntroLevelScene {
-    protected currentLevelGameItems = AllLevelGameItems;
+    // protected currentLevelGameItems = Level2GameItems;
     public override loadScene() {
         this.loadCurrentLevelGameItems();
         this.loadUltimateWave();
