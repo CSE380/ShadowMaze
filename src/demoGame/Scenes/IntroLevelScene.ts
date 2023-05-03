@@ -29,7 +29,7 @@ export default class IntroLevelScene extends AbstractScene {
         this.loadCurrentLevelGameItems();
         this.loadUltimateWave();
         this.loadAllGameMusic();
-        this.loadAllSpreadSheet();
+        this.loadAllSpriteSheet();
         this.loadAllMonstersPosition();
         this.load.image(this.inGameControlTextBackground, "shadowMaze_assets/images/inGameControlTextBackground.png");
         this.load.image(this.inGameHelpTextBackground, "shadowMaze_assets/images/inGameHelpTextBackground.png");

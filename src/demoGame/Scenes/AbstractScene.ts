@@ -222,7 +222,7 @@ export default abstract class AbstractScene extends Scene {
     protected loadAllMonstersPosition(){
         this.load.object("monster", `${this.pathToMonster}/monster.json`);
     }
-    protected loadAllSpreadSheet() {
+    protected loadAllSpriteSheet() {
         for (let key of Object.values(GameCharacters)) {
             this.loadGameCharacter(key);
         }
