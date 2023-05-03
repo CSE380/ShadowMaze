@@ -30,7 +30,7 @@ export default class IntroLevelScene extends AbstractScene {
         this.loadUltimateWave();
         this.loadAllGameMusic();
         this.loadAllSpreadSheet();
-        this.load.object("monster", "shadowMaze_assets/data/enemies/monster.json");
+        this.loadAllMonstersPosition();
         this.load.image(this.inGameControlTextBackground, "shadowMaze_assets/images/inGameControlTextBackground.png");
         this.load.image(this.inGameHelpTextBackground, "shadowMaze_assets/images/inGameHelpTextBackground.png");
 

@@ -3,4 +3,5 @@ export enum GameCharacters{
     BALCK_PUDDING="black_pudding",
     TROLL="troll",
     EXIT="exit",
+    
 }

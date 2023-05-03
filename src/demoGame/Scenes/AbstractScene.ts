@@ -147,7 +147,8 @@ export default abstract class AbstractScene extends Scene {
     protected isPauseMenuHidden: boolean;
     protected MenuCurentState: MenuState;
     // relative path to the assets
-    protected pathToItems = `shadowMaze_assets/data/items/`;
+    protected pathToItems = `shadowMaze_assets/data/Level1data/items/`;
+    protected pathToMonster = `shadowMaze_assets/data/Level1data/monsters/`
     protected pathToSprite = `shadowMaze_assets/sprites/`;
     protected pathToMusic = `shadowMaze_assets/music/`;
     protected pathToSpriteSheets = `shadowMaze_assets/spritesheets/`;
@@ -215,7 +216,11 @@ export default abstract class AbstractScene extends Scene {
         this.load.audio(key, `${this.pathToMusic}${key}.${format}`);
     }
     protected loadGameCharacter(key: string) {
+       
         this.load.spritesheet(key, `${this.pathToSpriteSheets}${key}.json`);
+    }
+    protected loadAllMonstersPosition(){
+        this.load.object("monster", `${this.pathToMonster}/monster.json`);
     }
     protected loadAllSpreadSheet() {
         for (let key of Object.values(GameCharacters)) {
