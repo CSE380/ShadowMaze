@@ -9,6 +9,7 @@ import BasicFinder from "../../../GameSystems/Searching/BasicFinder";
 import NavigationPath from "../../../../Wolfie2D/Pathfinding/NavigationPath";
 import Vec2 from "../../../../Wolfie2D/DataTypes/Vec2";
 import { AnimationType } from "../../Player/PlayerStates/PlayerState";
+import Timer from "../../../../Wolfie2D/Timing/Timer";
 /**
  * An abstract GoapAction for an NPC. All NPC actions consist of doing three things:
  * 
@@ -28,6 +29,7 @@ export default abstract class NPCAction extends GoapAction {
 
     protected parent: NPCBehavior;
     protected actor: NPCActor;
+    protected original_target: Vec2 = Vec2.ZERO;
 
     // The targeting strategy used for this GotoAction - determines how the target is selected basically
     protected _targetFinder: Finder<TargetableEntity>;
@@ -38,6 +40,8 @@ export default abstract class NPCAction extends GoapAction {
     // The path from the NPC to the target
     protected _path: NavigationPath | null;
 
+    protected pathTimer: Timer;
+
     protected currentDistance: number;
     public constructor(parent: NPCBehavior, actor: NPCActor) {
         super(parent, actor);
@@ -46,6 +50,8 @@ export default abstract class NPCAction extends GoapAction {
         this.target = null;
         this.path = null;
         this.currentDistance = 0;
+        this.pathTimer = new Timer(1000);
+        this.pathTimer.start();
     }
 
 
@@ -62,12 +68,12 @@ export default abstract class NPCAction extends GoapAction {
             this.actor.setTarget(this.target);
             // Construct a path from the actor to the target
             this.path = this.actor.getPath(this.actor.position, this.target.position);
-
-
         }
     }
 
     public update(deltaT: number): void {
+
+
         if (this.actor.frozen) {
             return;
         }
@@ -75,8 +81,12 @@ export default abstract class NPCAction extends GoapAction {
             this.target = this.targetFinder.find(this.targets);
             return
         }
+        // console.log(this.target.position.toString());
+        //there exit a path from the monster to the target
         if (this.path != null) {
+            //if the path is almonst done
             if (this.path.isAlmostDone()) {
+                //if the monster is at the targert perform its action and return
                 if (this.actor.atTarget()) {
                     this.performAction(this.target);
                     this.finished();
@@ -88,12 +98,32 @@ export default abstract class NPCAction extends GoapAction {
                 if (this.target == null) {
                     this.target = this.targetFinder.find(this.targets);
                 }
-                console.log("line 91")
+                //if we get to this point, that means the path was complete but the monster was not at the target
+                //we give the monster a new path to the target and continue
                 this.path = this.actor.getPath(this.actor.position, this.target.position);
                 this.currentDistance = this.actor.position.distanceTo(this.target.position);
 
             }
-            else {
+            else { 
+                //I NEED THE ORIGINAL TARGET
+                // if (this.original_target.equals(Vec2.ZERO)) {
+                //     this.original_target = this.target.position.clone();
+                // }
+                // console.log(this.actor.position.distanceTo(this.target.position));
+                // console.log(this.actor.position.distanceTo(this.original_target));
+                // if (this.actor.position.distanceTo(this.target.position) < this.actor.position.distanceTo(this.original_target)) {
+                //     console.log("smaller")
+                //     this.original_target = this.target.position.clone();
+                //     this.path = this.actor.getPath(this.actor.position, this.target.position);
+                // }
+                // else {
+                //     console.log("bigger")
+                // }
+                if (this.pathTimer.isStopped()) {
+                    this.path = this.actor.getPath(this.actor.position, this.target.position);
+                    this.pathTimer.start()
+                }
+
                 this.actor.moveOnPath(0.7, this.path);
                 if (this.actor.animation.isPlaying(AnimationType.HIT) || this.actor.animation.isPlaying(AnimationType.ATTACKING)) {
                     this.actor.moveOnPath(0, this.path);
