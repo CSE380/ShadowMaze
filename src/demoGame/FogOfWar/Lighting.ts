@@ -11,7 +11,7 @@ export default class Lighting {
     private timers: Timer[];
     private labels: Label[];
     private timerIndex: number;
-    private colorLength = 24;
+    private colorLength = 50;
     private colorArray: Color[];
     constructor(scene: AbstractScene) {
         this.scene = scene;
@@ -29,7 +29,7 @@ export default class Lighting {
             } else {
                 j = i;
             }
-            const ratio = 0.7 / this.colorLength;
+            const ratio = 0.6 / this.colorLength;
             const alpha = 0.7 + ratio * j;
             console.log(alpha)
             const color = new Color(0, 0, 0, alpha);

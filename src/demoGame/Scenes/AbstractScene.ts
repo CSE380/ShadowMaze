@@ -172,8 +172,6 @@ export default abstract class AbstractScene extends Scene {
         }
         this.healthbars = new Map<number, HealthbarHUD>();
         this.battlers = new Array<Battler & Actor>();
-        // this.isDark = true;
-        // this.darkTimer = new Timer(2000,handle)
     }
     public initScene(option: Record<string, any>): void {
         if (option !== undefined)
@@ -327,13 +325,11 @@ export default abstract class AbstractScene extends Scene {
         this.navManager.addNavigableEntity("navmesh", navmesh);
 
         this.initInventorySlotsMap();
-        // create screen first 
         if (!this.option.isfogOfWarChecked) {
             const Fog = new FogOfWarManagement(this,this.add,this.wallSize,this.labelSize);
-            // Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
-            Fog.initFogOfWar(FogOfWarMode.STANDARD);
+            Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
+            // Fog.initFogOfWar(FogOfWarMode.STANDARD);
         }
-
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         if (!this.option.isAstarChecked) {
@@ -592,14 +588,12 @@ export default abstract class AbstractScene extends Scene {
                 this.player.rotation = Vec2.UP.angleToCCW(this.path.getMoveDirection(this.player));
                 this.player.animation.playIfNotAlready(AnimationType.MOVING, true);
             }
-
         }
         else {
             this.handleAllPlayStatChange();
             this.isPlayerAtItems();
             this.isPlayerAttacking();
             this.isPlayerUseItem();
-
             this.floatPickableItem(deltaT);
             this.healthbars.forEach(healthbar => healthbar.update(deltaT));
         }
