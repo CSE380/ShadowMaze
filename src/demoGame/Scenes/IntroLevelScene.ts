@@ -10,6 +10,7 @@ import { MainMenuButtonEvent, PauseButtonEvent } from "../CustomizedButton";
 import { PlayerEvents } from "../ProjectEvents";
 import CheatCodeMenuScene from "./CheatCodeMenuScene";
 import { MenuState } from "../MenuState";
+import { AllLevelGameItems, Level1GameItems } from "../GameItems";
 const ACTIONTYPE = {
     PICK: "PICK",
     USE: "USE",

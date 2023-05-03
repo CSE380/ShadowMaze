@@ -127,7 +127,7 @@ export default abstract class AbstractScene extends Scene {
     protected dmgLabel: Label;
     protected defLabel: Label;
     //items to game 
-
+    protected itemDescriptionLabel: Label;
     protected gameItemsMap = new Map<string, Array<gameItems>>();
     protected laserGunsKey = "laserGuns";
     protected lanternShape: AABB;
@@ -212,9 +212,7 @@ export default abstract class AbstractScene extends Scene {
             format = 'wav';
         }
         this.load.audio(key, `${this.pathToMusic}${key}.${format}`);
-
     }
-
     protected loadGameCharacter(key: string) {
         this.load.spritesheet(key, `${this.pathToSpriteSheets}${key}.json`);
     }
@@ -271,6 +269,7 @@ export default abstract class AbstractScene extends Scene {
                 items[i].name = key;
                 items[i].isPickable = isPickableFlag;
                 items[i].floatInitPosition = gameItem.position[i][1];
+
                 this.gameItemGroup.push(items[i]);
 
             }
@@ -297,14 +296,12 @@ export default abstract class AbstractScene extends Scene {
             )
         }
     }
+
     private createDefDmgLabel(position: number[], statKey: PlayerStatKey): Label {
         const stat = this.player._ai[statKey];
-
         return <Label>this.add.uiElement(UIElementType.LABEL, this.GameLayers.BASE, {
             position: new Vec2(position[0] + 22, position[1]), text: `${stat}`
         });
-
-
     }
     public startScene(): void {
         let tilemapLayers = this.add.tilemap("level");
@@ -326,8 +323,8 @@ export default abstract class AbstractScene extends Scene {
 
         this.initInventorySlotsMap();
         if (!this.option.isfogOfWarChecked) {
-            const Fog = new FogOfWarManagement(this,this.add,this.wallSize,this.labelSize);
-            Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
+            const Fog = new FogOfWarManagement(this, this.add, this.wallSize, this.labelSize);
+            // Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
             // Fog.initFogOfWar(FogOfWarMode.STANDARD);
         }
         this.center = this.viewport.getHalfSize();
@@ -413,7 +410,7 @@ export default abstract class AbstractScene extends Scene {
         // UILayer stuff
         // this.addUILayer(GAMELayers.UIlayer);
         // HP Label
-        const currentStat = this.player._ai["currentStat"];
+        const currentStat = this.player._ai[PlayerStatKey.CURRENT_STAT];
         let yOffset = 10;
         let index = 0;
         let newText: string;
@@ -594,6 +591,7 @@ export default abstract class AbstractScene extends Scene {
             this.isPlayerAtItems();
             this.isPlayerAttacking();
             this.isPlayerUseItem();
+
             this.floatPickableItem(deltaT);
             this.healthbars.forEach(healthbar => healthbar.update(deltaT));
         }
@@ -675,6 +673,23 @@ export default abstract class AbstractScene extends Scene {
 
             }
         })
+
+    }
+    private isMouseHoveringAtItem() {
+        for (const [num, postionMap] of this.inventorySlotsMap) {
+            for (const [position, gameItemArray] of postionMap) {
+                gameItemArray.forEach(gameItem => {
+                    gameItem.visible && this.createItemDescription(gameItem)
+                })
+            }
+        }
+        // console.log(Input.getGlobalMousePosition().toString());
+    }
+    private createItemDescription(gameItem: gameItems) {
+        console.log(gameItem.name);
+        console.log(AllLevelGameItems[gameItem.name])
+        this.itemDescriptionLabel = <Label>this.add.uiElement(UIElementType.LABEL,
+            this.GameLayers.UI, { position: new Vec2(250, 96 - 50), text: `${gameItem.name}` });
     }
     public isPlayerAtLevelEnd() {
         if (this.levelEndPosition.distanceSqTo(this.player.position) < 10) {
@@ -713,15 +728,15 @@ export default abstract class AbstractScene extends Scene {
         switch (event.type) {
             case BattlerEvents.MONSTER_DEAD: {
                 this.handleBattlerKilled(event);
-                if (this.player._ai["currentStat"]["currentEnergy"] < this.playerMaxStatValue) {
-                    this.player._ai["currentStat"]["currentEnergy"]++;
+                if (this.player._ai[PlayerStatKey.CURRENT_STAT]["currentEnergy"] < this.playerMaxStatValue) {
+                    this.player._ai[PlayerStatKey.CURRENT_STAT]["currentEnergy"]++;
                     this.handlePlayerStatChange("currentEnergy");
                 }
                 break;
             }
             case BattlerEvents.PRINCE_HIT: {
                 if (!this.player._ai["isInvincible"]) {
-                    this.player._ai["currentStat"][PlayerStatKey.CURRENT_HEALTH]--;
+                    this.player._ai[PlayerStatKey.CURRENT_STAT][PlayerStatKey.CURRENT_HEALTH]--;
                     this.handlePlayerStatChange(PlayerStatKey.CURRENT_HEALTH);
                     this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.PRINCE_HIT, loop: false, holdReference: true });
 
@@ -770,7 +785,7 @@ export default abstract class AbstractScene extends Scene {
     protected handleUseGameItemsEvent(event: GameEvent) {
         this.RemoveItemFromInventory(event)
         switch (event.type) {
-            case AllLevelGameItems.LANTERNS: {
+            case AllLevelGameItems.LANTERN: {
                 this.lanternDuration = !this.lanternDuration;
                 this.ultimateWavePlayerDistance = 70;
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_LANTERN })
@@ -781,9 +796,9 @@ export default abstract class AbstractScene extends Scene {
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_DOOR })
                 break;
             }
-            case AllLevelGameItems.HEALTH_PACKS: {
-                if (this.player._ai["currentStat"][PlayerStatKey.CURRENT_HEALTH] < this.playerMaxStatValue)
-                    this.player._ai["currentStat"][PlayerStatKey.CURRENT_HEALTH]++;
+            case AllLevelGameItems.HEALTH_PACK: {
+                if (this.player._ai[PlayerStatKey.CURRENT_STAT][PlayerStatKey.CURRENT_HEALTH] < this.playerMaxStatValue)
+                    this.player._ai[PlayerStatKey.CURRENT_STAT][PlayerStatKey.CURRENT_HEALTH]++;
                 this.handlePlayerStatChange(PlayerStatKey.CURRENT_HEALTH);
                 this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.HEALING_KEY, loop: false, holdReference: true });
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_HEALTH_PACK })
@@ -876,6 +891,7 @@ export default abstract class AbstractScene extends Scene {
     }
     protected handlePickGameItemsEvent(event: GameEvent) {
         this.putItemToInventory(event);
+        // this.isMouseHoveringAtItem();
 
     }
     protected putItemToInventory(event: GameEvent) {
@@ -912,7 +928,6 @@ export default abstract class AbstractScene extends Scene {
 
     public initTransparentLabelByPosition(position: Vec2): Array<Label> {
         const labels = this.getLabelsByPosition(position)
-        console.log(labels)
         labels.forEach(label => { this.updateTranparentLablesColor(label) })
 
         return labels;
@@ -964,8 +979,9 @@ export default abstract class AbstractScene extends Scene {
     }
     protected handlePlayerStatChange(type: string): void {
         // this.PlayerStatUI[PlayerStatsNameArray[index]] = statUI;
+        PlayerStatKey.CURRENT_STAT
         let oneStatUI = this.PlayerStatUI[type]
-        const currentStatValue = this.player._ai["currentStat"][type]
+        const currentStatValue = this.player._ai[PlayerStatKey.CURRENT_STAT][type]
         let unit = oneStatUI["barBg"].size.x / this.playerMaxStatValue;
         oneStatUI["bar"].size.set(oneStatUI["barBg"].size.x - unit * (this.playerMaxStatValue - currentStatValue), oneStatUI["barBg"].size.y);
         oneStatUI["bar"].position.set(oneStatUI["barBg"].position.x - (unit / 2 / this.getViewScale()) * (this.playerMaxStatValue - currentStatValue), oneStatUI["barBg"].position.y);
@@ -1037,6 +1053,7 @@ export default abstract class AbstractScene extends Scene {
                 }
             })
         }
+
     }
     /**
      * Initializes the player in the scene
@@ -1070,8 +1087,6 @@ export default abstract class AbstractScene extends Scene {
         else {
             player.addAI(PlayerAI);
             this.initUltimateWave();
-          
-
         }
         // 
         player.animation.play("IDLE");
@@ -1252,7 +1267,7 @@ export default abstract class AbstractScene extends Scene {
 
     }
 
-    
+
 
     public abstract getBattlers(): Battler[];
 }

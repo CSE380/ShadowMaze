@@ -5,7 +5,7 @@ export enum PlayerStatKey{
     CURRENT_HEALTH="currentHealth",
     CURRENT_ENERGY="currentEnergy",
     CURRENT_SHIELD="currentShield",
-    CURRENT_STAT = "cuurentStat",
+    CURRENT_STAT = "currentStat",
     DMG="dmg",
     ULT_DMG= "ultDmg",
     DEF="def",
