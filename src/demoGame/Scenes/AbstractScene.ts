@@ -69,11 +69,17 @@ const enum tweensEffect {
     SLIDEOUT = "slideOut",
     FADEIN = "fadeIn",
     FADEOUT = "fadeOut",
+    
 }
+export const Color1 = {
+    Red : "Red",
+    Green : "Green"
+} as const
 export default abstract class AbstractScene extends Scene {
     protected walls: OrthogonalTilemap;
     protected path: NavigationPath;
     protected currentLevelGameItems:AllGameItemsType;
+    protected currentColor:{};
     //button event
     protected PauseButtonEvent = PauseButtonEvent;
     protected wallSize: number;
@@ -82,9 +88,6 @@ export default abstract class AbstractScene extends Scene {
     protected backgroundImage: Sprite;
     protected GameLayers = GameLayers;
     protected backButtonPosition = new Vec2(50, 50);
-
-    protected isDark: boolean;
-    protected darkTimer: Timer;
     //message box to display invalid action
     // level transtion
     protected levelTransitionTimer: Timer;
@@ -174,10 +177,12 @@ export default abstract class AbstractScene extends Scene {
         }
         this.healthbars = new Map<number, HealthbarHUD>();
         this.battlers = new Array<Battler & Actor>();
+        this.currentColor = Color1;
     }
     public initScene(option: Record<string, any>): void {
         if (option !== undefined)
             this.option = option
+       
         // this.option.isAstarChecked = true;
     }
     protected initLevelScene() {
@@ -204,6 +209,9 @@ export default abstract class AbstractScene extends Scene {
     protected loadCurrentLevelGameItems() {
         for (let key of Object.values(this.currentLevelGameItems)) {
             this.loadGameItems(key);
+        }
+        for (let key of Object.values(this.currentColor)) {
+            console.log(key);
         }
     }
     protected loadGameSound(key: string) {

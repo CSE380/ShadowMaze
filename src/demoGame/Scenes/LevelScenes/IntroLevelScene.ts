@@ -14,14 +14,18 @@ const ACTIONTYPE = {
     PICK: "PICK",
     USE: "USE",
 }
-
+const Color2 = {
+    Yellow : "Yellow",
+    Blue : "Blue"
+} as const
 export default class IntroLevelScene extends AbstractScene {
 
-    protected currentLevelGameItems = Level1GameItems;
+    
     /**
      * @see Scene.update()
      */
     public override loadScene() {
+        this.currentLevelGameItems = AllLevelGameItems;
         this.loadCurrentLevelGameItems();
         this.loadUltimateWave();
         this.loadAllGameMusic();
@@ -37,11 +41,6 @@ export default class IntroLevelScene extends AbstractScene {
     /**
      * @see Scene.startScene
      */
-   
-
-   
-
-
     public handleEvent(event: GameEvent): void {
         super.handleEvent(event);
         this.handleInGameButtonEvent(event);
