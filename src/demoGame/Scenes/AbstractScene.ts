@@ -63,13 +63,14 @@ import { GameCharacters } from "../GameCharacters";
 import { GameEventType } from "../../Wolfie2D/Events/GameEventType";
 import HealthbarHUD from "../GameSystems/HUD/HealthbarHUD";
 import Lighting from "../FogOfWar/Lighting";
+import FogOfWarManagement, { FogOfWarMode } from "../FogOfWar/FogOfWarManagement";
 const enum tweensEffect {
     SLIDEIN = "slideIn",
     SLIDEOUT = "slideOut",
     FADEIN = "fadeIn",
     FADEOUT = "fadeOut",
 }
-export default abstract class ProjectScene extends Scene {
+export default abstract class AbstractScene extends Scene {
     protected walls: OrthogonalTilemap;
     protected path: NavigationPath;
     //button event
@@ -80,7 +81,6 @@ export default abstract class ProjectScene extends Scene {
     protected backgroundImage: Sprite;
     protected GameLayers = GameLayers;
     protected backButtonPosition = new Vec2(50, 50);
-    // Lighting 
 
     protected isDark: boolean;
     protected darkTimer: Timer;
@@ -329,8 +329,9 @@ export default abstract class ProjectScene extends Scene {
         this.initInventorySlotsMap();
         // create screen first 
         if (!this.option.isfogOfWarChecked) {
-            this.initFogOfWar();
-            // this.buildLightning(new Vec2(100,200));
+            const Fog = new FogOfWarManagement(this,this.add,this.wallSize,this.labelSize);
+            // Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
+            Fog.initFogOfWar(FogOfWarMode.STANDARD);
         }
 
         this.center = this.viewport.getHalfSize();
@@ -1075,8 +1076,8 @@ export default abstract class ProjectScene extends Scene {
         else {
             player.addAI(PlayerAI);
             this.initUltimateWave();
-            let timer = new Lighting(this);
-            
+          
+
         }
         // 
         player.animation.play("IDLE");
@@ -1213,8 +1214,6 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected initializeNavmesh(graph: PositionGraph, walls: OrthogonalTilemap): Navmesh {
-
-
         let dim: Vec2 = walls.getDimensions();
         for (let i = 0; i < dim.y; i++) {
             for (let j = 0; j < dim.x; j++) {
@@ -1258,27 +1257,8 @@ export default abstract class ProjectScene extends Scene {
         return new Navmesh(graph);
 
     }
-    public initFogOfWar() {
-        const len = this.wallSize / this.labelSize;
-        for (let i = 0; i <= 2 * len; i++) {
-            for (let j = 6; j <= 2 * len; j++) {
-                let x = 0.5 * i * this.labelSize;
-                let y = 0.5 * j * this.labelSize;
-                let options = {
-                    position: new Vec2(x, y),
-                    text: "",
-                }
-                this.addBlackLabel(options);
-            }
-        }
-    }
-    public addBlackLabel(options: Record<string, any>) {
-        const label = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.FOG_OF_WAR, options);
-        label.size.set(this.labelSize * 2, this.labelSize * 2);
-        label.borderWidth = 0;
-        label.borderRadius = 0;
-        label.borderColor = Color.TRANSPARENT;
-        label.backgroundColor = Color.FOG_OF_WAR_BLACK;
-    }
+
+    
+
     public abstract getBattlers(): Battler[];
 }

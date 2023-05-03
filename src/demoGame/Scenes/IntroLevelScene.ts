@@ -2,7 +2,7 @@
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
 import SelectLevelMenuScene from "./SelectLevelMenuScene";
 import StartScene from "./StartScene";
-import ProjectScene from "./AbstractScene";
+import AbstractScene from "./AbstractScene";
 import Battler from "../GameSystems/BattleSystem/Battler";
 
 import { MainMenuButtonEvent, PauseButtonEvent } from "../CustomizedButton";
@@ -15,7 +15,7 @@ const ACTIONTYPE = {
     USE: "USE",
 }
 
-export default class IntroLevelScene extends ProjectScene {
+export default class IntroLevelScene extends AbstractScene {
 
 
     /**
