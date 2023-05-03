@@ -1,15 +1,15 @@
 
-import GameEvent from "../../Wolfie2D/Events/GameEvent";
-import SelectLevelMenuScene from "./SelectLevelMenuScene";
-import StartScene from "./StartScene";
-import AbstractScene from "./AbstractScene";
-import Battler from "../GameSystems/BattleSystem/Battler";
+import GameEvent from "../../../Wolfie2D/Events/GameEvent";
+import SelectLevelMenuScene from "../SelectLevelMenuScene";
+import StartScene from "../StartScene";
+import AbstractScene from "../AbstractScene";
+import Battler from "../../GameSystems/BattleSystem/Battler";
 
-import { MainMenuButtonEvent, PauseButtonEvent } from "../CustomizedButton";
-import { PlayerEvents } from "../ProjectEvents";
-import CheatCodeMenuScene from "./CheatCodeMenuScene";
-import { MenuState } from "../MenuState";
-import { AllLevelGameItems, Level1GameItems } from "../GameItems";
+import { MainMenuButtonEvent, PauseButtonEvent } from "../../CustomizedButton";
+import { PlayerEvents } from "../../ProjectEvents";
+import CheatCodeMenuScene from "../CheatCodeMenuScene";
+import { MenuState } from "../../MenuState";
+import { AllLevelGameItems, Level1GameItems } from "../../GameItems";
 const ACTIONTYPE = {
     PICK: "PICK",
     USE: "USE",
@@ -17,15 +17,11 @@ const ACTIONTYPE = {
 
 export default class IntroLevelScene extends AbstractScene {
 
-    protected currentLevelGameItems = Level1GameItems;
+    // protected currentLevelGameItems = Level1GameItems;
     /**
      * @see Scene.update()
      */
     public override loadScene() {
-        
-
-        // this.load.audio(this.levelMusicKey, IntroLevelScene.LEVEL_MUSIC_PATH);
-
         this.loadCurrentLevelGameItems();
         this.loadUltimateWave();
         this.loadAllGameMusic();

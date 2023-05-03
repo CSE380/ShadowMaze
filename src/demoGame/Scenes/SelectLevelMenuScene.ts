@@ -6,12 +6,13 @@ import Color from "../../Wolfie2D/Utils/Color";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
 import { BackButtonEvent, SelectMenuButtonEvent } from "../CustomizedButton";
 import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
-import IntroLevelScene from "./IntroLevelScene";
+import IntroLevelScene from "./LevelScenes/IntroLevelScene";
 import { GameLayers } from "../GameLayers";
 import AbstractScene from "./AbstractScene";
 import CheatCodeMenuScene from "./CheatCodeMenuScene";
 import MainMenuScene from "./MainMenuScene";
 import Battler from "../GameSystems/BattleSystem/Battler";
+import Level2Scene from "./LevelScenes/Level2Scene";
 export default class MainMenu extends AbstractScene  {
     private mainMenuLayerName = "mainMenu";
     // private backgroundImageKey = "backgroundImage";
@@ -34,8 +35,9 @@ export default class MainMenu extends AbstractScene  {
         let positionY=center.y - 100;
         let i = 0 ;
         for(let buttonName in SelectMenuButtonEvent){
-            buttonName = SelectMenuButtonEvent[buttonName]
-            if(i  === 0 ){
+            buttonName = SelectMenuButtonEvent[buttonName];
+           
+            if(i  < 2 ){
                 let buttonOption={
                     buttonName:buttonName,
                     position:new Vec2(center.x,positionY),
@@ -43,9 +45,9 @@ export default class MainMenu extends AbstractScene  {
                     text:buttonName,
                 }
                 this.addButtons(buttonOption);
-                break;
             }
             i++;
+            positionY=positionY + 100;
         }
         this.addBackButon(this.backButtonPosition);
     }
@@ -68,7 +70,7 @@ export default class MainMenu extends AbstractScene  {
                 break;
             }
             case SelectMenuButtonEvent.LEVEL_2: {
-                // this.sceneManager.changeToScene(AstarDemoScene);
+                this.sceneManager.changeToScene(Level2Scene,this.option);
                 break;
             }
             case SelectMenuButtonEvent.LEVEL_6: {

@@ -3,7 +3,7 @@ import MainMenu from "./demoGame/Scenes/MainMenuScene";
 import { PlayerInput } from "./demoGame/AI/Player/PlayerController";
 import default_scene from "./default_scene";
 // import MainHW4Scene from "./demoGame/Scenes/MainHW4Scene";
-import IntroLevelScene from "./demoGame/Scenes/IntroLevelScene";
+import IntroLevelScene from "./demoGame/Scenes/LevelScenes/IntroLevelScene";
 import StartScene from "./demoGame/Scenes/StartScene";
 import ControlScene from "./demoGame/Scenes/ControlScene";
 import HelpScene from "./demoGame/Scenes/HelpScene";
@@ -55,12 +55,12 @@ import CheatCodeMenuScene from "./demoGame/Scenes/CheatCodeMenuScene";
     // Create a game with the options specified
     const game = new Game(options);
     // Start our game
-    game.start(IntroLevelScene, {});
+    // game.start(IntroLevelScene, {});
     // game.start(HelpScene, {});
     // game.start(ControlScene,{});
     // game.start(StartScene, {});
     // game.start(CheatCodeMenuScene,{});
-    // game.start(SelectLevelMenuScene,{});
+    game.start(SelectLevelMenuScene,{});
     // game.start(MainMenu, {});
 })();
 
