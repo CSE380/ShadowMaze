@@ -62,6 +62,7 @@ import { GameCharacters } from "../GameCharacters";
 //
 import { GameEventType } from "../../Wolfie2D/Events/GameEventType";
 import HealthbarHUD from "../GameSystems/HUD/HealthbarHUD";
+import Lighting from "../FogOfWar/Lighting";
 const enum tweensEffect {
     SLIDEIN = "slideIn",
     SLIDEOUT = "slideOut",
@@ -79,11 +80,15 @@ export default abstract class ProjectScene extends Scene {
     protected backgroundImage: Sprite;
     protected GameLayers = GameLayers;
     protected backButtonPosition = new Vec2(50, 50);
+    // Lighting 
 
+    protected isDark: boolean;
+    protected darkTimer: Timer;
     //message box to display invalid action
     // level transtion
     protected levelTransitionTimer: Timer;
     protected levelTransitionScreen: Rect;
+
     //Level end
     protected center: Vec2;
     protected levelEndArea: Rect;
@@ -128,13 +133,13 @@ export default abstract class ProjectScene extends Scene {
     protected lanternShape: AABB;
     protected lanternDuration = false;
     protected inventorySlotsMap = new Map<number, Map<Vec2, Array<gameItems>>>();
-    protected count=0;
+    protected count = 0;
     // protected test = new Map<number,Vec2>()
     //ui display
     protected currentPlayerPositionLabels: Array<Label>;
 
     //audio and music
-    
+
     public static readonly LEVEL_MUSIC_KEY = "LEVEL_MUSIC";
     public static readonly LEVEL_MUSIC_PATH = "shadowMaze_assets/music/level_bgm.mp3";
     protected labelSize: number;
@@ -167,6 +172,8 @@ export default abstract class ProjectScene extends Scene {
         }
         this.healthbars = new Map<number, HealthbarHUD>();
         this.battlers = new Array<Battler & Actor>();
+        // this.isDark = true;
+        // this.darkTimer = new Timer(2000,handle)
     }
     public initScene(option: Record<string, any>): void {
         if (option !== undefined)
@@ -199,26 +206,26 @@ export default abstract class ProjectScene extends Scene {
             this.loadGameItems(key);
         }
     }
-    protected loadGameSound(key:string){
-        let format:string;
-        if(key == GameSound.LEVEL_BGM_KEY)
+    protected loadGameSound(key: string) {
+        let format: string;
+        if (key == GameSound.LEVEL_BGM_KEY)
             format = 'mp3';
-        else{
+        else {
             format = 'wav';
         }
         this.load.audio(key, `${this.pathToMusic}${key}.${format}`);
 
     }
 
-    protected loadGameCharacter(key:string){
+    protected loadGameCharacter(key: string) {
         this.load.spritesheet(key, `${this.pathToSpriteSheets}${key}.json`);
     }
-    protected loadAllSpreadSheet(){
+    protected loadAllSpreadSheet() {
         for (let key of Object.values(GameCharacters)) {
             this.loadGameCharacter(key);
         }
     }
-    protected loadAllGameMusic(){
+    protected loadAllGameMusic() {
         for (let key of Object.values(GameSound)) {
             this.loadGameSound(key);
         }
@@ -265,7 +272,7 @@ export default abstract class ProjectScene extends Scene {
                 items[i].position.set(gameItem.position[i][0], gameItem.position[i][1]);
                 items[i].name = key;
                 items[i].isPickable = isPickableFlag;
-                items[i].floatInitPosition =  gameItem.position[i][1];
+                items[i].floatInitPosition = gameItem.position[i][1];
                 this.gameItemGroup.push(items[i]);
 
             }
@@ -281,12 +288,12 @@ export default abstract class ProjectScene extends Scene {
         this.ultimateWave.setCollisionShape(new AABB(this.player.position, halfSize));
         this.visibleGroup.push(this.ultimateWave);
     }
-    private floatPickableItem(deltaT:number) {
-        this.count+=deltaT
+    private floatPickableItem(deltaT: number) {
+        this.count += deltaT
         for (let [key, gameItemArray] of (this.gameItemsMap)) {
             gameItemArray.forEach(item => {
                 if (item.isPickable) {
-                    item.position.set(item.position.x,item.floatInitPosition+item.floatDistance*Math.sin(this.count))
+                    item.position.set(item.position.x, item.floatInitPosition + item.floatDistance * Math.sin(this.count))
                 }
             }
             )
@@ -321,16 +328,18 @@ export default abstract class ProjectScene extends Scene {
 
         this.initInventorySlotsMap();
         // create screen first 
-        if (!this.option.isfogOfWarChecked)
-            // this.initFogOfWar();
+        if (!this.option.isfogOfWarChecked) {
+            this.initFogOfWar();
+            // this.buildLightning(new Vec2(100,200));
+        }
+
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
-
         if (!this.option.isAstarChecked) {
             this.initPlayerStatHUD();
             this.initNPCs();
             this.initAllGameItems();
-            
+
         }
         // this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.LEVEL_BGM_KEY, loop: true, holdReference: true });
     }
@@ -362,7 +371,7 @@ export default abstract class ProjectScene extends Scene {
     }
     public loadScene(): void {
         this.loadAllGameItems();
-        
+
         this.loadAllGameMusic();
         // this.loadGameItems(this.laserGunsKey);
         this.load.spritesheet("prince", "shadowMaze_assets/spritesheets/prince.json");
@@ -578,9 +587,9 @@ export default abstract class ProjectScene extends Scene {
             if (this.path.isDone()) {
                 this.handleEnteredLevelEnd();
             }
-            else{
-               this.player.rotation = Vec2.UP.angleToCCW(this.path.getMoveDirection(this.player));
-               this.player.animation.playIfNotAlready(AnimationType.MOVING,true);
+            else {
+                this.player.rotation = Vec2.UP.angleToCCW(this.path.getMoveDirection(this.player));
+                this.player.animation.playIfNotAlready(AnimationType.MOVING, true);
             }
 
         }
@@ -589,21 +598,22 @@ export default abstract class ProjectScene extends Scene {
             this.isPlayerAtItems();
             this.isPlayerAttacking();
             this.isPlayerUseItem();
-            this.updateVisibleGroup();
+
             this.floatPickableItem(deltaT);
             this.healthbars.forEach(healthbar => healthbar.update(deltaT));
         }
+        this.updateVisibleGroup();
         this.isPlayerAtLevelEnd();
     }
-    protected handleAllPlayStatChange(){
+    protected handleAllPlayStatChange() {
         this.handlePlayerStatChange(PlayerStatKey.CURRENT_SHIELD);
         this.handlePlayerStatChange(PlayerStatKey.CURRENT_HEALTH);
         this.handlePlayerStatChange(PlayerStatKey.CURRENT_ENERGY);
-       
+
     }
     protected updateVisibleGroup() {
         this.updateTranparentLabels(this.player);
-        if (this.ultimateWave.visible) {
+        if (this.ultimateWave && this.ultimateWave.visible) {
             const distance = this.ultimateWave.position.distanceTo(this.player.position);
             const f = this.ultimateWave.collisionShape.overlaps(this.player.collisionShape)
             if (distance > this.ultimateWavePlayerDistance) {
@@ -730,7 +740,7 @@ export default abstract class ProjectScene extends Scene {
                 }, 2000)
             }
             case PlayerInput.ULTIMATE: {
-                if (!this.ultimateWave.visible){
+                if (!this.ultimateWave.visible) {
                     this.handleFireUltimate();
                     this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.ULT_KEY, loop: false, holdReference: true });
                 }
@@ -753,12 +763,12 @@ export default abstract class ProjectScene extends Scene {
     protected handleBattlerKilled(event: GameEvent) {
         let id: number = event.data.get("id");
         let battler = this.battlers.find(b => b.id === id);
-        
+
         if (battler) {
             this.healthbars.get(id).visible = false;
-            setTimeout(()=>{
+            setTimeout(() => {
                 battler.battlerActive = false;
-            },1000)
+            }, 1000)
 
         }
     }
@@ -907,7 +917,9 @@ export default abstract class ProjectScene extends Scene {
 
     public initTransparentLabelByPosition(position: Vec2): Array<Label> {
         const labels = this.getLabelsByPosition(position)
+        console.log(labels)
         labels.forEach(label => { this.updateTranparentLablesColor(label) })
+
         return labels;
     }
     public updateTranparentLabels(sprite: Sprite) {
@@ -925,7 +937,15 @@ export default abstract class ProjectScene extends Scene {
             labels = <Array<Label>>this.getSceneGraph().getNodesInRegion(this.buildLanternShape(postion));
         }
         labels = labels.filter(label => label.getLayer().getName() == GameLayers.FOG_OF_WAR)
+
         return labels;
+    }
+    public buildLightning(position: Vec2) {
+        // let shape = new AABB(position);
+        // let labels= <Array<Label>>this.getSceneGraph().getNodesAt(position);
+        let labels = this.getLabelsByPosition(position);
+        console.log(labels)
+        labels.forEach(label => this.showPositionByColor(label.position, Color.TRANSPARENT));
     }
     public updateTranparentLablesColor(label: Label) {
         if (label.backgroundColor) {
@@ -1026,10 +1046,10 @@ export default abstract class ProjectScene extends Scene {
     /**
      * Initializes the player in the scene
      */
-    protected initExit():void{
-        let exit  = this.add.animatedSprite(PlayerActor, GameCharacters.EXIT, this.GameLayers.BASE);
-        exit.position.set(this.levelEndPosition.x,this.levelEndPosition.y);
-        exit.animation.playIfNotAlready(AnimationType.IDLE,true)
+    protected initExit(): void {
+        let exit = this.add.animatedSprite(PlayerActor, GameCharacters.EXIT, this.GameLayers.BASE);
+        exit.position.set(this.levelEndPosition.x, this.levelEndPosition.y);
+        exit.animation.playIfNotAlready(AnimationType.IDLE, true)
     }
     protected initPlayer(): void {
         let player = this.add.animatedSprite(PlayerActor, GameCharacters.PRINCE, this.GameLayers.BASE);
@@ -1055,6 +1075,8 @@ export default abstract class ProjectScene extends Scene {
         else {
             player.addAI(PlayerAI);
             this.initUltimateWave();
+            let timer = new Lighting(this);
+            
         }
         // 
         player.animation.play("IDLE");
