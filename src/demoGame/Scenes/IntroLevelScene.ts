@@ -36,7 +36,7 @@ export default class IntroLevelScene extends ProjectScene {
 
         // Load the tilemap
         // this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
-        this.load.tilemap("level", "shadowMaze_assets/tilemaps/LI_TEST_MAP.json");
+        this.load.tilemap("level", "shadowMaze_assets/tilemaps/LI_SECOND_MAP.json");
     }
     /**
      * @see Scene.startScene
