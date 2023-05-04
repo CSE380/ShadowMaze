@@ -303,54 +303,53 @@
       "frames": [
         {
           "index": 210,
-          "duration": 15
+          "duration": 1
         },
         {
           "index": 211,
-          "duration": 15
+          "duration": 1
         },
         {
           "index": 212,
-          "duration": 15
+          "duration": 1
         },
         {
           "index": 213,
-          "duration": 15
+          "duration": 1
         },
         {
           "index": 214,
-          "duration": 15
+          "duration": 1
         },
         {
           "index": 215,
-          "duration": 15
+          "duration": 1
         },
         {
           "index": 216,
-          "duration": 15
+          "duration": 1
         },
         {
           "index": 217,
-          "duration": 15
+          "duration": 1
         },
         {
           "index": 218,
-          "duration": 15
+          "duration": 1
         },
         {
           "index": 219,
-          "duration": 15
+          "duration": 100
         }
       ]
     },
     
     {
       "name": "DEAD",
-      "repeat":true,
       "frames": [
         {
           "index": 240,
-          "duration": 1000
+          "duration": 10
           
         }
       ]

@@ -785,7 +785,7 @@ export default abstract class AbstractScene extends Scene {
     protected handleBattlerKilled(event: GameEvent) {
         let id: number = event.data.get("id");
         let battler = this.battlers.find(b => b.id === id);
-
+        
         if (battler) {
             this.healthbars.get(id).visible = false;
             setTimeout(() => {
