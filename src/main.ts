@@ -3,7 +3,7 @@ import MainMenu from "./demoGame/Scenes/MainMenuScene";
 import { PlayerInput } from "./demoGame/AI/Player/PlayerController";
 import default_scene from "./default_scene";
 // import MainHW4Scene from "./demoGame/Scenes/MainHW4Scene";
-import IntroLevelScene from "./demoGame/Scenes/IntroLevelScene";
+import IntroLevelScene from "./demoGame/Scenes/LevelScenes/IntroLevelScene";
 import StartScene from "./demoGame/Scenes/StartScene";
 import ControlScene from "./demoGame/Scenes/ControlScene";
 import HelpScene from "./demoGame/Scenes/HelpScene";
@@ -13,6 +13,7 @@ import LaserShaderType from "./demoGame/Shaders/LaserShaderType";
 import RegistryManager from "./Wolfie2D/Registry/RegistryManager";
 import { UseItemInput } from "./demoGame/AI/Player/PlayerController";
 import CheatCodeMenuScene from "./demoGame/Scenes/CheatCodeMenuScene";
+import Level2Scene from "./demoGame/Scenes/LevelScenes/Level2Scene";
 // The main function is your entrypoint into Wolfie2D. Specify your first scene and any options here.
 (function main() {
     // Run any tests
@@ -56,6 +57,7 @@ import CheatCodeMenuScene from "./demoGame/Scenes/CheatCodeMenuScene";
     const game = new Game(options);
     // Start our game
     game.start(IntroLevelScene, {});
+    // game.start(Level2Scene, {});
     // game.start(HelpScene, {});
     // game.start(ControlScene,{});
     // game.start(StartScene, {});

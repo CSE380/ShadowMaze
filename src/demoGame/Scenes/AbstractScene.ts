@@ -40,7 +40,7 @@ import Graphic from "../../Wolfie2D/Nodes/Graphic";
 import { MainMenuButtonEvent, PauseButtonEvent } from "../CustomizedButton";
 import AABB from "../../Wolfie2D/DataTypes/Shapes/AABB";
 import PlayerAI from "../AI/Player/PlayerAI";
-import { AllLevelGameItems, Level1GameItems } from "../GameItems";
+import { AllGameItemsType, AllLevelGameItems, Level1GameItems } from "../GameItems";
 import { PlayerInput } from "../AI/Player/PlayerController";
 import LaserGun from "../GameSystems/ItemSystem/Items/LaserGuns";
 import { ACTIONTYPE } from "../ActionType";
@@ -63,15 +63,23 @@ import { GameCharacters } from "../GameCharacters";
 import { GameEventType } from "../../Wolfie2D/Events/GameEventType";
 import HealthbarHUD from "../GameSystems/HUD/HealthbarHUD";
 import Lighting from "../FogOfWar/Lighting";
+import FogOfWarManagement, { FogOfWarMode } from "../FogOfWar/FogOfWarManagement";
 const enum tweensEffect {
     SLIDEIN = "slideIn",
     SLIDEOUT = "slideOut",
     FADEIN = "fadeIn",
     FADEOUT = "fadeOut",
+    
 }
-export default abstract class ProjectScene extends Scene {
+export const Color1 = {
+    Red : "Red",
+    Green : "Green"
+} as const
+export default abstract class AbstractScene extends Scene {
     protected walls: OrthogonalTilemap;
     protected path: NavigationPath;
+    protected currentLevelGameItems:AllGameItemsType;
+    protected currentColor:{};
     //button event
     protected PauseButtonEvent = PauseButtonEvent;
     protected wallSize: number;
@@ -80,10 +88,6 @@ export default abstract class ProjectScene extends Scene {
     protected backgroundImage: Sprite;
     protected GameLayers = GameLayers;
     protected backButtonPosition = new Vec2(50, 50);
-    // Lighting 
-
-    protected isDark: boolean;
-    protected darkTimer: Timer;
     //message box to display invalid action
     // level transtion
     protected levelTransitionTimer: Timer;
@@ -127,7 +131,7 @@ export default abstract class ProjectScene extends Scene {
     protected dmgLabel: Label;
     protected defLabel: Label;
     //items to game 
-
+    protected itemDescriptionLabel: Label;
     protected gameItemsMap = new Map<string, Array<gameItems>>();
     protected laserGunsKey = "laserGuns";
     protected lanternShape: AABB;
@@ -146,7 +150,8 @@ export default abstract class ProjectScene extends Scene {
     protected isPauseMenuHidden: boolean;
     protected MenuCurentState: MenuState;
     // relative path to the assets
-    protected pathToItems = `shadowMaze_assets/data/items/`;
+    protected pathToItems = `shadowMaze_assets/data/Level1data/items/`;
+    protected pathToMonster = `shadowMaze_assets/data/Level1data/monsters/`
     protected pathToSprite = `shadowMaze_assets/sprites/`;
     protected pathToMusic = `shadowMaze_assets/music/`;
     protected pathToSpriteSheets = `shadowMaze_assets/spritesheets/`;
@@ -172,12 +177,12 @@ export default abstract class ProjectScene extends Scene {
         }
         this.healthbars = new Map<number, HealthbarHUD>();
         this.battlers = new Array<Battler & Actor>();
-        // this.isDark = true;
-        // this.darkTimer = new Timer(2000,handle)
+        this.currentColor = Color1;
     }
     public initScene(option: Record<string, any>): void {
         if (option !== undefined)
             this.option = option
+       
         // this.option.isAstarChecked = true;
     }
     protected initLevelScene() {
@@ -201,9 +206,12 @@ export default abstract class ProjectScene extends Scene {
     }
 
 
-    protected loadAllGameItems() {
-        for (let key of Object.values(AllLevelGameItems)) {
+    protected loadCurrentLevelGameItems() {
+        for (let key of Object.values(this.currentLevelGameItems)) {
             this.loadGameItems(key);
+        }
+        for (let key of Object.values(this.currentColor)) {
+            console.log(key);
         }
     }
     protected loadGameSound(key: string) {
@@ -214,13 +222,15 @@ export default abstract class ProjectScene extends Scene {
             format = 'wav';
         }
         this.load.audio(key, `${this.pathToMusic}${key}.${format}`);
-
     }
-
     protected loadGameCharacter(key: string) {
+       
         this.load.spritesheet(key, `${this.pathToSpriteSheets}${key}.json`);
     }
-    protected loadAllSpreadSheet() {
+    protected loadAllMonstersPosition(){
+        this.load.object("monster", `${this.pathToMonster}/monster.json`);
+    }
+    protected loadAllSpriteSheet() {
         for (let key of Object.values(GameCharacters)) {
             this.loadGameCharacter(key);
         }
@@ -241,7 +251,7 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected initAllGameItems() {
-        for (let key of Object.values(AllLevelGameItems)) {
+        for (let key of Object.values(this.currentLevelGameItems)) {
             let gameItem = this.load.getObject(key);
             const items = new Array<gameItems>(gameItem.position.length);
             for (let i = 0; i < items.length; i++) {
@@ -273,6 +283,7 @@ export default abstract class ProjectScene extends Scene {
                 items[i].name = key;
                 items[i].isPickable = isPickableFlag;
                 items[i].floatInitPosition = gameItem.position[i][1];
+
                 this.gameItemGroup.push(items[i]);
 
             }
@@ -299,14 +310,12 @@ export default abstract class ProjectScene extends Scene {
             )
         }
     }
+
     private createDefDmgLabel(position: number[], statKey: PlayerStatKey): Label {
         const stat = this.player._ai[statKey];
-
         return <Label>this.add.uiElement(UIElementType.LABEL, this.GameLayers.BASE, {
             position: new Vec2(position[0] + 22, position[1]), text: `${stat}`
         });
-
-
     }
     public startScene(): void {
         let tilemapLayers = this.add.tilemap("level");
@@ -327,12 +336,11 @@ export default abstract class ProjectScene extends Scene {
         this.navManager.addNavigableEntity("navmesh", navmesh);
 
         this.initInventorySlotsMap();
-        // create screen first 
         if (!this.option.isfogOfWarChecked) {
-            this.initFogOfWar();
-            // this.buildLightning(new Vec2(100,200));
+            const Fog = new FogOfWarManagement(this, this.add, this.wallSize, this.labelSize);
+            // Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
+            // Fog.initFogOfWar(FogOfWarMode.STANDARD);
         }
-
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         if (!this.option.isAstarChecked) {
@@ -370,7 +378,7 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     public loadScene(): void {
-        this.loadAllGameItems();
+        this.loadCurrentLevelGameItems();
 
         this.loadAllGameMusic();
         // this.loadGameItems(this.laserGunsKey);
@@ -416,7 +424,7 @@ export default abstract class ProjectScene extends Scene {
         // UILayer stuff
         // this.addUILayer(GAMELayers.UIlayer);
         // HP Label
-        const currentStat = this.player._ai["currentStat"];
+        const currentStat = this.player._ai[PlayerStatKey.CURRENT_STAT];
         let yOffset = 10;
         let index = 0;
         let newText: string;
@@ -591,7 +599,6 @@ export default abstract class ProjectScene extends Scene {
                 this.player.rotation = Vec2.UP.angleToCCW(this.path.getMoveDirection(this.player));
                 this.player.animation.playIfNotAlready(AnimationType.MOVING, true);
             }
-
         }
         else {
             this.handleAllPlayStatChange();
@@ -680,6 +687,21 @@ export default abstract class ProjectScene extends Scene {
 
             }
         })
+
+    }
+    private isMouseHoveringAtItem() {
+        for (const [num, postionMap] of this.inventorySlotsMap) {
+            for (const [position, gameItemArray] of postionMap) {
+                gameItemArray.forEach(gameItem => {
+                    gameItem.visible && this.createItemDescription(gameItem)
+                })
+            }
+        }
+        // console.log(Input.getGlobalMousePosition().toString());
+    }
+    private createItemDescription(gameItem: gameItems) {
+        this.itemDescriptionLabel = <Label>this.add.uiElement(UIElementType.LABEL,
+            this.GameLayers.UI, { position: new Vec2(250, 96 - 50), text: `${gameItem.name}` });
     }
     public isPlayerAtLevelEnd() {
         if (this.levelEndPosition.distanceSqTo(this.player.position) < 10) {
@@ -718,15 +740,15 @@ export default abstract class ProjectScene extends Scene {
         switch (event.type) {
             case BattlerEvents.MONSTER_DEAD: {
                 this.handleBattlerKilled(event);
-                if (this.player._ai["currentStat"]["currentEnergy"] < this.playerMaxStatValue) {
-                    this.player._ai["currentStat"]["currentEnergy"]++;
+                if (this.player._ai[PlayerStatKey.CURRENT_STAT]["currentEnergy"] < this.playerMaxStatValue) {
+                    this.player._ai[PlayerStatKey.CURRENT_STAT]["currentEnergy"]++;
                     this.handlePlayerStatChange("currentEnergy");
                 }
                 break;
             }
             case BattlerEvents.PRINCE_HIT: {
                 if (!this.player._ai["isInvincible"]) {
-                    this.player._ai["currentStat"][PlayerStatKey.CURRENT_HEALTH]--;
+                    this.player._ai[PlayerStatKey.CURRENT_STAT][PlayerStatKey.CURRENT_HEALTH]--;
                     this.handlePlayerStatChange(PlayerStatKey.CURRENT_HEALTH);
                     this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.PRINCE_HIT, loop: false, holdReference: true });
 
@@ -775,7 +797,7 @@ export default abstract class ProjectScene extends Scene {
     protected handleUseGameItemsEvent(event: GameEvent) {
         this.RemoveItemFromInventory(event)
         switch (event.type) {
-            case AllLevelGameItems.LANTERNS: {
+            case AllLevelGameItems.LANTERN: {
                 this.lanternDuration = !this.lanternDuration;
                 this.ultimateWavePlayerDistance = 70;
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_LANTERN })
@@ -786,9 +808,9 @@ export default abstract class ProjectScene extends Scene {
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_DOOR })
                 break;
             }
-            case AllLevelGameItems.HEALTH_PACKS: {
-                if (this.player._ai["currentStat"][PlayerStatKey.CURRENT_HEALTH] < this.playerMaxStatValue)
-                    this.player._ai["currentStat"][PlayerStatKey.CURRENT_HEALTH]++;
+            case AllLevelGameItems.HEALTH_PACK: {
+                if (this.player._ai[PlayerStatKey.CURRENT_STAT][PlayerStatKey.CURRENT_HEALTH] < this.playerMaxStatValue)
+                    this.player._ai[PlayerStatKey.CURRENT_STAT][PlayerStatKey.CURRENT_HEALTH]++;
                 this.handlePlayerStatChange(PlayerStatKey.CURRENT_HEALTH);
                 this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.HEALING_KEY, loop: false, holdReference: true });
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_HEALTH_PACK })
@@ -881,6 +903,7 @@ export default abstract class ProjectScene extends Scene {
     }
     protected handlePickGameItemsEvent(event: GameEvent) {
         this.putItemToInventory(event);
+        // this.isMouseHoveringAtItem();
 
     }
     protected putItemToInventory(event: GameEvent) {
@@ -917,7 +940,6 @@ export default abstract class ProjectScene extends Scene {
 
     public initTransparentLabelByPosition(position: Vec2): Array<Label> {
         const labels = this.getLabelsByPosition(position)
-        console.log(labels)
         labels.forEach(label => { this.updateTranparentLablesColor(label) })
 
         return labels;
@@ -969,8 +991,9 @@ export default abstract class ProjectScene extends Scene {
     }
     protected handlePlayerStatChange(type: string): void {
         // this.PlayerStatUI[PlayerStatsNameArray[index]] = statUI;
+        PlayerStatKey.CURRENT_STAT
         let oneStatUI = this.PlayerStatUI[type]
-        const currentStatValue = this.player._ai["currentStat"][type]
+        const currentStatValue = this.player._ai[PlayerStatKey.CURRENT_STAT][type]
         let unit = oneStatUI["barBg"].size.x / this.playerMaxStatValue;
         oneStatUI["bar"].size.set(oneStatUI["barBg"].size.x - unit * (this.playerMaxStatValue - currentStatValue), oneStatUI["barBg"].size.y);
         oneStatUI["bar"].position.set(oneStatUI["barBg"].position.x - (unit / 2 / this.getViewScale()) * (this.playerMaxStatValue - currentStatValue), oneStatUI["barBg"].position.y);
@@ -1042,6 +1065,7 @@ export default abstract class ProjectScene extends Scene {
                 }
             })
         }
+
     }
     /**
      * Initializes the player in the scene
@@ -1075,8 +1099,6 @@ export default abstract class ProjectScene extends Scene {
         else {
             player.addAI(PlayerAI);
             this.initUltimateWave();
-            let timer = new Lighting(this);
-            
         }
         // 
         player.animation.play("IDLE");
@@ -1213,8 +1235,6 @@ export default abstract class ProjectScene extends Scene {
         }
     }
     protected initializeNavmesh(graph: PositionGraph, walls: OrthogonalTilemap): Navmesh {
-
-
         let dim: Vec2 = walls.getDimensions();
         for (let i = 0; i < dim.y; i++) {
             for (let j = 0; j < dim.x; j++) {
@@ -1258,27 +1278,8 @@ export default abstract class ProjectScene extends Scene {
         return new Navmesh(graph);
 
     }
-    public initFogOfWar() {
-        const len = this.wallSize / this.labelSize;
-        for (let i = 0; i <= 2 * len; i++) {
-            for (let j = 6; j <= 2 * len; j++) {
-                let x = 0.5 * i * this.labelSize;
-                let y = 0.5 * j * this.labelSize;
-                let options = {
-                    position: new Vec2(x, y),
-                    text: "",
-                }
-                this.addBlackLabel(options);
-            }
-        }
-    }
-    public addBlackLabel(options: Record<string, any>) {
-        const label = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.FOG_OF_WAR, options);
-        label.size.set(this.labelSize * 2, this.labelSize * 2);
-        label.borderWidth = 0;
-        label.borderRadius = 0;
-        label.borderColor = Color.TRANSPARENT;
-        label.backgroundColor = Color.FOG_OF_WAR_BLACK;
-    }
+
+
+
     public abstract getBattlers(): Battler[];
 }

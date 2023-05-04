@@ -1,51 +1,30 @@
+import GameEvent from "../../../Wolfie2D/Events/GameEvent";
+import { MainMenuButtonEvent, PauseButtonEvent } from "../../CustomizedButton";
+import { AllLevelGameItems, Level1GameItems, Level2GameItems } from "../../GameItems";
+import Battler from "../../GameSystems/BattleSystem/Battler";
+import { MenuState } from "../../MenuState";
+import { PlayerEvents } from "../../ProjectEvents";
+import AbstractScene, { Color1 } from "../AbstractScene";
+import CheatCodeMenuScene from "../CheatCodeMenuScene";
+import SelectLevelMenuScene from "../SelectLevelMenuScene";
+import StartScene from "../StartScene";
+import IntroLevelScene from "./IntroLevelScene";
 
-import GameEvent from "../../Wolfie2D/Events/GameEvent";
-import SelectLevelMenuScene from "./SelectLevelMenuScene";
-import StartScene from "./StartScene";
-import ProjectScene from "./AbstractScene";
-import Battler from "../GameSystems/BattleSystem/Battler";
-
-import { MainMenuButtonEvent, PauseButtonEvent } from "../CustomizedButton";
-
-import { PlayerEvents } from "../ProjectEvents";
-import CheatCodeMenuScene from "./CheatCodeMenuScene";
-import { MenuState } from "../MenuState";
-const ACTIONTYPE = {
-    PICK: "PICK",
-    USE: "USE",
-}
-
-export default class IntroLevelScene extends ProjectScene {
-
-
-    /**
-     * @see Scene.update()
-     */
+export default class Level2Scene extends AbstractScene {
+   
+   
+   
     public override loadScene() {
-        
-
-        // this.load.audio(this.levelMusicKey, IntroLevelScene.LEVEL_MUSIC_PATH);
-
-        this.loadAllGameItems();
+        this.currentLevelGameItems = Level1GameItems;
+        this.loadCurrentLevelGameItems();
         this.loadUltimateWave();
         this.loadAllGameMusic();
-        this.loadAllSpreadSheet();
-        this.load.object("monster", "shadowMaze_assets/data/enemies/monster.json");
+        this.loadAllSpriteSheet();
+        this.loadAllMonstersPosition();
         this.load.image(this.inGameControlTextBackground, "shadowMaze_assets/images/inGameControlTextBackground.png");
         this.load.image(this.inGameHelpTextBackground, "shadowMaze_assets/images/inGameHelpTextBackground.png");
-
-        // Load the tilemap
-        // this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
-        this.load.tilemap("level", "shadowMaze_assets/tilemaps/LI_SECOND_MAP.json");
+        this.load.tilemap("level", "shadowMaze_assets/tilemaps/lavaMap.json");
     }
-    /**
-     * @see Scene.startScene
-     */
-   
-
-   
-
-
     public handleEvent(event: GameEvent): void {
         super.handleEvent(event);
         this.handleInGameButtonEvent(event);
@@ -56,7 +35,7 @@ export default class IntroLevelScene extends ProjectScene {
         // console.log(event)
         switch (event.type) {
             case MainMenuButtonEvent.Restart: {
-                nextScene = IntroLevelScene
+                nextScene = Level2Scene;
                 break;
             }
             case PauseButtonEvent.PAUSE: {
@@ -102,10 +81,5 @@ export default class IntroLevelScene extends ProjectScene {
             this.sceneChange(nextScene)
         }
     }
-
     public getBattlers(): Battler[] { return this.battlers; }
-    /** Initializes the layers in the scene */
-
-
-
-}
+}   
