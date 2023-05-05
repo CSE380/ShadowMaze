@@ -104,7 +104,7 @@ export default abstract class AbstractScene extends Scene {
     protected levelEndHalfSize = new Vec2(25, 25)
     protected levelEndColor = new Color(255, 0, 0, 0.5);
     protected levelEndTimer: Timer;
-    protected isLevelEndEnetered: boolean;
+    protected isLevelEndEntered: boolean;
     //player 
     protected player: PlayerActor;
     protected laserGuns: Array<gameItems>;
@@ -148,7 +148,7 @@ export default abstract class AbstractScene extends Scene {
     public static readonly LEVEL_MUSIC_PATH = "shadowMaze_assets/music/level_bgm.mp3";
     protected labelSize: number;
     protected isPauseMenuHidden: boolean;
-    protected MenuCurentState: MenuState;
+    protected MenuCurrentState: MenuState;
     // relative path to the assets
     protected pathToItems = `shadowMaze_assets/data/Level1data/items/`;
     protected pathToMonster = `shadowMaze_assets/data/Level1data/monsters/`
@@ -170,7 +170,7 @@ export default abstract class AbstractScene extends Scene {
         });
         this.labelSize = 32;
         this.isPauseMenuHidden = true;
-        this.MenuCurentState = MenuState.HIDDEN;
+        this.MenuCurrentState = MenuState.HIDDEN;
         this.option = {
             isAstarChecked: false,
             isfogOfWarChecked: false,
@@ -190,7 +190,7 @@ export default abstract class AbstractScene extends Scene {
         this.initSubscribe();
         this.levelTransitionTimer = new Timer(500);
         this.levelEndTimer = new Timer(1000)
-        this.isLevelEndEnetered = false;
+        this.isLevelEndEntered = false;
         this.initLayers();
         this.levelEndTransitionLabel = this.addTweenLabel(this.levelEndTransitionLabel, PlayerEvents.LEVEL_END, tweensEffect.SLIDEIN);
         this.messageBoxLabel = this.addTweenLabel(this.messageBoxLabel, MessageBoxEvents.HIDDEN, tweensEffect.SLIDEIN);
@@ -244,9 +244,9 @@ export default abstract class AbstractScene extends Scene {
         const inventorySlotsPosition = this.load.getObject(AllLevelGameItems.INVENTORY_SLOT)
         let i = 1;
         for (let position of inventorySlotsPosition.position) {
-            const postionItemsMap = new Map<Vec2, Array<gameItems>>();
-            postionItemsMap.set(position, []);
-            this.inventorySlotsMap.set(i, postionItemsMap);
+            const positionItemsMap = new Map<Vec2, Array<gameItems>>();
+            positionItemsMap.set(position, []);
+            this.inventorySlotsMap.set(i, positionItemsMap);
             i++;
         }
     }
@@ -478,8 +478,8 @@ export default abstract class AbstractScene extends Scene {
         return newTextLabel;
     }
     protected handleEnteredLevelEnd(): void {
-        if (!this.isLevelEndEnetered) {
-            this.isLevelEndEnetered = true;
+        if (!this.isLevelEndEntered) {
+            this.isLevelEndEntered = true;
             this.levelEndTransitionLabel.tweens.play(tweensEffect.SLIDEIN);
         }
 
@@ -570,7 +570,7 @@ export default abstract class AbstractScene extends Scene {
         return newButton;
     }
 
-    protected addBackButon(position: Vec2) {
+    protected addBackButton(position: Vec2) {
         const leftArrow = '\u2190';
         let buttonOption = {
             position: new Vec2(position.x, position.y),
@@ -619,7 +619,7 @@ export default abstract class AbstractScene extends Scene {
 
     }
     protected updateVisibleGroup() {
-        this.updateTranparentLabels(this.player);
+        this.updateTransparentLabels(this.player);
         if (this.ultimateWave && this.ultimateWave.visible) {
             const distance = this.ultimateWave.position.distanceTo(this.player.position);
             const f = this.ultimateWave.collisionShape.overlaps(this.player.collisionShape)
@@ -628,29 +628,29 @@ export default abstract class AbstractScene extends Scene {
                     this.ultimateWave.currentTransparentLabels = this.initTransparentLabelByPosition(this.ultimateWave.position);
                 }
                 else
-                    this.updateTranparentLabels(this.ultimateWave);
+                    this.updateTransparentLabels(this.ultimateWave);
             }
             this.updateUltimateWave();
         }
     }
     protected isUltimateLeftPlayer(): boolean {
-        let lables = this.getLabelsByPosition(this.ultimateWave.position);
+        let labels = this.getLabelsByPosition(this.ultimateWave.position);
 
-        lables = lables.filter(label => label.backgroundColor == Color.FOG_OF_WAR_TRANSPARENT)
-        return lables.length == 0;
+        labels = labels.filter(label => label.backgroundColor == Color.FOG_OF_WAR_TRANSPARENT)
+        return labels.length == 0;
     }
     protected updateUltimateWave() {
         let oldPosition = this.ultimateWave.position;
-        let travellingDirectionVec = this.ultimateWaveDirection;
+        let travelingDirectionVec = this.ultimateWaveDirection;
         // this.ultimateWave.currentTransparentLabels = this.initTransparentLabelByPosition(this.ultimateWave.position);
 
         const ratio = 8;
-        this.ultimateWave.position.set(oldPosition.x + travellingDirectionVec.x / ratio, oldPosition.y + travellingDirectionVec.y / ratio);
+        this.ultimateWave.position.set(oldPosition.x + travelingDirectionVec.x / ratio, oldPosition.y + travelingDirectionVec.y / ratio);
         if (this.hasVecOutOfBound(this.ultimateWave.position.x) ||
             this.hasVecOutOfBound(this.ultimateWave.position.y)) {
             this.ultimateWave.visible = false;
             this.ultimateWave.currentTransparentLabels.forEach(label => {
-                this.updateTranparentLablesColor(label);
+                this.updateTransparentLabelsColor(label);
             })
             this.ultimateWave.currentTransparentLabels = undefined;
         }
@@ -690,8 +690,8 @@ export default abstract class AbstractScene extends Scene {
 
     }
     private isMouseHoveringAtItem() {
-        for (const [num, postionMap] of this.inventorySlotsMap) {
-            for (const [position, gameItemArray] of postionMap) {
+        for (const [num, positionMap] of this.inventorySlotsMap) {
+            for (const [position, gameItemArray] of positionMap) {
                 gameItemArray.forEach(gameItem => {
                     gameItem.visible && this.createItemDescription(gameItem)
                 })
@@ -705,7 +705,7 @@ export default abstract class AbstractScene extends Scene {
     }
     public isPlayerAtLevelEnd() {
         if (this.levelEndPosition.distanceSqTo(this.player.position) < 10) {
-            if (!this.isLevelEndEnetered)
+            if (!this.isLevelEndEntered)
                 this.emitter.fireEvent(PlayerEvents.PLAYER_ENTERED_LEVEL_END)
         }
     }
@@ -721,7 +721,7 @@ export default abstract class AbstractScene extends Scene {
         switch (event.type) {
             case MessageBoxEvents.SHOW: {
                 this.messageBoxLabel.text = event.data.get("message");
-                if (this.messageBoxLabel.text == MessageBoxEvents.UNUSE_CURSED_SWORD)
+                if (this.messageBoxLabel.text == MessageBoxEvents.UNUSED_CURSED_SWORD)
                     this.dmgLabel.text = this.player._ai[PlayerStatKey.DMG];
                 this.messageBoxLabel.tweens.play(tweensEffect.SLIDEIN);
                 break;
@@ -856,27 +856,27 @@ export default abstract class AbstractScene extends Scene {
         gameItem.visible = false;
     }
     protected handleMenuStateChange() {
-        switch (this.MenuCurentState) {
+        switch (this.MenuCurrentState) {
             case MenuState.HIDDEN: {
-                this.MenuCurentState = MenuState.SHOWN;
+                this.MenuCurrentState = MenuState.SHOWN;
                 break;
             }
             case MenuState.SHOWN: {
-                this.MenuCurentState = MenuState.HIDDEN;
+                this.MenuCurrentState = MenuState.HIDDEN;
                 break;
             }
             case MenuState.CONTROL_TEXT_MENU_SHOWN: {
-                this.MenuCurentState = MenuState.SHOWN;
+                this.MenuCurrentState = MenuState.SHOWN;
                 break;
             }
             case MenuState.HELP_TEXT_MENU_SHOWN: {
-                this.MenuCurentState = MenuState.SHOWN;
+                this.MenuCurrentState = MenuState.SHOWN;
                 break;
             }
         }
     }
     protected handleMenuShown() {
-        switch (this.MenuCurentState) {
+        switch (this.MenuCurrentState) {
             case MenuState.HIDDEN: {
                 this.setContainerAndMenu(GameLayers.PAUSE_MENU_CONTAINER, GameLayers.PAUSE_MENU, true)
                 break;
@@ -908,11 +908,11 @@ export default abstract class AbstractScene extends Scene {
     }
     protected putItemToInventory(event: GameEvent) {
         const gameItem = <LaserGun>event.data.get("gameItem");
-        for (let postionItemsMap of Array.from(this.inventorySlotsMap.values())) {
-            for (const [key, value] of postionItemsMap) {
+        for (let positionItemsMap of Array.from(this.inventorySlotsMap.values())) {
+            for (const [key, value] of positionItemsMap) {
                 if (value.length === 0) {
                     gameItem.position.set(key[0], key[1]);
-                    postionItemsMap.set(key, [gameItem]);
+                    positionItemsMap.set(key, [gameItem]);
                     gameItem.isPickable = false;
                     this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.PICK_ITEM, loop: false, holdReference: true });
                     return;
@@ -940,23 +940,23 @@ export default abstract class AbstractScene extends Scene {
 
     public initTransparentLabelByPosition(position: Vec2): Array<Label> {
         const labels = this.getLabelsByPosition(position)
-        labels.forEach(label => { this.updateTranparentLablesColor(label) })
+        labels.forEach(label => { this.updateTransparentLabelsColor(label) })
 
         return labels;
     }
-    public updateTranparentLabels(sprite: Sprite) {
+    public updateTransparentLabels(sprite: Sprite) {
         let nextTransparentLabels = this.getLabelsByPosition(sprite.position);
-        sprite.currentTransparentLabels.forEach(label => { this.updateTranparentLablesColor(label) })
-        nextTransparentLabels.forEach(label => this.updateTranparentLablesColor(label))
+        sprite.currentTransparentLabels.forEach(label => { this.updateTransparentLabelsColor(label) })
+        nextTransparentLabels.forEach(label => this.updateTransparentLabelsColor(label))
         sprite.currentTransparentLabels = nextTransparentLabels
     }
-    public getLabelsByPosition(postion: Vec2): Array<Label> {
+    public getLabelsByPosition(position: Vec2): Array<Label> {
         let labels: Array<Label>
         if (!this.lanternDuration) {
-            labels = <Array<Label>>this.getSceneGraph().getNodesAt(postion);
+            labels = <Array<Label>>this.getSceneGraph().getNodesAt(position);
         }
         else {
-            labels = <Array<Label>>this.getSceneGraph().getNodesInRegion(this.buildLanternShape(postion));
+            labels = <Array<Label>>this.getSceneGraph().getNodesInRegion(this.buildLanternShape(position));
         }
         labels = labels.filter(label => label.getLayer().getName() == GameLayers.FOG_OF_WAR)
 
@@ -969,7 +969,7 @@ export default abstract class AbstractScene extends Scene {
         console.log(labels)
         labels.forEach(label => this.showPositionByColor(label.position, Color.TRANSPARENT));
     }
-    public updateTranparentLablesColor(label: Label) {
+    public updateTransparentLabelsColor(label: Label) {
         if (label.backgroundColor) {
             if (label.backgroundColor.isEqual(Color.FOG_OF_WAR_BLACK)) {
                 label.backgroundColor = Color.FOG_OF_WAR_TRANSPARENT;
@@ -1013,7 +1013,7 @@ export default abstract class AbstractScene extends Scene {
             //if the monster is active and is within a certain distance of the prince attack animation, then we can assume the monster has been hit
             if (battler.battlerActive && battler.position.distanceTo(midpoint) <= 15 && this.player.animation.isPlaying(AnimationType.ATTACKING)) {
                 //fire an event that means the monster has been hit. we need to know which monster has been hit and provide the damage the prince has dealt
-                //in NPCbehaviour.ts, the event will be handleded
+                //in NPCbehaviour.ts, the event will be handled
                 this.emitter.fireEvent(BattlerEvents.MONSTER_HIT, { id: battler.id, dmg: this.player._ai["dmg"] });
             }
         }

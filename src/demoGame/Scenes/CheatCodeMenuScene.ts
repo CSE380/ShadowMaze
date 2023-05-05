@@ -44,7 +44,7 @@ export default class CheatCodeMenuScene extends HW4Scene {
         this.isfogOfWarChecked = false;
         this.backgroundImage = this.add.sprite(this.backgroundImageKey, this.GameLayers.BASE);
         let center = this.viewport.getCenter();
-        this.addBackButon(this.backButtonPosition);
+        this.addBackButton(this.backButtonPosition);
         this.backgroundImage.position.set(center.x, center.y);
         let textOption = {
             position: new Vec2(center.x, center.y - 450),
