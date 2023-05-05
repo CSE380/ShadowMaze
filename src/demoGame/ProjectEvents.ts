@@ -29,7 +29,7 @@ export enum MessageBoxEvents {
     USE_ORACLE_ELIXIR="All monsters'position are shown",
     USE_SEEING_STONE="All items'position are shown",
     USE_CURSED_SWORD="Increased physical damage at cost of health",
-    UNUSE_CURSED_SWORD="The prince can not hold cursed sword anymore",
+    UNUSED_CURSED_SWORD="The prince can not hold cursed sword anymore",
     
 }
 export type AllGameEventType= BattlerEvents | PlayerEvents | MessageBoxEvents;

@@ -48,12 +48,12 @@ export default class Level2Scene extends AbstractScene {
                 break;
             }
             case MainMenuButtonEvent.Controls: {
-                this.MenuCurentState = MenuState.CONTROL_TEXT_MENU_SHOWN
+                this.MenuCurrentState = MenuState.CONTROL_TEXT_MENU_SHOWN
                 this.handleMenuShown();
                 return;
             }
             case MainMenuButtonEvent.Help: {
-                this.MenuCurentState = MenuState.HELP_TEXT_MENU_SHOWN
+                this.MenuCurrentState = MenuState.HELP_TEXT_MENU_SHOWN
                 this.handleMenuShown();
                 break;
             }

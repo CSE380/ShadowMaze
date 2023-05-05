@@ -92,7 +92,7 @@ export default class PlayerAI extends StateMachineAI implements AI {
         if (this.isCursed) {
             if(this.currentStat[PlayerStatKey.CURRENT_HEALTH]<=this.cursedThreshHold){
                 this.dmg = 2;
-                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.UNUSE_CURSED_SWORD})
+                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.UNUSED_CURSED_SWORD})
                 this.isCursed = false;
             }
             this.dynamicUpdatePlayerStat(this.cursedRatio * deltaT, PlayerStatKey.CURRENT_HEALTH);
