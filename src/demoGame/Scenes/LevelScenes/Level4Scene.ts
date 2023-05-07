@@ -18,7 +18,10 @@ export default class Level4Scene extends AbstractScene {
     public override loadScene() {
         this.playerInitPosition = new Vec2(120, 400);
         this.levelEndPosition = new Vec2(457, 480);
+        this.pathToItems = "shadowMaze_assets/data/Level4data/items/"
+        this.pathToMonster = "shadowMaze_assets/data/Level4data/enemies/"
         this.currentLevelGameItems = Level1GameItems;
+        this.currentLevel = 4;
         this.loadCurrentLevelGameItems();
         this.loadUltimateWave();
         this.loadAllGameMusic();

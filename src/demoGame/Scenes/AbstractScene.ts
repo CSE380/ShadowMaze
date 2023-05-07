@@ -162,6 +162,8 @@ export default abstract class AbstractScene extends Scene {
     protected visibleGroup: (PlayerActor | NPCActor | Sprite)[] = [];
     protected npcGroup = [];
     protected gameItemGroup: gameItems[] = [];
+    protected currentLevel = 0;
+    
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, {
             ...options, physics: {
@@ -337,9 +339,10 @@ export default abstract class AbstractScene extends Scene {
 
         this.initInventorySlotsMap();
         if (!this.option.isfogOfWarChecked) {
+            console.log(this.currentLevel);
             const Fog = new FogOfWarManagement(this, this.add, this.wallSize, this.labelSize);
             // Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
-            // Fog.initFogOfWar(FogOfWarMode.STANDARD);
+            Fog.initFogOfWar(FogOfWarMode.STANDARD);
         }
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();

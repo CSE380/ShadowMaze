@@ -20,12 +20,49 @@ export enum Level1GameItems {
     IRON_SWORD =  "ironSword",
 }
 export enum Level2GameItems {
-    LANTERNS = "lantern",
+    DOOR = "door",
+    HEALTH_PACK = "healthPacks",
     INVENTORY_SLOT = "inventorySlot",
+    LANTERN = "lantern",
+    MEDUSA = "medusa",
+    ORACLE_ELIXIR = "oracleElixir",
+    SEEING_STONE = "seeingStone",
+    WOODEN_SWORD = "woodenSword",
     IRON_SHIELD = "ironShield",
     IRON_SWORD =  "ironSword",
 }
 
+export enum Level3GameItems {
+    DOOR = "door",
+    HEALTH_PACK = "healthPacks",
+    INVENTORY_SLOT = "inventorySlot",
+    LANTERN = "lantern",
+    MEDUSA = "medusa",
+    ORACLE_ELIXIR = "oracleElixir",
+    SEEING_STONE = "seeingStone",
+    WOODEN_SWORD = "woodenSword",
+    IRON_SHIELD = "ironShield",
+    IRON_SWORD =  "ironSword",
+    PHASING_POTION="phasingPotion",
+    TELEPORT_BOOT="teleportBoot",
+}
 
-export type AllGameItemsType=typeof AllLevelGameItems | typeof Level1GameItems | typeof Level2GameItems;
+export enum Level4GameItems {
+    DOOR = "door",
+    HEALTH_PACK = "healthPacks",
+    INVENTORY_SLOT = "inventorySlot",
+    LANTERN = "lantern",
+    MEDUSA = "medusa",
+    ORACLE_ELIXIR = "oracleElixir",
+    SEEING_STONE = "seeingStone",
+    WOODEN_SWORD = "woodenSword",
+    IRON_SHIELD = "ironShield",
+    IRON_SWORD =  "ironSword",
+    PHASING_POTION="phasingPotion",
+    TELEPORT_BOOT="teleportBoot",
+}
+
+
+
+export type AllGameItemsType=typeof AllLevelGameItems | typeof Level1GameItems | typeof Level2GameItems | typeof Level3GameItems | typeof Level4GameItems;
 

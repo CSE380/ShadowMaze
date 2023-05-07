@@ -1,7 +1,7 @@
 import Vec2 from "../../../Wolfie2D/DataTypes/Vec2";
 import GameEvent from "../../../Wolfie2D/Events/GameEvent";
 import { MainMenuButtonEvent, PauseButtonEvent } from "../../CustomizedButton";
-import { AllLevelGameItems, Level1GameItems, Level2GameItems } from "../../GameItems";
+import { Level2GameItems } from "../../GameItems";
 import Battler from "../../GameSystems/BattleSystem/Battler";
 import { MenuState } from "../../MenuState";
 import { PlayerEvents } from "../../ProjectEvents";
@@ -16,9 +16,12 @@ export default class Level2Scene extends AbstractScene {
    
    
     public override loadScene() {
-        this.playerInitPosition = new Vec2(20, 258);
+        this.playerInitPosition = new Vec2(25, 258);
         this.levelEndPosition = new Vec2(480, 480);
-        this.currentLevelGameItems = Level1GameItems;
+        this.pathToItems = "shadowMaze_assets/data/Level2data/items/"
+        this.pathToMonster = "shadowMaze_assets/data/Level2data/enemies/"
+        this.currentLevelGameItems = Level2GameItems;
+        this.currentLevel = 2;
         this.loadCurrentLevelGameItems();
         this.loadUltimateWave();
         this.loadAllGameMusic();
@@ -26,7 +29,7 @@ export default class Level2Scene extends AbstractScene {
         this.loadAllMonstersPosition();
         this.load.image(this.inGameControlTextBackground, "shadowMaze_assets/images/inGameControlTextBackground.png");
         this.load.image(this.inGameHelpTextBackground, "shadowMaze_assets/images/inGameHelpTextBackground.png");
-        this.load.tilemap("level", "shadowMaze_assets/tilemaps/LI_SECOND_MAP.json");
+        this.load.tilemap("level", "shadowMaze_assets/tilemaps/LI_SECOND_MAP_FIXED.json");
     }
     public handleEvent(event: GameEvent): void {
         super.handleEvent(event);

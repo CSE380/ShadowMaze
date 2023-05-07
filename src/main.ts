@@ -56,13 +56,12 @@ import Level2Scene from "./demoGame/Scenes/LevelScenes/Level2Scene";
     // Create a game with the options specified
     const game = new Game(options);
     // Start our game
-    game.start(IntroLevelScene, {});
-    // game.start(Level2Scene, {});
+    // game.start(IntroLevelScene, {});
     // game.start(HelpScene, {});
     // game.start(ControlScene,{});
     // game.start(StartScene, {});
     // game.start(CheatCodeMenuScene,{});
-    // game.start(SelectLevelMenuScene,{});
+    game.start(SelectLevelMenuScene,{});
     // game.start(MainMenu, {});
 })();
 

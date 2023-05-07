@@ -17,6 +17,7 @@ export default class Level5Scene extends AbstractScene {
     public override loadScene() {
         this.currentLevelGameItems = Level1GameItems;
         this.loadCurrentLevelGameItems();
+        this.currentLevel = 5;
         this.loadUltimateWave();
         this.loadAllGameMusic();
         this.loadAllSpriteSheet();

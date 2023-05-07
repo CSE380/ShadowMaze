@@ -1,7 +1,7 @@
 import Vec2 from "../../../Wolfie2D/DataTypes/Vec2";
 import GameEvent from "../../../Wolfie2D/Events/GameEvent";
 import { MainMenuButtonEvent, PauseButtonEvent } from "../../CustomizedButton";
-import { AllLevelGameItems, Level1GameItems, Level2GameItems } from "../../GameItems";
+import { Level3GameItems } from "../../GameItems";
 import Battler from "../../GameSystems/BattleSystem/Battler";
 import { MenuState } from "../../MenuState";
 import { PlayerEvents } from "../../ProjectEvents";
@@ -18,7 +18,10 @@ export default class Level3Scene extends AbstractScene {
     public override loadScene() {
         this.playerInitPosition = new Vec2(280, 290);
         this.levelEndPosition = new Vec2(21, 485);
-        this.currentLevelGameItems = Level1GameItems;
+        this.pathToItems = "shadowMaze_assets/data/Level3data/items/"
+        this.pathToMonster = "shadowMaze_assets/data/Level3data/enemies/"
+        this.currentLevel = 3;
+        this.currentLevelGameItems = Level3GameItems;
         this.loadCurrentLevelGameItems();
         this.loadUltimateWave();
         this.loadAllGameMusic();
