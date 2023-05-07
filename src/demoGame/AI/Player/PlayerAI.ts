@@ -119,8 +119,8 @@ export default class PlayerAI extends StateMachineAI implements AI {
                 break;
             }
             case BattlerEvents.MONSTER_HIT:{
-                
                 this.handleMonsterHit();
+                break;
             }
         }
     }

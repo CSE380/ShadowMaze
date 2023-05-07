@@ -53,7 +53,7 @@ export default class FogOfWarManagement {
     }
     public addBlackLabel(options: Record<string, any>) {
         const label = <Label>this.add.uiElement(UIElementType.LABEL, GameLayers.FOG_OF_WAR, options);
-        label.size.set(this.labelSize * 2, this.labelSize * 2);
+        label.size.set(this.labelSize * 4, this.labelSize * 4);
         label.borderWidth = 0;
         label.borderRadius = 0;
         label.borderColor = Color.TRANSPARENT;

@@ -163,6 +163,8 @@ export default abstract class AbstractScene extends Scene {
     protected npcGroup = [];
     protected gameItemGroup: gameItems[] = [];
     protected currentLevel = 0;
+    protected status = true;
+    protected ultstatus = true;
     
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, {
@@ -339,10 +341,15 @@ export default abstract class AbstractScene extends Scene {
 
         this.initInventorySlotsMap();
         if (!this.option.isfogOfWarChecked) {
-            console.log(this.currentLevel);
             const Fog = new FogOfWarManagement(this, this.add, this.wallSize, this.labelSize);
-            // Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
             Fog.initFogOfWar(FogOfWarMode.STANDARD);
+
+            // if (this.currentLevel == 2 || this.currentLevel == 3) {
+            //     Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
+            // }
+            // else {
+            //     Fog.initFogOfWar(FogOfWarMode.STANDARD);
+            // }
         }
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
@@ -636,12 +643,7 @@ export default abstract class AbstractScene extends Scene {
             this.updateUltimateWave();
         }
     }
-    protected isUltimateLeftPlayer(): boolean {
-        let labels = this.getLabelsByPosition(this.ultimateWave.position);
 
-        labels = labels.filter(label => label.backgroundColor == Color.FOG_OF_WAR_TRANSPARENT)
-        return labels.length == 0;
-    }
     protected updateUltimateWave() {
         let oldPosition = this.ultimateWave.position;
         let travelingDirectionVec = this.ultimateWaveDirection;
@@ -652,6 +654,7 @@ export default abstract class AbstractScene extends Scene {
         if (this.hasVecOutOfBound(this.ultimateWave.position.x) ||
             this.hasVecOutOfBound(this.ultimateWave.position.y)) {
             this.ultimateWave.visible = false;
+            this.ultstatus = true;
             this.ultimateWave.currentTransparentLabels.forEach(label => {
                 this.updateTransparentLabelsColor(label);
             })
@@ -662,7 +665,8 @@ export default abstract class AbstractScene extends Scene {
     protected checkUltimateMonstersCollision() {
         this.battlers.forEach(battler => {
             if (battler.battlerActive && !(battler == this.player)) {
-                if (battler.position.distanceTo(this.ultimateWave.position) < 30) {
+                if (this.ultstatus && battler.position.distanceTo(this.ultimateWave.position) < 30) {
+                    this.ultstatus = false;
                     this.emitter.fireEvent(BattlerEvents.MONSTER_HIT, { id: battler.id, dmg: this.player._ai["ultDmg"] });
                 }
             }
@@ -826,7 +830,12 @@ export default abstract class AbstractScene extends Scene {
                 break;
             }
             case AllLevelGameItems.TELEPORT_BOOT: {
-                this.player.position.set(90, 150);
+                if (this.currentLevel == 1) {
+                    this.player.position.set(100, 150);
+                }
+                if (this.currentLevel == 3) {
+                    this.player.position.set(200, 90);
+                }
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_TElEPORT_BOOT });
                 break;
             }
@@ -1014,10 +1023,15 @@ export default abstract class AbstractScene extends Scene {
                 continue;
             }
             //if the monster is active and is within a certain distance of the prince attack animation, then we can assume the monster has been hit
-            if (battler.battlerActive && battler.position.distanceTo(midpoint) <= 15 && this.player.animation.isPlaying(AnimationType.ATTACKING)) {
+            if (this.status && battler.battlerActive && battler.position.distanceTo(midpoint) <= 15 && this.player.animation.isPlaying(AnimationType.ATTACKING)) {
                 //fire an event that means the monster has been hit. we need to know which monster has been hit and provide the damage the prince has dealt
                 //in NPCbehaviour.ts, the event will be handled
+                this.status = false;
+                console.log("furew");
                 this.emitter.fireEvent(BattlerEvents.MONSTER_HIT, { id: battler.id, dmg: this.player._ai["dmg"] });
+            }
+            if (!this.player.animation.isPlaying(AnimationType.ATTACKING)) {
+                this.status = true;
             }
         }
     }

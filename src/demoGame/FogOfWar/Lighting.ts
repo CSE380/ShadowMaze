@@ -22,7 +22,7 @@ export default class Lighting {
         this.colorArray = [];
         this.labels = this.scene.getLayer(GameLayers.FOG_OF_WAR).getItems() as Label[];
         for (let i = 0; i < this.colorLength; i++) {
-            const timer = new Timer(300, this.handleTimer.bind(this, i));
+            const timer = new Timer(500, this.handleTimer.bind(this, i));
             let j = 1;
             if (i >= this.colorLength / 2) {
                 j = this.colorLength - i;
