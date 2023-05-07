@@ -11,13 +11,13 @@ import SelectLevelMenuScene from "../SelectLevelMenuScene";
 import StartScene from "../StartScene";
 import IntroLevelScene from "./IntroLevelScene";
 
-export default class Level2Scene extends AbstractScene {
-    
+export default class Level3Scene extends AbstractScene {
+   
    
    
     public override loadScene() {
-        this.playerInitPosition = new Vec2(20, 258);
-        this.levelEndPosition = new Vec2(480, 480);
+        this.playerInitPosition = new Vec2(280, 290);
+        this.levelEndPosition = new Vec2(21, 485);
         this.currentLevelGameItems = Level1GameItems;
         this.loadCurrentLevelGameItems();
         this.loadUltimateWave();
@@ -26,7 +26,7 @@ export default class Level2Scene extends AbstractScene {
         this.loadAllMonstersPosition();
         this.load.image(this.inGameControlTextBackground, "shadowMaze_assets/images/inGameControlTextBackground.png");
         this.load.image(this.inGameHelpTextBackground, "shadowMaze_assets/images/inGameHelpTextBackground.png");
-        this.load.tilemap("level", "shadowMaze_assets/tilemaps/LI_SECOND_MAP.json");
+        this.load.tilemap("level", "shadowMaze_assets/tilemaps/LI_THIRD_MAP.json");
     }
     public handleEvent(event: GameEvent): void {
         super.handleEvent(event);
@@ -38,7 +38,7 @@ export default class Level2Scene extends AbstractScene {
         // console.log(event)
         switch (event.type) {
             case MainMenuButtonEvent.Restart: {
-                nextScene = Level2Scene;
+                nextScene = Level3Scene;
                 break;
             }
             case PauseButtonEvent.PAUSE: {

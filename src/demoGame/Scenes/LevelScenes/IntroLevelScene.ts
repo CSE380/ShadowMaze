@@ -10,14 +10,8 @@ import { PlayerEvents } from "../../ProjectEvents";
 import CheatCodeMenuScene from "../CheatCodeMenuScene";
 import { MenuState } from "../../MenuState";
 import { AllLevelGameItems, Level1GameItems } from "../../GameItems";
-const ACTIONTYPE = {
-    PICK: "PICK",
-    USE: "USE",
-}
-const Color2 = {
-    Yellow : "Yellow",
-    Blue : "Blue"
-} as const
+import Vec2 from "../../../Wolfie2D/DataTypes/Vec2";
+
 export default class IntroLevelScene extends AbstractScene {
 
     
@@ -25,7 +19,10 @@ export default class IntroLevelScene extends AbstractScene {
      * @see Scene.update()
      */
     public override loadScene() {
+        this.playerInitPosition = new Vec2(260, 235);
+        this.levelEndPosition = new Vec2(21, 485);
         this.currentLevelGameItems = AllLevelGameItems;
+        this.pathToItems = "shadowMaze_assets/data/Level1data/items/";
         this.loadCurrentLevelGameItems();
         this.loadUltimateWave();
         this.loadAllGameMusic();
@@ -33,9 +30,6 @@ export default class IntroLevelScene extends AbstractScene {
         this.loadAllMonstersPosition();
         this.load.image(this.inGameControlTextBackground, "shadowMaze_assets/images/inGameControlTextBackground.png");
         this.load.image(this.inGameHelpTextBackground, "shadowMaze_assets/images/inGameHelpTextBackground.png");
-
-        // Load the tilemap
-        // this.load.tilemap("level", "shadowMaze_assets/tilemaps/futureLevel.json");
         this.load.tilemap("level", "shadowMaze_assets/tilemaps/LI_TEST_MAP.json");
     }
     /**

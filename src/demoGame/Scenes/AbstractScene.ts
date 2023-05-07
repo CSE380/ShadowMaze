@@ -304,7 +304,7 @@ export default abstract class AbstractScene extends Scene {
         for (let [key, gameItemArray] of (this.gameItemsMap)) {
             gameItemArray.forEach(item => {
                 if (item.isPickable) {
-                    item.position.set(item.position.x, item.floatInitPosition + item.floatDistance * Math.sin(this.count))
+                    item.position.set(item.position.x, item.floatInitPosition + item.floatDistance * (Math.sin(this.count) * .3))
                 }
             }
             )

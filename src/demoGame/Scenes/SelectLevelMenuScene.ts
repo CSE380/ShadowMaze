@@ -13,6 +13,10 @@ import CheatCodeMenuScene from "./CheatCodeMenuScene";
 import MainMenuScene from "./MainMenuScene";
 import Battler from "../GameSystems/BattleSystem/Battler";
 import Level2Scene from "./LevelScenes/Level2Scene";
+import Level3Scene from "./LevelScenes/Level3Scene";
+import Level4Scene from "./LevelScenes/Level4Scene";
+import Level5Scene from "./LevelScenes/Level5Scene.";
+import Level6Scene from "./LevelScenes/Level6Scene";
 export default class MainMenu extends AbstractScene  {
     private mainMenuLayerName = "mainMenu";
     // private backgroundImageKey = "backgroundImage";
@@ -32,22 +36,22 @@ export default class MainMenu extends AbstractScene  {
         this.backgroundImage = this.add.sprite(this.backgroundImageKey, this.GameLayers.BASE);
         this.backgroundImage.position.set(center.x, center.y);
         // The main menu
-        let positionY=center.y - 100;
+        let positionY=center.y-250;
         let i = 0 ;
         for(let buttonName in SelectMenuButtonEvent){
             buttonName = SelectMenuButtonEvent[buttonName];
            
-            if(i  < 2 ){
+            if(i  < 6 ){
                 let buttonOption={
                     buttonName:buttonName,
                     position:new Vec2(center.x,positionY),
-                    size:new Vec2(300, 50),
+                    size:new Vec2(300, 70),
                     text:buttonName,
                 }
                 this.addButtons(buttonOption);
             }
             i++;
-            positionY=positionY + 100;
+            positionY=positionY+100;
         }
         this.addBackButton(this.backButtonPosition);
     }
@@ -73,13 +77,22 @@ export default class MainMenu extends AbstractScene  {
                 this.sceneManager.changeToScene(Level2Scene,this.option);
                 break;
             }
-            case SelectMenuButtonEvent.LEVEL_6: {
-
+            case SelectMenuButtonEvent.LEVEL_3: {
+                this.sceneManager.changeToScene(Level3Scene,this.option);
+                break;
             }
-            // case SelectMenuButtonEvent.CHEAT:{
-               
-            //     this.sceneManager.changeToScene( CheatCodeMenuScene);
-            // }
+            case SelectMenuButtonEvent.LEVEL_4: {
+                this.sceneManager.changeToScene(Level4Scene,this.option);
+                break;
+            }
+            case SelectMenuButtonEvent.LEVEL_5: {
+                this.sceneManager.changeToScene(Level5Scene,this.option);
+                break;
+            }
+            case SelectMenuButtonEvent.LEVEL_6: {
+                this.sceneManager.changeToScene(Level6Scene,this.option);
+                break;
+            }
         }
     }
 
