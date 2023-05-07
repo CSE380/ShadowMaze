@@ -150,8 +150,8 @@ export default abstract class AbstractScene extends Scene {
     protected isPauseMenuHidden: boolean;
     protected MenuCurrentState: MenuState;
     // relative path to the assets
-    protected pathToItems = `shadowMaze_assets/data/Level1data/items/`;
-    protected pathToMonster = `shadowMaze_assets/data/Level1data/monsters/`
+    protected pathToItems = `shadowMaze_assets/data/Level1Data/items/`;
+    protected pathToMonster = `shadowMaze_assets/data/Level1Data/monsters/`
     protected pathToSprite = `shadowMaze_assets/sprites/`;
     protected pathToMusic = `shadowMaze_assets/music/`;
     protected pathToSpriteSheets = `shadowMaze_assets/spritesheets/`;

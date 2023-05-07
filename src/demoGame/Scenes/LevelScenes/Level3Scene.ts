@@ -18,8 +18,8 @@ export default class Level3Scene extends AbstractScene {
     public override loadScene() {
         this.playerInitPosition = new Vec2(280, 290);
         this.levelEndPosition = new Vec2(21, 485);
-        this.pathToItems = "shadowMaze_assets/data/Level3data/items/"
-        this.pathToMonster = "shadowMaze_assets/data/Level3data/enemies/"
+        this.pathToItems = "shadowMaze_assets/data/Level3Data/items/"
+        this.pathToMonster = "shadowMaze_assets/data/Level3Data/enemies/"
         this.currentLevel = 3;
         this.currentLevelGameItems = Level3GameItems;
         this.loadCurrentLevelGameItems();
