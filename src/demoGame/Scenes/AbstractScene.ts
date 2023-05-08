@@ -603,7 +603,7 @@ export default abstract class AbstractScene extends Scene {
         let buttonOption = {
             position: new Vec2(position.x, position.y),
             text: leftArrow,
-            buttonName: "Back",
+            buttonName: BackButtonEvent.BACK,
         }
         this.addButtons(buttonOption);
     }
@@ -797,6 +797,7 @@ export default abstract class AbstractScene extends Scene {
         }
     }
     protected handleFireUltimate() {
+        // this.handlePlayerStatChange("Current Energy");
         this.ultimateWave.visible = true;
         let faceDirectionVec = this.getFaceDirectionVec();
         this.ultimateWave.position.set(faceDirectionVec.x, faceDirectionVec.y);
