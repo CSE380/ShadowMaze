@@ -74,7 +74,6 @@ export enum Level5GameItems {
 }
 
 export enum Level6GameItems {
-    LANTERNS = "lantern",
     INVENTORY_SLOT = "inventorySlot",
     IRON_SHIELD = "ironShield",
     IRON_SWORD =  "ironSword",
