@@ -1,5 +1,6 @@
 import Vec2 from "../../../Wolfie2D/DataTypes/Vec2";
 import GameEvent from "../../../Wolfie2D/Events/GameEvent";
+import Color from "../../../Wolfie2D/Utils/Color";
 import { MainMenuButtonEvent, PauseButtonEvent } from "../../CustomizedButton";
 import { AllLevelGameItems, Level3GameItems } from "../../GameItems";
 import Battler from "../../GameSystems/BattleSystem/Battler";

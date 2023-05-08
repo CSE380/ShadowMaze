@@ -165,6 +165,7 @@ export default abstract class AbstractScene extends Scene {
     protected currentLevel = 0;
     protected status = true;
     protected ultstatus = true;
+    protected monsterID = 0;
     
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, {
@@ -342,7 +343,8 @@ export default abstract class AbstractScene extends Scene {
         this.initInventorySlotsMap();
         if (!this.option.isfogOfWarChecked) {
             const Fog = new FogOfWarManagement(this, this.add, this.wallSize, this.labelSize);
-            Fog.initFogOfWar(FogOfWarMode.STANDARD);
+            
+            // Fog.initFogOfWar(FogOfWarMode.STANDARD);
 
             // if (this.currentLevel == 2 || this.currentLevel == 3) {
             //     Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
@@ -365,7 +367,8 @@ export default abstract class AbstractScene extends Scene {
     protected initNPCs(): void {
         const monster = this.load.getObject("monster");
         const npcData = [
-            { name: "slime", key: "black_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
+            { name: "black_slime", key: "black_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
+            { name: "blue_slime", key: "blue_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
             // { name: "troll", key: "troll", scale: new Vec2(1.5, 1.5), behavior: monsterBehavior },
         ];
         for (const { name, key, scale, behavior } of npcData) {
@@ -665,8 +668,9 @@ export default abstract class AbstractScene extends Scene {
     protected checkUltimateMonstersCollision() {
         this.battlers.forEach(battler => {
             if (battler.battlerActive && !(battler == this.player)) {
-                if (this.ultstatus && battler.position.distanceTo(this.ultimateWave.position) < 30) {
+                if ((this.ultstatus || this.monsterID != battler.id) && battler.position.distanceTo(this.ultimateWave.position) < 30) {
                     this.ultstatus = false;
+                    this.monsterID = battler.id;
                     this.emitter.fireEvent(BattlerEvents.MONSTER_HIT, { id: battler.id, dmg: this.player._ai["ultDmg"] });
                 }
             }

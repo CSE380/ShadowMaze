@@ -1,0 +1,358 @@
+{
+    "name": "moon_pudding",
+    "spriteSheetImage": "moon_pudding.png",
+    "spriteWidth": 128,
+    "spriteHeight": 128,
+    "columns": 30,
+    "rows": 10,
+    "leftBuffer": 0,
+    "rightBuffer": 0,
+    "topBuffer": 0,
+    "bottomBuffer": 0,
+    "animations": [
+      {
+        "name": "IDLE",
+        "frames": [
+          {
+            "index": 0,
+            "duration": 1
+          },
+          {
+            "index": 1,
+            "duration": 1
+          },
+          {
+            "index": 2,
+            "duration": 1
+          },
+          {
+            "index": 3,
+            "duration": 1
+          },
+          {
+            "index": 4,
+            "duration": 1
+          },
+          {
+            "index": 5,
+            "duration": 1
+          },
+          {
+            "index": 6,
+            "duration": 1
+          },
+          {
+            "index": 7,
+            "duration": 1
+          },
+          {
+            "index": 8,
+            "duration": 1
+          },
+          {
+            "index": 9,
+            "duration": 1
+          },
+          {
+            "index": 10,
+            "duration": 1
+          },
+          {
+            "index": 11,
+            "duration": 1
+          }
+        ]
+      },
+      {
+        "name": "MOVING",
+        "frames": [
+          {
+            "index": 30,
+            "duration": 1
+          },
+          {
+            "index": 31,
+            "duration": 1
+          },
+          {
+            "index": 32,
+            "duration": 1
+          },
+          {
+            "index": 33,
+            "duration": 1
+          },
+          {
+            "index": 34,
+            "duration": 1
+          },
+          {
+            "index": 35,
+            "duration": 1
+          },
+          {
+            "index": 36,
+            "duration": 1
+          },
+          {
+            "index": 37,
+            "duration": 1
+          },
+          {
+            "index": 38,
+            "duration": 1
+          },
+          {
+            "index": 39,
+            "duration": 1
+          }
+        ]
+      },
+      {
+        "name": "ATTACKING",
+        "frames": [
+          {
+            "index": 90,
+            "duration": 1
+          },
+          {
+            "index": 91,
+            "duration": 1
+          },
+          {
+            "index": 92,
+            "duration": 1
+          },
+          {
+            "index": 93,
+            "duration": 1
+          },
+          {
+            "index": 94,
+            "duration": 1
+          },
+          {
+            "index": 95,
+            "duration": 1
+          },
+          {
+            "index": 96,
+            "duration": 1
+          },
+          {
+            "index": 97,
+            "duration": 1
+          },
+          {
+            "index": 98,
+            "duration": 1
+          },
+          {
+            "index": 99,
+            "duration": 1
+          },
+          {
+            "index": 100,
+            "duration": 1
+          },
+          {
+            "index": 101,
+            "duration": 1
+          },
+          {
+            "index": 102,
+            "duration": 1
+          },
+          {
+            "index": 103,
+            "duration": 1
+          },
+          {
+            "index": 104,
+            "duration": 1
+          },
+          {
+            "index": 105,
+            "duration": 1
+          },
+          {
+            "index": 106,
+            "duration": 1
+          },
+          {
+            "index": 107,
+            "duration": 1
+          },
+          {
+            "index": 108,
+            "duration": 1
+          },
+          {
+            "index": 109,
+            "duration": 1
+          },
+          {
+            "index": 110,
+            "duration": 1
+          },
+          {
+            "index": 111,
+            "duration": 1
+          },
+          {
+            "index": 112,
+            "duration": 1
+          },
+          {
+            "index": 113,
+            "duration": 1
+          },
+          {
+            "index": 114,
+            "duration": 1
+          },
+          {
+            "index": 115,
+            "duration": 1
+          },
+          {
+            "index": 116,
+            "duration": 1
+          },
+          {
+            "index": 117,
+            "duration": 1
+          },
+          {
+            "index": 118,
+            "duration": 1
+          },
+          {
+            "index": 119,
+            "duration": 1
+          }
+        ]
+      },
+      {
+        "name": "HIT",
+        "frames": [
+          {
+            "index": 150,
+            "duration": 1
+          },
+          {
+            "index": 151,
+            "duration": 1
+          },
+          {
+            "index": 152,
+            "duration": 1
+          },
+          {
+            "index": 153,
+            "duration": 1
+          },
+          {
+            "index": 154,
+            "duration": 1
+          },
+          {
+            "index": 155,
+            "duration": 1
+          },
+          {
+            "index": 156,
+            "duration": 1
+          },
+          {
+            "index": 157,
+            "duration": 1
+          },
+          {
+            "index": 158,
+            "duration": 1
+          },
+          {
+            "index": 159,
+            "duration": 1
+          },
+          {
+            "index": 160,
+            "duration": 1
+          },
+          {
+            "index": 161,
+            "duration": 1
+          },
+          {
+            "index": 162,
+            "duration": 1
+          },
+          {
+            "index": 163,
+            "duration": 1
+          },
+          {
+            "index": 164,
+            "duration": 1
+          }
+        ]
+      },
+      {
+        "name": "DYING",
+        "frames": [
+          {
+            "index": 210,
+            "duration": 1
+          },
+          {
+            "index": 211,
+            "duration": 1
+          },
+          {
+            "index": 212,
+            "duration": 1
+          },
+          {
+            "index": 213,
+            "duration": 1
+          },
+          {
+            "index": 214,
+            "duration": 1
+          },
+          {
+            "index": 215,
+            "duration": 1
+          },
+          {
+            "index": 216,
+            "duration": 1
+          },
+          {
+            "index": 217,
+            "duration": 1
+          },
+          {
+            "index": 218,
+            "duration": 1
+          },
+          {
+            "index": 219,
+            "duration": 100
+          }
+        ]
+      },
+      
+      {
+        "name": "DEAD",
+        "frames": [
+          {
+            "index": 240,
+            "duration": 10
+            
+          }
+        ]
+      }
+    ]
+  }

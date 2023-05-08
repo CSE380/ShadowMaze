@@ -73,6 +73,11 @@ export default abstract class NPCAction extends GoapAction {
 
     public update(deltaT: number): void {
 
+        if (this.path.distance() > 50) {
+            this.finished();
+            this.onEnter(null);
+            return;
+        }
 
         if (this.actor.frozen) {
             return;
@@ -98,27 +103,12 @@ export default abstract class NPCAction extends GoapAction {
                 if (this.target == null) {
                     this.target = this.targetFinder.find(this.targets);
                 }
-                //if we get to this point, that means the path was complete but the monster was not at the target
-                //we give the monster a new path to the target and continue
+
                 this.path = this.actor.getPath(this.actor.position, this.target.position);
                 this.currentDistance = this.actor.position.distanceTo(this.target.position);
 
             }
             else { 
-                //I NEED THE ORIGINAL TARGET
-                // if (this.original_target.equals(Vec2.ZERO)) {
-                //     this.original_target = this.target.position.clone();
-                // }
-                // console.log(this.actor.position.distanceTo(this.target.position));
-                // console.log(this.actor.position.distanceTo(this.original_target));
-                // if (this.actor.position.distanceTo(this.target.position) < this.actor.position.distanceTo(this.original_target)) {
-                //     console.log("smaller")
-                //     this.original_target = this.target.position.clone();
-                //     this.path = this.actor.getPath(this.actor.position, this.target.position);
-                // }
-                // else {
-                //     console.log("bigger")
-                // }
                 if (this.pathTimer.isStopped()) {
                     this.path = this.actor.getPath(this.actor.position, this.target.position);
                     this.pathTimer.start()
