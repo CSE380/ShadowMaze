@@ -12,9 +12,6 @@ import StartScene from "../StartScene";
 import IntroLevelScene from "./IntroLevelScene";
 
 export default class Level3Scene extends AbstractScene {
-   
-   
-   
     public override loadScene() {
         this.playerInitPosition = new Vec2(260, 235);
         this.levelEndPosition = new Vec2(21, 485);
