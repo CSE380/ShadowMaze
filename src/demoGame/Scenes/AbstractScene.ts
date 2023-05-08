@@ -162,7 +162,7 @@ export default abstract class AbstractScene extends Scene {
     protected visibleGroup: (PlayerActor | NPCActor | Sprite)[] = [];
     protected npcGroup = [];
     protected gameItemGroup: gameItems[] = [];
-    protected currentLevel = 0;
+    protected currentLevel = 1;
     protected status = true;
     protected ultstatus = true;
     protected monsterID = 0;
@@ -214,7 +214,6 @@ export default abstract class AbstractScene extends Scene {
         let key = this.ultimateWaveKey;
         this.load.image(key, `${this.pathToSprite}${key}.png`);
     }
-
 
     protected loadCurrentLevelGameItems() {
         for (let key of Object.values(this.currentLevelGameItems)) {
@@ -426,7 +425,6 @@ export default abstract class AbstractScene extends Scene {
         this.lanternShape = new AABB(position, centerToEdge);
         return this.lanternShape;
     }
-
 
     protected initSubscribe() {
 
@@ -764,19 +762,15 @@ export default abstract class AbstractScene extends Scene {
                 this.messageBoxLabel.tweens.play(tweensEffect.SLIDEOUT);
                 break;
             }
-
-
-
         }
     }
     protected handleBattlerEvents(event: GameEvent) {
         switch (event.type) {
             case BattlerEvents.MONSTER_DEAD: {
                 this.handleBattlerKilled(event);
-                if (this.player._ai[PlayerStatKey.CURRENT_STAT]["currentEnergy"] < this.playerMaxStatValue) {
-                    this.player._ai[PlayerStatKey.CURRENT_STAT]["currentEnergy"]++;
-                    this.handlePlayerStatChange("currentEnergy");
-                }
+                let newEnergy = this.player._ai[PlayerStatKey.CURRENT_STAT]["currentEnergy"] + 4;
+                this.player._ai[PlayerStatKey.CURRENT_STAT]["currentEnergy"] = Math.min(newEnergy, this.playerMaxStatValue);
+                this.handlePlayerStatChange("currentEnergy");
                 break;
             }
             case BattlerEvents.PRINCE_HIT: {
@@ -784,7 +778,6 @@ export default abstract class AbstractScene extends Scene {
                     this.player._ai[PlayerStatKey.CURRENT_STAT][PlayerStatKey.CURRENT_HEALTH]--;
                     this.handlePlayerStatChange(PlayerStatKey.CURRENT_HEALTH);
                     this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.PRINCE_HIT, loop: false, holdReference: true });
-
                 }
                 break;
             }
@@ -795,12 +788,12 @@ export default abstract class AbstractScene extends Scene {
                 }, 2000)
             }
             case PlayerInput.ULTIMATE: {
-                if (!this.ultimateWave.visible) {
+                if (!this.ultimateWave.visible 
+                 && this.player._ai["currentStat"].currentEnergy == this.player._ai["maxStatValue"]) {
+                    this.player._ai["currentStat"].currentEnergy = this.player._ai["minStatValue"];
                     this.handleFireUltimate();
                     this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.ULT_KEY, loop: false, holdReference: true });
                 }
-
-
             }
         }
     }
@@ -1147,9 +1140,6 @@ export default abstract class AbstractScene extends Scene {
         }
         // 
         player.animation.play("IDLE");
-
-
-
     }
     protected initAstarMode() {
         let navmesh = this.initializeNavmesh(new PositionGraph(), this.walls);
@@ -1323,8 +1313,6 @@ export default abstract class AbstractScene extends Scene {
         return new Navmesh(graph);
 
     }
-
-
 
     public abstract getBattlers(): Battler[];
 }

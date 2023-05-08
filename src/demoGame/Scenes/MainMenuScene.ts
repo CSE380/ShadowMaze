@@ -34,7 +34,6 @@ export default class MainMenu extends Scene {
     }
 
     public startScene(){
-        
         const center = this.viewport.getCenter();
         this.mainMenu = this.addUILayer(  GameLayers.BASE);
         this.backgroundImage = this.add.sprite(this.backgroundImageKey,  GameLayers.BASE);
@@ -44,9 +43,12 @@ export default class MainMenu extends Scene {
        
         for(let buttonName in MainMenuButtonEvent){
             if(buttonName == "Restart") continue;
-            positionY = positionY + 100;
             if(buttonName == "Select_levels") 
-                buttonName = "Select levels"           
+                buttonName = "Select levels"
+            if(buttonName == "CHEAT") 
+                buttonName = "Cheat codes" 
+                
+            positionY = positionY + 100;          
             const options={
                 position:new Vec2(center.x,positionY),
                 text:buttonName,
@@ -92,7 +94,7 @@ export default class MainMenu extends Scene {
                 break;
             }
             case MainMenuButtonEvent.CHEAT:{
-                this.sceneManager.changeToScene( CheatCodeMenuScene);
+                this.sceneManager.changeToScene(CheatCodeMenuScene);
                 break;
             }
         }

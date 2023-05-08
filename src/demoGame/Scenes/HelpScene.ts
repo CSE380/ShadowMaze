@@ -5,13 +5,13 @@ import Color from "../../Wolfie2D/Utils/Color";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
 import { BackButtonEvent } from "../CustomizedButton";
 import MainMenu from "./MainMenuScene";
-import HW4Scene from "./AbstractScene";
+import AbstractScene from "./AbstractScene";
 import Battler from "../GameSystems/BattleSystem/Battler";
 /* #################### CLASS DEFINITION #################### */
 
 // Welcome to Wolfie2D!
 // This is a simple sample scene so something displays when you run the game.
-export default class HelpScene extends HW4Scene {
+export default class HelpScene extends AbstractScene {
     /* ########## MEMBER DEFINITIONS ##########*/
     // private mainMenuLayerName: string = "startScene";
     loadScene(): void {

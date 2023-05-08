@@ -1,6 +1,7 @@
+import Vec2 from "../../../Wolfie2D/DataTypes/Vec2";
 import GameEvent from "../../../Wolfie2D/Events/GameEvent";
 import { MainMenuButtonEvent, PauseButtonEvent } from "../../CustomizedButton";
-import { AllLevelGameItems, Level1GameItems, Level2GameItems } from "../../GameItems";
+import { Level5GameItems } from "../../GameItems";
 import Battler from "../../GameSystems/BattleSystem/Battler";
 import { MenuState } from "../../MenuState";
 import { PlayerEvents } from "../../ProjectEvents";
@@ -8,13 +9,16 @@ import AbstractScene, { Color1 } from "../AbstractScene";
 import CheatCodeMenuScene from "../CheatCodeMenuScene";
 import SelectLevelMenuScene from "../SelectLevelMenuScene";
 import StartScene from "../StartScene";
-import IntroLevelScene from "./IntroLevelScene";
 
 export default class Level5Scene extends AbstractScene {
     public override loadScene() {
-        this.currentLevelGameItems = Level1GameItems;
-        this.loadCurrentLevelGameItems();
+        this.playerInitPosition = new Vec2(490, 330);
+        this.levelEndPosition = new Vec2(480, 485);
+        this.pathToItems = "shadowMaze_assets/data/Level5Data/items/"
+        this.pathToMonster = "shadowMaze_assets/data/Level5Data/enemies/"
+        this.currentLevelGameItems = Level5GameItems;
         this.currentLevel = 5;
+        this.loadCurrentLevelGameItems();
         this.loadUltimateWave();
         this.loadAllGameMusic();
         this.loadAllSpriteSheet();

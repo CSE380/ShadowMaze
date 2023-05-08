@@ -159,5 +159,4 @@ export default class PlayerAI extends StateMachineAI implements AI {
     protected resetFlag = (flag:boolean) => {
         return !flag;
     };
-
 }

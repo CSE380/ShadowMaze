@@ -6,12 +6,12 @@ import Color from "../../Wolfie2D/Utils/Color";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
 import { BackButtonEvent, SelectMenuButtonEvent } from "../CustomizedButton";
 import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
-import IntroLevelScene from "./LevelScenes/IntroLevelScene";
 import { GameLayers } from "../GameLayers";
 import AbstractScene from "./AbstractScene";
 import CheatCodeMenuScene from "./CheatCodeMenuScene";
 import MainMenuScene from "./MainMenuScene";
 import Battler from "../GameSystems/BattleSystem/Battler";
+import IntroLevelScene from "./LevelScenes/IntroLevelScene";
 import Level2Scene from "./LevelScenes/Level2Scene";
 import Level3Scene from "./LevelScenes/Level3Scene";
 import Level4Scene from "./LevelScenes/Level4Scene";
@@ -37,20 +37,15 @@ export default class MainMenu extends AbstractScene  {
         this.backgroundImage.position.set(center.x, center.y);
         // The main menu
         let positionY=center.y-250;
-        let i = 0 ;
-        for(let buttonName in SelectMenuButtonEvent){
-            buttonName = SelectMenuButtonEvent[buttonName];
-           
-            if(i  < 6 ){
-                let buttonOption={
-                    buttonName:buttonName,
-                    position:new Vec2(center.x,positionY),
-                    size:new Vec2(300, 70),
-                    text:buttonName,
-                }
-                this.addButtons(buttonOption);
+        for (let button in SelectMenuButtonEvent){
+            let buttonName = SelectMenuButtonEvent[button]
+            let buttonOption={
+                buttonName:buttonName,
+                position:new Vec2(center.x,positionY),
+                size:new Vec2(300, 70),
+                text:buttonName,
             }
-            i++;
+            this.addButtons(buttonOption);
             positionY=positionY+100;
         }
         this.addBackButton(this.backButtonPosition);
