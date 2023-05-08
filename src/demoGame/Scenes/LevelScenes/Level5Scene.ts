@@ -5,7 +5,7 @@ import { Level5GameItems } from "../../GameItems";
 import Battler from "../../GameSystems/BattleSystem/Battler";
 import { MenuState } from "../../MenuState";
 import { PlayerEvents } from "../../ProjectEvents";
-import AbstractScene, { Color1 } from "../AbstractScene";
+import AbstractScene from "../AbstractScene";
 import CheatCodeMenuScene from "../CheatCodeMenuScene";
 import SelectLevelMenuScene from "../SelectLevelMenuScene";
 import StartScene from "../StartScene";
