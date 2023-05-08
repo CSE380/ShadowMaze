@@ -15,7 +15,7 @@ import Battler from "../GameSystems/BattleSystem/Battler";
 import Level2Scene from "./LevelScenes/Level2Scene";
 import Level3Scene from "./LevelScenes/Level3Scene";
 import Level4Scene from "./LevelScenes/Level4Scene";
-import Level5Scene from "./LevelScenes/Level5Scene.";
+import Level5Scene from "./LevelScenes/Level5Scene";
 import Level6Scene from "./LevelScenes/Level6Scene";
 export default class MainMenu extends AbstractScene  {
     private mainMenuLayerName = "mainMenu";
