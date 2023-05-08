@@ -1,21 +1,38 @@
 {
-    "slime": [
+    "black_slime": [
         [20, 100],
         [20, 200],
-        [20, 300],
-        [60, 100],
-        [60, 210],
-        [60, 320],
-        [100, 100]
-
-
-
-
+        [20, 300]
     ],
-    "troll": [
+    "blue_slime": [
+        [440, 490],
         [400, 490],
-        [260,450],
-        [20,450],
-        [20,200]
-    ]
+        [300, 490],
+        [493, 220]
+    ],
+    "aqua_slime": [],
+    "bioluminescent_slime": [],
+    "eggyolk_slime": [],
+    "evilcyan_slime": [],
+    "green_slime": [
+        [100, 410],
+        [150, 410],
+        [493, 150]
+    ],
+    "iceblue_slime": [],
+    "moon_slime": [],
+    "pink_slime": [],
+    "purple_slime": [
+        [60, 90],
+        [60, 210],
+        [493, 100]
+    ],
+    "red_slime": [],
+    "void_slime": [
+        [60, 320],
+        [100, 90]
+    ],
+    "weirdgreen_slime": [],
+    "yellow_slime": [],
+    "troll": []
 }
