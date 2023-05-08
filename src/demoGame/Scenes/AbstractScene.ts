@@ -166,6 +166,8 @@ export default abstract class AbstractScene extends Scene {
     protected status = true;
     protected ultstatus = true;
     protected monsterID = 0;
+    protected medusaTimer: Timer;
+    protected phasingTimer: Timer;
     
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, {
@@ -196,6 +198,8 @@ export default abstract class AbstractScene extends Scene {
         this.levelTransitionTimer = new Timer(500);
         this.levelEndTimer = new Timer(1000)
         this.isLevelEndEntered = false;
+        this.medusaTimer = new Timer(5000)
+        this.phasingTimer = new Timer(10000);
         this.initLayers();
         this.levelEndTransitionLabel = this.addTweenLabel(this.levelEndTransitionLabel, PlayerEvents.LEVEL_END, tweensEffect.SLIDEIN);
         this.messageBoxLabel = this.addTweenLabel(this.messageBoxLabel, MessageBoxEvents.HIDDEN, tweensEffect.SLIDEIN);
@@ -369,7 +373,20 @@ export default abstract class AbstractScene extends Scene {
         const npcData = [
             { name: "black_slime", key: "black_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
             { name: "blue_slime", key: "blue_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
-            // { name: "troll", key: "troll", scale: new Vec2(1.5, 1.5), behavior: monsterBehavior },
+            { name: "aqua_slime", key: "aqua_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
+            { name: "bioluminescent_slime", key: "bioluminescent_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
+            { name: "eggyolk_slime", key: "eggyolk_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
+            { name: "evilcyan_slime", key: "evilcyan_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
+            { name: "green_slime", key: "green_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
+            { name: "iceblue_slime", key: "iceblue_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
+            { name: "moon_slime", key: "moon_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
+            { name: "pink_slime", key: "pink_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
+            { name: "purple_slime", key: "purple_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
+            { name: "red_slime", key: "red_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
+            { name: "void_slime", key: "void_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
+            { name: "weirdgreen_slime", key: "weirdgreen_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
+            { name: "yellow_slime", key: "yellow_pudding", scale: new Vec2(0.15, 0.15), behavior: MonsterBehavior },
+            { name: "troll", key: "troll", scale: new Vec2(1.5, 1.5), behavior: MonsterBehavior },
         ];
         for (const { name, key, scale, behavior } of npcData) {
             const data = monster[name];
@@ -594,7 +611,12 @@ export default abstract class AbstractScene extends Scene {
     }
 
     public updateScene(deltaT: number) {
-
+        if (this.phasingTimer.isStopped()) {
+            this.player.setCollisionShape(new AABB(this.player.position, this.player.sizeWithZoom.scale(0.125)));
+        }
+        if (this.medusaTimer.isStopped()) {
+            this.npcGroup.forEach(npc => npc.unfreeze());
+        }
         while (this.receiver.hasNextEvent()) {
             const gameEvent = this.receiver.getNextEvent()
             this.handleEvent(gameEvent);
@@ -708,7 +730,6 @@ export default abstract class AbstractScene extends Scene {
                 })
             }
         }
-        // console.log(Input.getGlobalMousePosition().toString());
     }
     private createItemDescription(gameItem: gameItems) {
         this.itemDescriptionLabel = <Label>this.add.uiElement(UIElementType.LABEL,
@@ -828,6 +849,7 @@ export default abstract class AbstractScene extends Scene {
                 break;
             }
             case AllLevelGameItems.PHASING_POTION: {
+                this.phasingTimer.start();
                 const halfSize = this.player.sizeWithZoom.scale(0);
                 this.player.setCollisionShape(new AABB(this.player.position, halfSize));
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_PHASING_POTION });
@@ -845,6 +867,7 @@ export default abstract class AbstractScene extends Scene {
             }
             case AllLevelGameItems.MEDUSA: {
                 this.npcGroup.forEach(npc => npc.freeze());
+                this.medusaTimer.start();
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_MEDUSA })
                 break;
             }
@@ -1031,7 +1054,6 @@ export default abstract class AbstractScene extends Scene {
                 //fire an event that means the monster has been hit. we need to know which monster has been hit and provide the damage the prince has dealt
                 //in NPCbehaviour.ts, the event will be handled
                 this.status = false;
-                console.log("furew");
                 this.emitter.fireEvent(BattlerEvents.MONSTER_HIT, { id: battler.id, dmg: this.player._ai["dmg"] });
             }
             if (!this.player.animation.isPlaying(AnimationType.ATTACKING)) {

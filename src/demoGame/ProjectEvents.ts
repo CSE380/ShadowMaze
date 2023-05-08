@@ -25,7 +25,7 @@ export enum MessageBoxEvents {
     USE_HEALTH_PACK= "Health pack is used",
     USE_PHASING_POTION = "The prince is able to phase through the wall",
     USE_TElEPORT_BOOT="The prince is being teleported to a random position",
-    USE_MEDUSA="All monsters are frozen",
+    USE_MEDUSA="All monsters are frozen for 5 seconds",
     USE_ORACLE_ELIXIR="All monsters'position are shown",
     USE_SEEING_STONE="All items'position are shown",
     USE_CURSED_SWORD="Increased physical damage at cost of health",
