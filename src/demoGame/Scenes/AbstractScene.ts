@@ -767,10 +767,9 @@ export default abstract class AbstractScene extends Scene {
         switch (event.type) {
             case BattlerEvents.MONSTER_DEAD: {
                 this.handleBattlerKilled(event);
-                if (this.player._ai[PlayerStatKey.CURRENT_STAT]["currentEnergy"] < this.playerMaxStatValue) {
-                    this.player._ai[PlayerStatKey.CURRENT_STAT]["currentEnergy"]++;
-                    this.handlePlayerStatChange("currentEnergy");
-                }
+                let newEnergy = this.player._ai[PlayerStatKey.CURRENT_STAT]["currentEnergy"] + 4;
+                this.player._ai[PlayerStatKey.CURRENT_STAT]["currentEnergy"] = Math.min(newEnergy, this.playerMaxStatValue);
+                this.handlePlayerStatChange("currentEnergy");
                 break;
             }
             case BattlerEvents.PRINCE_HIT: {
@@ -790,6 +789,7 @@ export default abstract class AbstractScene extends Scene {
             case PlayerInput.ULTIMATE: {
                 if (!this.ultimateWave.visible 
                  && this.player._ai["currentStat"].currentEnergy == this.player._ai["maxStatValue"]) {
+                    this.player._ai["currentStat"].currentEnergy = this.player._ai["minStatValue"];
                     this.handleFireUltimate();
                     this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.ULT_KEY, loop: false, holdReference: true });
                 }
@@ -797,7 +797,6 @@ export default abstract class AbstractScene extends Scene {
         }
     }
     protected handleFireUltimate() {
-        // this.handlePlayerStatChange("Current Energy");
         this.ultimateWave.visible = true;
         let faceDirectionVec = this.getFaceDirectionVec();
         this.ultimateWave.position.set(faceDirectionVec.x, faceDirectionVec.y);
