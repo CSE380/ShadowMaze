@@ -214,7 +214,6 @@ export default abstract class AbstractScene extends Scene {
         this.load.image(key, `${this.pathToSprite}${key}.png`);
     }
 
-
     protected loadCurrentLevelGameItems() {
         for (let key of Object.values(this.currentLevelGameItems)) {
             this.loadGameItems(key);
@@ -426,7 +425,6 @@ export default abstract class AbstractScene extends Scene {
         return this.lanternShape;
     }
 
-
     protected initSubscribe() {
 
         this.initGameEventSubscribe([
@@ -605,7 +603,7 @@ export default abstract class AbstractScene extends Scene {
         let buttonOption = {
             position: new Vec2(position.x, position.y),
             text: leftArrow,
-            buttonName: BackButtonEvent.BACK,
+            buttonName: "Back",
         }
         this.addButtons(buttonOption);
     }
@@ -763,9 +761,6 @@ export default abstract class AbstractScene extends Scene {
                 this.messageBoxLabel.tweens.play(tweensEffect.SLIDEOUT);
                 break;
             }
-
-
-
         }
     }
     protected handleBattlerEvents(event: GameEvent) {
@@ -783,7 +778,6 @@ export default abstract class AbstractScene extends Scene {
                     this.player._ai[PlayerStatKey.CURRENT_STAT][PlayerStatKey.CURRENT_HEALTH]--;
                     this.handlePlayerStatChange(PlayerStatKey.CURRENT_HEALTH);
                     this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.PRINCE_HIT, loop: false, holdReference: true });
-
                 }
                 break;
             }
@@ -794,12 +788,11 @@ export default abstract class AbstractScene extends Scene {
                 }, 2000)
             }
             case PlayerInput.ULTIMATE: {
-                if (!this.ultimateWave.visible) {
+                if (!this.ultimateWave.visible 
+                 && this.player._ai["currentStat"].currentEnergy == this.player._ai["maxStatValue"]) {
                     this.handleFireUltimate();
                     this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.ULT_KEY, loop: false, holdReference: true });
                 }
-
-
             }
         }
     }
@@ -1145,9 +1138,6 @@ export default abstract class AbstractScene extends Scene {
         }
         // 
         player.animation.play("IDLE");
-
-
-
     }
     protected initAstarMode() {
         let navmesh = this.initializeNavmesh(new PositionGraph(), this.walls);
@@ -1321,8 +1311,6 @@ export default abstract class AbstractScene extends Scene {
         return new Navmesh(graph);
 
     }
-
-
 
     public abstract getBattlers(): Battler[];
 }

@@ -37,20 +37,14 @@ export default class MainMenu extends AbstractScene  {
         this.backgroundImage.position.set(center.x, center.y);
         // The main menu
         let positionY=center.y-250;
-        let i = 0 ;
-        for(let buttonName in SelectMenuButtonEvent){
-            buttonName = SelectMenuButtonEvent[buttonName];
-           
-            if(i  < 6 ){
-                let buttonOption={
-                    buttonName:buttonName,
-                    position:new Vec2(center.x,positionY),
-                    size:new Vec2(300, 70),
-                    text:buttonName,
-                }
-                this.addButtons(buttonOption);
+        for (let buttonName in SelectMenuButtonEvent){
+            let buttonOption={
+                buttonName:buttonName,
+                position:new Vec2(center.x,positionY),
+                size:new Vec2(300, 70),
+                text:buttonName,
             }
-            i++;
+            this.addButtons(buttonOption);
             positionY=positionY+100;
         }
         this.addBackButton(this.backButtonPosition);
