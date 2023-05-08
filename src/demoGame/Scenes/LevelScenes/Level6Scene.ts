@@ -11,9 +11,6 @@ import StartScene from "../StartScene";
 import IntroLevelScene from "./IntroLevelScene";
 
 export default class Level6Scene extends AbstractScene {
-   
-   
-   
     public override loadScene() {
         this.currentLevelGameItems = Level1GameItems;
         this.loadCurrentLevelGameItems();
