@@ -168,6 +168,7 @@ export default abstract class AbstractScene extends Scene {
     protected monsterID = 0;
     protected medusaTimer: Timer;
     protected phasingTimer: Timer;
+    protected original_half_size: Vec2;
     
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, {
@@ -348,14 +349,14 @@ export default abstract class AbstractScene extends Scene {
         if (!this.option.isfogOfWarChecked) {
             const Fog = new FogOfWarManagement(this, this.add, this.wallSize, this.labelSize);
             
-            // Fog.initFogOfWar(FogOfWarMode.STANDARD);
+            Fog.initFogOfWar(FogOfWarMode.STANDARD);
 
-            // if (this.currentLevel == 2 || this.currentLevel == 3) {
-            //     Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
-            // }
-            // else {
-            //     Fog.initFogOfWar(FogOfWarMode.STANDARD);
-            // }
+            if (this.currentLevel == 3 || this.currentLevel == 6) {
+                Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
+            }
+            else {
+                Fog.initFogOfWar(FogOfWarMode.STANDARD);
+            }
         }
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
@@ -611,8 +612,8 @@ export default abstract class AbstractScene extends Scene {
     }
 
     public updateScene(deltaT: number) {
-        if (this.phasingTimer.isStopped()) {
-            this.player.setCollisionShape(new AABB(this.player.position, this.player.sizeWithZoom.scale(0.125)));
+        if (this.phasingTimer.isStopped() && this.phasingTimer.hasRun()) {
+            this.player.setCollisionShape(new AABB(this.player.position, this.original_half_size));
         }
         if (this.medusaTimer.isStopped()) {
             this.npcGroup.forEach(npc => npc.unfreeze());
@@ -1050,7 +1051,7 @@ export default abstract class AbstractScene extends Scene {
                 continue;
             }
             //if the monster is active and is within a certain distance of the prince attack animation, then we can assume the monster has been hit
-            if (this.status && battler.battlerActive && battler.position.distanceTo(midpoint) <= 15 && this.player.animation.isPlaying(AnimationType.ATTACKING)) {
+            if (this.status && battler.battlerActive && battler.position.distanceTo(midpoint) <= 19 && this.player.animation.isPlaying(AnimationType.ATTACKING)) {
                 //fire an event that means the monster has been hit. we need to know which monster has been hit and provide the damage the prince has dealt
                 //in NPCbehaviour.ts, the event will be handled
                 this.status = false;
@@ -1128,6 +1129,7 @@ export default abstract class AbstractScene extends Scene {
         this.battlers.push(this.player);
         player.addPhysics(new AABB(Vec2.ZERO, new Vec2(8, 8)), null, false);
         const halfSize = this.player.sizeWithZoom.scale(0.125);
+        this.original_half_size = halfSize.clone();
         player.setCollisionShape(new AABB(this.player.position, halfSize))
         player.currentTransparentLabels = this.initTransparentLabelByPosition(this.player.position);
         this.buildLanternShape(this.player.position);
