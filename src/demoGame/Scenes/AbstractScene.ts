@@ -162,7 +162,7 @@ export default abstract class AbstractScene extends Scene {
     protected visibleGroup: (PlayerActor | NPCActor | Sprite)[] = [];
     protected npcGroup = [];
     protected gameItemGroup: gameItems[] = [];
-    protected currentLevel = 0;
+    protected currentLevel = 1;
     protected status = true;
     protected ultstatus = true;
     protected monsterID = 0;

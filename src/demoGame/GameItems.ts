@@ -19,6 +19,7 @@ export enum Level1GameItems {
     IRON_SHIELD = "ironShield",
     IRON_SWORD =  "ironSword",
 }
+
 export enum Level2GameItems {
     DOOR = "door",
     HEALTH_PACK = "healthPacks",
@@ -62,8 +63,24 @@ export enum Level4GameItems {
     TELEPORT_BOOT="teleportBoot",
 }
 
+export enum Level5GameItems {
+    LANTERNS = "lantern",
+    INVENTORY_SLOT = "inventorySlot",
+    IRON_SHIELD = "ironShield",
+    IRON_SWORD =  "ironSword",
+    ORACLE_ELIXIR = "oracleElixir",
+    MEDUSA = "medusa",
+    WOODEN_SWORD = "woodenSword",
+}
+
+export enum Level6GameItems {
+    LANTERNS = "lantern",
+    INVENTORY_SLOT = "inventorySlot",
+    IRON_SHIELD = "ironShield",
+    IRON_SWORD =  "ironSword",
+}
 
 
 
-export type AllGameItemsType=typeof AllLevelGameItems | typeof Level1GameItems | typeof Level2GameItems | typeof Level3GameItems | typeof Level4GameItems;
+export type AllGameItemsType=typeof AllLevelGameItems | typeof Level1GameItems | typeof Level2GameItems | typeof Level3GameItems | typeof Level4GameItems | typeof Level5GameItems | typeof Level6GameItems;
 
