@@ -23,7 +23,7 @@ export default class Level6Scene extends AbstractScene {
         this.loadAllMonstersPosition();
         this.load.image(this.inGameControlTextBackground, "shadowMaze_assets/images/inGameControlTextBackground.png");
         this.load.image(this.inGameHelpTextBackground, "shadowMaze_assets/images/inGameHelpTextBackground.png");
-        this.load.tilemap("level", "shadowMaze_assets/tilemaps/LI_FOURTH_MAP.json");
+        this.load.tilemap("level", "shadowMaze_assets/tilemaps/LEVEL_SIX.json");
     }
     public handleEvent(event: GameEvent): void {
         super.handleEvent(event);
