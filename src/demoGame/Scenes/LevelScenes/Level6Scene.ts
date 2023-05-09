@@ -18,7 +18,7 @@ export default class Level6Scene extends AbstractScene {
         this.pathToItems = "shadowMaze_assets/data/Level6Data/items/"
         this.pathToMonster = "shadowMaze_assets/data/Level6Data/enemies/"
         this.currentLevelGameItems = Level6GameItems;
-        this.currentLevel = 5;
+        this.currentLevel = 6;
         this.loadCurrentLevelGameItems();
         this.loadUltimateWave();
         this.loadAllGameMusic();

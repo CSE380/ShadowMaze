@@ -362,7 +362,7 @@ export default abstract class AbstractScene extends Scene {
             this.initAllGameItems();
 
         }
-        // this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.LEVEL_BGM_KEY, loop: true, holdReference: true });
+        this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.LEVEL_BGM_KEY, loop: true, holdReference: true });
     }
 
     protected initNPCs(): void {
