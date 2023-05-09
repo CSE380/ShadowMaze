@@ -27,7 +27,7 @@ export enum MessageBoxEvents {
     USE_TElEPORT_BOOT="The prince is being teleported to a random position",
     USE_MEDUSA="All monsters are frozen for 5 seconds",
     USE_ORACLE_ELIXIR="All monsters' positions are shown",
-    USE_SEEING_STONE="All items' positions are shown",
+    USE_SEEING_STONE="All items' positions are shown for 10 seconds",
     USE_CURSED_SWORD="Increased physical damage at cost of health",
     UNUSED_CURSED_SWORD="The prince can not hold cursed sword anymore",
     

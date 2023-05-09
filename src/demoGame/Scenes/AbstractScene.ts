@@ -347,9 +347,7 @@ export default abstract class AbstractScene extends Scene {
         if (!this.option.isfogOfWarChecked) {
             const Fog = new FogOfWarManagement(this, this.add, this.wallSize, this.labelSize);
             
-            Fog.initFogOfWar(FogOfWarMode.STANDARD);
-
-            if (this.currentLevel == 3 || this.currentLevel == 6) {
+            if (this.currentLevel == 6) {
                 Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
             }
             else {
