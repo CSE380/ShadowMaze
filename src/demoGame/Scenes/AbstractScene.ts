@@ -81,7 +81,6 @@ export default abstract class AbstractScene extends Scene {
     protected currentLevelGameItems:AllGameItemsType;
     protected currentColor:{};
     //button event
-    protected PauseButtonEvent = PauseButtonEvent;
     protected wallSize: number;
     protected emptyString = "";
     protected action = "action";
