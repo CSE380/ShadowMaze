@@ -3,7 +3,7 @@ export enum MainMenuButtonEvent {
     Select_levels="Select levels",
     Controls = "Controls",
     Help = "Help",
-    CHEAT = "Cheat codes",
+    CHEAT = "CHEAT",
     Exit="Exit",
    
 }
