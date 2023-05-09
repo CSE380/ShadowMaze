@@ -45,8 +45,6 @@ export default class MainMenu extends Scene {
             if(buttonName == "Restart") continue;
             if(buttonName == "Select_levels") 
                 buttonName = "Select levels"
-            if(buttonName == "CHEAT") 
-                buttonName = "Cheat codes" 
                 
             positionY = positionY + 100;          
             const options={
