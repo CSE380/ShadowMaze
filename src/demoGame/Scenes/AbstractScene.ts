@@ -165,6 +165,7 @@ export default abstract class AbstractScene extends Scene {
     protected status = true;
     protected ultstatus = true;
     protected monsterID = 0;
+    protected monsterAttackedID = 0;
     protected medusaTimer: Timer;
     protected phasingTimer: Timer;
     protected original_half_size: Vec2;
@@ -347,12 +348,12 @@ export default abstract class AbstractScene extends Scene {
         if (!this.option.isfogOfWarChecked) {
             const Fog = new FogOfWarManagement(this, this.add, this.wallSize, this.labelSize);
             
-            if (this.currentLevel == 6) {
-                Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
-            }
-            else {
-                Fog.initFogOfWar(FogOfWarMode.STANDARD);
-            }
+            // if (this.currentLevel == 6) {
+            //     Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
+            // }
+            // else {
+            //     Fog.initFogOfWar(FogOfWarMode.STANDARD);
+            // }
         }
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
@@ -1041,10 +1042,11 @@ export default abstract class AbstractScene extends Scene {
                 continue;
             }
             //if the monster is active and is within a certain distance of the prince attack animation, then we can assume the monster has been hit
-            if (this.status && battler.battlerActive && battler.position.distanceTo(midpoint) <= 19 && this.player.animation.isPlaying(AnimationType.ATTACKING)) {
+            if ((this.status || this.monsterAttackedID != battler.id) && battler.battlerActive && battler.position.distanceTo(midpoint) <= 19 && this.player.animation.isPlaying(AnimationType.ATTACKING)) {
                 //fire an event that means the monster has been hit. we need to know which monster has been hit and provide the damage the prince has dealt
                 //in NPCbehaviour.ts, the event will be handled
                 this.status = false;
+                this.monsterAttackedID = battler.id;
                 this.emitter.fireEvent(BattlerEvents.MONSTER_HIT, { id: battler.id, dmg: this.player._ai["dmg"] });
             }
             if (!this.player.animation.isPlaying(AnimationType.ATTACKING)) {

@@ -1,14 +1,11 @@
 {
     "black_slime": [
         [20, 100],
-        [20, 200],
         [20, 300]
     ],
     "blue_slime": [
         [440, 490],
-        [400, 490],
-        [300, 490],
-        [493, 220]
+        [300, 490]
     ],
     "aqua_slime": [],
     "bioluminescent_slime": [],
@@ -24,13 +21,11 @@
     "pink_slime": [],
     "purple_slime": [
         [60, 90],
-        [60, 210],
         [493, 100]
     ],
     "red_slime": [],
     "void_slime": [
-        [60, 320],
-        [100, 90]
+        [60, 320]
     ],
     "weirdgreen_slime": [],
     "yellow_slime": [],
