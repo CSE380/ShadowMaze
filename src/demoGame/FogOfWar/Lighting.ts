@@ -7,7 +7,6 @@ import AbstractScene from "../Scenes/AbstractScene";
 
 export default class Lighting {
     private scene: Scene;
-    private isDark: boolean;
     private timers: Timer[];
     private labels: Label[];
     private timerIndex: number;
@@ -17,7 +16,6 @@ export default class Lighting {
     private numberofMaxFlashback = 4;
     constructor(scene: AbstractScene) {
         this.scene = scene;
-        this.isDark = true;
 
         // Create an array of timers and labels
         this.timers = [];
@@ -39,17 +37,15 @@ export default class Lighting {
         const base = 0.5;
         const ratio = base / lightningInterval;
         let offset = 0.1;
+
         if (i < lightningInterval) {
             a = 1 - ratio * i;
-            r = Math.round(255 - (i / lightningInterval) * 255);
-            g = Math.round(255 - (i / lightningInterval) * 255);
-            b = Math.round(255 - (i / lightningInterval) * 255);
+            let rgbValue = 255 - (i / lightningInterval) * 255
+            r = g = b = Math.round(rgbValue);
         } else {
             const range = 1 - base;
             a = base + (i - lightningInterval) / (this.length - lightningInterval) * range + offset;
-            r = 0;
-            g = 0;
-            b = 0;
+            r = g = b = 0;
         }
         const color = new Color(r, g, b, a);
         this.colorArray.push(color);
@@ -66,29 +62,29 @@ export default class Lighting {
     }
     protected updateLightningColor() {
         let index = this.timerIndex
-        let ratio = 30;
+        let flashbackRatio = 30;
         let flashBackIntervalRatio = 0.4;
         let start = flashBackIntervalRatio * this.length;
         let end = (flashBackIntervalRatio + 0.2) * this.length;
         let probability = 1;
-        let off = 0.03;
+        let probablityOffset = 0.03;
         if (index > start && index < end && this.calculateFlashbackProbability() && this.numberofFlashback < this.numberofMaxFlashback) {
             let random = Math.random();
-            let offset = 0;
-            if (random > probability - off) {
-                offset = ratio;
+            let flashbackOffset = 0;
+            if (random > probability - probablityOffset) {
+                flashbackOffset = flashbackRatio;
             }
-            else if (random > probability - 2 * off) {
-                offset = 0.7 * ratio;
+            else if (random > probability - 2 * probablityOffset) {
+                flashbackOffset = 0.7 * flashbackRatio;
             }
-            else if (random > probability - 3 * off) {
-                offset = 0.3 * ratio;
+            else if (random > probability - 3 * probablityOffset) {
+                flashbackOffset = 0.3 * flashbackRatio;
             }
-            if (offset > 0) {
+            if (flashbackOffset > 0) {
                 this.numberofFlashback++;
                 console.log("flash")
             }
-            index -= offset;
+            index -= flashbackOffset;
             this.timerIndex = index;
         }
         this.labels.forEach(label => label.backgroundColor = this.colorArray[index]);
