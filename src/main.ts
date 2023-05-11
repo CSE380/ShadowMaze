@@ -8,12 +8,9 @@ import StartScene from "./demoGame/Scenes/StartScene";
 import ControlScene from "./demoGame/Scenes/ControlScene";
 import HelpScene from "./demoGame/Scenes/HelpScene";
 import SelectLevelMenuScene from "./demoGame/Scenes/SelectLevelMenuScene";
-import BubbleShaderType from "./demoGame/Shaders/BubbleShaderType";
-import LaserShaderType from "./demoGame/Shaders/LaserShaderType";
-import RegistryManager from "./Wolfie2D/Registry/RegistryManager";
-import { UseItemInput } from "./demoGame/AI/Player/PlayerController";
 import CheatCodeMenuScene from "./demoGame/Scenes/CheatCodeMenuScene";
 import Level2Scene from "./demoGame/Scenes/LevelScenes/Level2Scene";
+import Level6Scene from "./demoGame/Scenes/LevelScenes/Level6Scene";
 // The main function is your entrypoint into Wolfie2D. Specify your first scene and any options here.
 (function main() {
     // Run any tests
@@ -41,27 +38,17 @@ import Level2Scene from "./demoGame/Scenes/LevelScenes/Level2Scene";
     }
 
     // Set up custom registries
-    // RegistryManager.shaders.registerAndPreloadItem(
-    //     BubbleShaderType.KEY,   // The key of the shader program
-    //     BubbleShaderType,           // The constructor of the shader program
-    //     BubbleShaderType.VSHADER,   // The path to the vertex shader
-    //     BubbleShaderType.FSHADER);  // the path to the fragment shader*/
 
-    // RegistryManager.shaders.registerAndPreloadItem(
-    //     LaserShaderType.KEY,
-    //     LaserShaderType,
-    //     LaserShaderType.VSHADER,
-    //     LaserShaderType.FSHADER
-    // );
     // Create a game with the options specified
     const game = new Game(options);
     // Start our game
     // game.start(IntroLevelScene, {});
     // game.start(HelpScene, {});
     // game.start(ControlScene,{});
-    game.start(StartScene, {});
+    // game.start(Level6Scene,{});
+    // game.start(StartScene, {});
     // game.start(CheatCodeMenuScene,{});
-    // game.start(SelectLevelMenuScene,{});
+    game.start(SelectLevelMenuScene,{});
     // game.start(MainMenu, {});
 })();
 
