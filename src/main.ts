@@ -46,9 +46,9 @@ import Level6Scene from "./demoGame/Scenes/LevelScenes/Level6Scene";
     // game.start(HelpScene, {});
     // game.start(ControlScene,{});
     // game.start(Level6Scene,{});
-    // game.start(StartScene, {});
+    game.start(StartScene, {});
     // game.start(CheatCodeMenuScene,{});
-    game.start(SelectLevelMenuScene,{});
+    // game.start(SelectLevelMenuScene,{});
     // game.start(MainMenu, {});
 })();
 

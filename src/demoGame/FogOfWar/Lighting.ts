@@ -70,7 +70,7 @@ export default class Lighting {
     }
     protected updateLightningColor() {
         let index = this.timerIndex
-        let flashbackRatio = 30;
+        let flashbackRatio = 40;
         let flashBackIntervalRatio = 0.4;
         let start = flashBackIntervalRatio * this.length;
         let end = (flashBackIntervalRatio + 0.2) * this.length;
@@ -83,14 +83,13 @@ export default class Lighting {
                 flashbackOffset = flashbackRatio;
             }
             else if (random > probability - 2 * probablityOffset) {
-                flashbackOffset = 0.7 * flashbackRatio;
+                flashbackOffset = 0.6 * flashbackRatio;
             }
             else if (random > probability - 3 * probablityOffset) {
                 flashbackOffset = 0.3 * flashbackRatio;
             }
             if (flashbackOffset > 0) {
-                this.numberofFlashback++;
-                console.log("flash")
+                this.numberofFlashback++;                
             }
             index -= flashbackOffset;
             this.timerIndex = index;

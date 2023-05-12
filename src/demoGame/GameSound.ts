@@ -8,5 +8,6 @@ export enum GameWAVSound {
 export enum GameMP3Sound {
     LEVEL_BGM_KEY = "levelBgm",
     LIGHTNING = "lightning",
-    RAIN = "rain"
+    RAIN = "rain",
+    AFTER_LIGHTNING = "afterLightning"
 }
