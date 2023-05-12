@@ -11,7 +11,7 @@ import { HudEvent } from "../../ProjectEvents";
 import MathUtils from "../../../Wolfie2D/Utils/MathUtils";
 import { AnimationType } from "../Player/PlayerStates/PlayerState";
 import { GameEventType } from "../../../Wolfie2D/Events/GameEventType";
-import { GameSound } from "../../GameSound";
+import { GameWAVSound } from "../../GameSound";
 /**
  * An abstract implementation of behavior for an NPC. Each concrete implementation of the
  * NPCBehavior class should define some new behavior for an NPCActor. 
@@ -30,7 +30,7 @@ export default abstract class NPCBehavior extends StateMachineGoapAI<NPCAction> 
         this.receiver.subscribe(BattlerEvents.MONSTER_HIT);
         this.invincibleTime = new Timer(500, this.handleinvincibleTimeEnd, false);
         this.currentHealth = this.owner.health;
-       
+
     }
     public initSubscribe() {
         for (let event of Object.values(BattlerEvents)) {
@@ -62,10 +62,10 @@ export default abstract class NPCBehavior extends StateMachineGoapAI<NPCAction> 
             case BattlerEvents.MONSTER_HIT: {
                 let id: number = event.data.get("id");
                 let dmg: number = event.data.get("dmg");
-               
+
                 if (id == this.owner.id) {
-                    
-                    this.handleMonsterHit(dmg,id);
+
+                    this.handleMonsterHit(dmg, id);
                 }
                 break;
             }
@@ -75,14 +75,14 @@ export default abstract class NPCBehavior extends StateMachineGoapAI<NPCAction> 
             }
         }
     }
-    protected handleMonsterHit(dmg: number,id:number) {
+    protected handleMonsterHit(dmg: number, id: number) {
         if (!this.isInvincible) {
             this.isInvincible = true;
             this.currentHealth -= dmg;
             this.invincibleTime.start();
-            this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.MONSTER_HIT, loop: false, holdReference: true });
-            if (this.currentHealth<= 0) {
-                this.owner.animation.play(AnimationType.DYING,false);
+            this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameWAVSound.MONSTER_HIT, loop: false, holdReference: true });
+            if (this.currentHealth <= 0) {
+                this.owner.animation.play(AnimationType.DYING, false);
                 this.owner.freeze();
                 return;
             }

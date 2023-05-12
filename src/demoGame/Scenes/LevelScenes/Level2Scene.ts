@@ -36,6 +36,9 @@ export default class Level2Scene extends AbstractScene {
         this.handleInGameButtonEvent(event);
         // action type:  
     }
+    public unloadScene(): void {
+        this.keepResource();
+    }
     protected handleInGameButtonEvent(event:GameEvent){
         let nextScene;
         // console.log(event)

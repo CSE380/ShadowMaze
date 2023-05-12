@@ -5,7 +5,8 @@ import Timer from "../../Wolfie2D/Timing/Timer";
 import Color from "../../Wolfie2D/Utils/Color";
 import { GameLayers } from "../GameLayers";
 import AbstractScene from "../Scenes/AbstractScene";
-
+import { GameMP3Sound, GameWAVSound } from "../GameSound";
+import { GameEventType } from "../../Wolfie2D/Events/GameEventType";
 export default class Lighting {
     private scene: Scene;
     private timers: Timer[];
@@ -33,7 +34,7 @@ export default class Lighting {
         this.timerIndex = 0;
         this.timers[0].start();
     }
-  
+
 
     protected createAlpha(i: number) {
         let { r, g, b, a } = new Color(0, 0, 0, 0);
@@ -62,6 +63,8 @@ export default class Lighting {
         if (this.timerIndex >= this.timers.length) {
             this.timerIndex = 0;
             this.numberofFlashback = 0;
+            this.scene.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameMP3Sound.LIGHTNING, loop: false, holdReference: false });
+
         }
         this.timers[this.timerIndex].start();
     }

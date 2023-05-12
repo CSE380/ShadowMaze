@@ -57,7 +57,7 @@ import MonsterBehavior from "../AI/NPC/NPCBehavior/MonsterBehavior";
 import BasicTargetable from "../GameSystems/Targeting/BasicTargetable";
 import Position from "../GameSystems/Targeting/Position";
 import AnimatedSprite from "../../Wolfie2D/Nodes/Sprites/AnimatedSprite";
-import { GameSound } from "../GameSound";
+import { GameMP3Sound, GameWAVSound } from "../GameSound";
 import { GameCharacters } from "../GameCharacters";
 //
 import { GameEventType } from "../../Wolfie2D/Events/GameEventType";
@@ -69,17 +69,17 @@ const enum tweensEffect {
     SLIDEOUT = "slideOut",
     FADEIN = "fadeIn",
     FADEOUT = "fadeOut",
-    
+
 }
 export const Color1 = {
-    Red : "Red",
-    Green : "Green"
+    Red: "Red",
+    Green: "Green"
 } as const
 export default abstract class AbstractScene extends Scene {
     protected walls: OrthogonalTilemap;
     protected path: NavigationPath;
-    protected currentLevelGameItems:AllGameItemsType;
-    protected currentColor:{};
+    protected currentLevelGameItems: AllGameItemsType;
+    protected currentColor: {};
     //button event
     protected wallSize: number;
     protected emptyString = "";
@@ -98,7 +98,7 @@ export default abstract class AbstractScene extends Scene {
     protected levelEndTransitionLabel: Label;
     protected messageBoxLabel: Label;
     protected playerInitPosition = new Vec2(260, 235);
-    
+
     // protected playerInitPosition = new Vec2(360, 180);
     protected levelEndPosition = new Vec2(260, 490);
     protected levelEndHalfSize = new Vec2(25, 25)
@@ -170,7 +170,7 @@ export default abstract class AbstractScene extends Scene {
     protected medusaTimer: Timer;
     protected phasingTimer: Timer;
     protected original_half_size: Vec2;
-    
+
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, {
             ...options, physics: {
@@ -191,7 +191,7 @@ export default abstract class AbstractScene extends Scene {
     public initScene(option: Record<string, any>): void {
         if (option !== undefined)
             this.option = option
-       
+
         // this.option.isAstarChecked = true;
     }
     protected initLevelScene() {
@@ -224,20 +224,14 @@ export default abstract class AbstractScene extends Scene {
             console.log(key);
         }
     }
-    protected loadGameSound(key: string) {
-        let format: string;
-        if (key == GameSound.LEVEL_BGM_KEY)
-            format = 'mp3';
-        else {
-            format = 'wav';
-        }
+    protected loadGameSound(key: string, format: string) {
         this.load.audio(key, `${this.pathToMusic}${key}.${format}`);
     }
     protected loadGameCharacter(key: string) {
-       
+
         this.load.spritesheet(key, `${this.pathToSpriteSheets}${key}.json`);
     }
-    protected loadAllMonstersPosition(){
+    protected loadAllMonstersPosition() {
         this.load.object("monster", `${this.pathToMonster}/monster.json`);
     }
     protected loadAllSpriteSheet() {
@@ -246,8 +240,11 @@ export default abstract class AbstractScene extends Scene {
         }
     }
     protected loadAllGameMusic() {
-        for (let key of Object.values(GameSound)) {
-            this.loadGameSound(key);
+        for (let key of Object.values(GameWAVSound)) {
+            this.loadGameSound(key, "wav");
+        }
+        for (let key of Object.values(GameMP3Sound)) {
+            this.loadGameSound(key, "mp3");
         }
     }
     protected initInventorySlotsMap() {
@@ -349,13 +346,13 @@ export default abstract class AbstractScene extends Scene {
 
         if (!this.option.isfogOfWarChecked) {
             const Fog = new FogOfWarManagement(this, this.add, this.wallSize, this.labelSize);
-            
-            // if (this.currentLevel == 6) {
-            //     Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
-            // }
-            // else {
-            //     Fog.initFogOfWar(FogOfWarMode.STANDARD);
-            // }
+
+            if (this.currentLevel == 5) {
+                Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
+            }
+            else {
+                Fog.initFogOfWar(FogOfWarMode.STANDARD);
+            }
         }
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
@@ -365,9 +362,13 @@ export default abstract class AbstractScene extends Scene {
             this.initAllGameItems();
 
         }
-        this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.LEVEL_BGM_KEY, loop: true, holdReference: true });
+        this.fireInGameMusic();
     }
+    protected fireInGameMusic() {
 
+        this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameMP3Sound.LEVEL_BGM_KEY, loop: true, holdReference: true });
+
+    }
     protected initNPCs(): void {
         const monster = this.load.getObject("monster");
         const npcData = [
@@ -777,7 +778,7 @@ export default abstract class AbstractScene extends Scene {
                 if (!this.player._ai["isInvincible"]) {
                     this.player._ai[PlayerStatKey.CURRENT_STAT][PlayerStatKey.CURRENT_HEALTH]--;
                     this.handlePlayerStatChange(PlayerStatKey.CURRENT_HEALTH);
-                    this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.PRINCE_HIT, loop: false, holdReference: true });
+                    this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameWAVSound.PRINCE_HIT, loop: false, holdReference: true });
                 }
                 break;
             }
@@ -788,11 +789,11 @@ export default abstract class AbstractScene extends Scene {
                 }, 2000)
             }
             case PlayerInput.ULTIMATE: {
-                if (!this.ultimateWave.visible 
-                 && this.player._ai["currentStat"].currentEnergy == this.player._ai["maxStatValue"]) {
+                if (!this.ultimateWave.visible
+                    && this.player._ai["currentStat"].currentEnergy == this.player._ai["maxStatValue"]) {
                     this.player._ai["currentStat"].currentEnergy = this.player._ai["minStatValue"];
                     this.handleFireUltimate();
-                    this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.ULT_KEY, loop: false, holdReference: true });
+                    this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameWAVSound.ULT_KEY, loop: false, holdReference: true });
                 }
             }
         }
@@ -811,7 +812,7 @@ export default abstract class AbstractScene extends Scene {
     protected handleBattlerKilled(event: GameEvent) {
         let id: number = event.data.get("id");
         let battler = this.battlers.find(b => b.id === id);
-        
+
         if (battler) {
             this.healthbars.get(id).visible = false;
             setTimeout(() => {
@@ -838,7 +839,7 @@ export default abstract class AbstractScene extends Scene {
                 if (this.player._ai[PlayerStatKey.CURRENT_STAT][PlayerStatKey.CURRENT_HEALTH] < this.playerMaxStatValue)
                     this.player._ai[PlayerStatKey.CURRENT_STAT][PlayerStatKey.CURRENT_HEALTH]++;
                 this.handlePlayerStatChange(PlayerStatKey.CURRENT_HEALTH);
-                this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.HEALING_KEY, loop: false, holdReference: true });
+                this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameWAVSound.HEALING_KEY, loop: false, holdReference: true });
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_HEALTH_PACK })
                 break;
             }
@@ -947,7 +948,7 @@ export default abstract class AbstractScene extends Scene {
                     gameItem.position.set(key[0], key[1]);
                     positionItemsMap.set(key, [gameItem]);
                     gameItem.isPickable = false;
-                    this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameSound.PICK_ITEM, loop: false, holdReference: true });
+                    this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameWAVSound.PICK_ITEM, loop: false, holdReference: true });
                     return;
                 }
             }
@@ -1205,7 +1206,24 @@ export default abstract class AbstractScene extends Scene {
     protected sceneChange(nextScene) {
         this.viewport.setZoomLevel(1);
         this.sceneManager.changeToScene(nextScene, this.option);
-        this.emitter.fireEvent(GameEventType.STOP_SOUND, { key: GameSound.LEVEL_BGM_KEY, loop: true, holdReference: true });
+        this.stopInGameMusic();
+    }
+    protected keepResource() {
+        Object.values(GameWAVSound).forEach(
+            key => {
+                this.load.keepAudio(key)
+            }
+        )
+        this.load.keepAudio(GameMP3Sound.LEVEL_BGM_KEY);
+        this.load.keepSpritesheet(GameCharacters.PRINCE);
+
+    }
+    protected stopInGameMusic() {
+        Object.values(GameMP3Sound).forEach(
+            key => {
+                this.emitter.fireEvent(GameEventType.STOP_SOUND, { key, loop: true, holdReference: true });
+            }
+        )
     }
     public initPauseMenuLayer() {
         const pauseSign = "\u23F8";

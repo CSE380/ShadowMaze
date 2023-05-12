@@ -10,6 +10,8 @@ import AbstractScene from "../Scenes/AbstractScene";
 import Lighting from "./Lighting";
 import Rain, { CENTER, RAIN_SHAPE, RAIN_SIZE, VIEWPORT_SIZE } from "./Rain";
 import RandUtils from "../../Wolfie2D/Utils/RandUtils";
+import { GameEventType } from "../../Wolfie2D/Events/GameEventType";
+import { GameMP3Sound } from "../GameSound";
 export enum FogOfWarMode {
     LIGHTING_MODE = "lighting",
     STANDARD = "Standard"
@@ -39,6 +41,9 @@ export default class FogOfWarManagement {
             label.borderColor = Color.TRANSPARENT;
             label.backgroundColor = Color.BLACK;
             new Lighting(this.scene);
+            this.initObjectPools();
+            this.scene.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameMP3Sound.LIGHTNING, loop: false, holdReference: true });
+            this.scene.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameMP3Sound.RAIN, loop: true, holdReference: true });
         }
         else {
             const len = this.wallSize / this.labelSize;
@@ -63,14 +68,11 @@ export default class FogOfWarManagement {
         label.borderColor = Color.TRANSPARENT;
         label.backgroundColor = Color.FOG_OF_WAR_BLACK;
     }
-    public createLine() {
-
-    }
     public initObjectPools(): void {
         this.rainDroplets = new Array(500);
         for (let i = 0; i < this.rainDroplets.length; i++) {
             let start = RandUtils.randOutsideViewportVec(RAIN_SIZE, VIEWPORT_SIZE);
-            this.rainDroplets[i] = this.add.graphic(GraphicType.RECT, GameLayers.UI, {
+            this.rainDroplets[i] = this.add.graphic(GraphicType.RECT, GameLayers.BASE, {
                 position: start,
                 size: new Vec2(1, RandUtils.randFloat(7,10)),
             });
@@ -84,12 +86,3 @@ export default class FogOfWarManagement {
 
 }
 
-// let start = RandUtils.randOutsideViewportVec(RAIN_SIZE, VIEWPORT_SIZE /2);
-// let dir = start.dirTo(CENTER).scale(0.1);
-// let end = start.clone();
-// end.add(dir)
-// this.rainDroplets[i] = this.add.graphic(GraphicType.LINE, GameLayers.UI, {
-//     start,
-//     end,
-//     color: Color.BLACK,
-// });
