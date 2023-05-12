@@ -104,7 +104,9 @@ export default class Color {
 	static get BLACK(): Color {
 		return new Color(0, 0, 0, 1);
 	}
-
+	static get RAIN_COLOR():Color{
+		return new Color(197, 226, 247,1);
+	}
 	/**	
 	 * Orange color
 	 * @returns rgb(255, 100, 0)

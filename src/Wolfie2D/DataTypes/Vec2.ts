@@ -8,11 +8,11 @@ export default class Vec2 {
 	// Store x and y in an array
 	/** The array that stores the actual vector values x and y */
 	private vec: Float32Array;
-	public currentTransparentLabels:Array<Label>;
+	public currentTransparentLabels: Array<Label>;
 	/**	
 	 * When this vector changes its value, do something
 	 */
-	private onChange: Function = () => {};
+	private onChange: Function = () => { };
 
 	/**
 	 * Creates a new Vec2
@@ -33,7 +33,7 @@ export default class Vec2 {
 	set x(x: number) {
 		this.vec[0] = x;
 
-		if(this.onChange){
+		if (this.onChange) {
 			this.onChange();
 		}
 	}
@@ -45,7 +45,7 @@ export default class Vec2 {
 	set y(y: number) {
 		this.vec[1] = y;
 
-		if(this.onChange){
+		if (this.onChange) {
 			this.onChange();
 		}
 	}
@@ -82,9 +82,13 @@ export default class Vec2 {
 	 * @returns The squared magnitude of the vector
 	 */
 	magSq(): number {
-		return this.x*this.x + this.y*this.y;
+		return this.x * this.x + this.y * this.y;
 	}
-
+	generateRandomVec(start: number): Vec2 {
+		let x = Math.random() * (start);
+		let y = Math.random() * (start);
+		return new Vec2(x,y);
+	}
 	/**
 	 * The magnitude of the vector.
 	 * @returns The magnitude of the vector.
@@ -98,7 +102,7 @@ export default class Vec2 {
 	 * @returns This vector as a unit vector.
 	 */
 	normalize(): Vec2 {
-		if(this.x === 0 && this.y === 0) return this;
+		if (this.x === 0 && this.y === 0) return this;
 		let mag = this.mag();
 		this.x /= mag;
 		this.y /= mag;
@@ -110,12 +114,12 @@ export default class Vec2 {
 	 * @returns A new vector that is the unit vector for this one
 	 */
 	normalized(): Vec2 {
-		if(this.isZero()){
+		if (this.isZero()) {
 			return this;
 		}
-		
+
 		let mag = this.mag();
-		return new Vec2(this.x/mag, this.y/mag);
+		return new Vec2(this.x / mag, this.y / mag);
 	}
 
 	/**
@@ -133,8 +137,8 @@ export default class Vec2 {
 	 * @returns This vector.
 	 */
 	setToAngle(angle: number, radius: number = 1): Vec2 {
-		this.x = MathUtils.floorToPlace(Math.cos(angle)*radius, 5);
-		this.y = MathUtils.floorToPlace(-Math.sin(angle)*radius, 5);
+		this.x = MathUtils.floorToPlace(Math.cos(angle) * radius, 5);
+		this.y = MathUtils.floorToPlace(-Math.sin(angle) * radius, 5);
 		return this;
 	}
 
@@ -146,7 +150,7 @@ export default class Vec2 {
 	vecTo(other: Vec2): Vec2 {
 		return new Vec2(other.x - this.x, other.y - this.y);
 	}
-	
+
 	/**
 	 * Returns a vector containing the direction from this vector to another
 	 * @param other The vector to point to
@@ -172,7 +176,7 @@ export default class Vec2 {
 	 * @returns This vector after scaling
 	 */
 	scale(factor: number, yFactor: number = null): Vec2 {
-		if(yFactor !== null){
+		if (yFactor !== null) {
 			this.x *= factor;
 			this.y *= yFactor;
 			return this;
@@ -200,8 +204,8 @@ export default class Vec2 {
 	rotateCCW(angle: number): Vec2 {
 		let cs = Math.cos(angle);
 		let sn = Math.sin(angle);
-		let tempX = this.x*cs - this.y*sn;
-		let tempY = this.x*sn + this.y*cs;
+		let tempX = this.x * cs - this.y * sn;
+		let tempY = this.x * sn + this.y * cs;
 		this.x = tempX;
 		this.y = tempY;
 		return this;
@@ -246,7 +250,7 @@ export default class Vec2 {
 	 * @returnss This vector after incrementing
 	 */
 	inc(a: number, b?: number): Vec2 {
-		if(b === undefined){
+		if (b === undefined) {
 			this.x += a;
 			this.y += a;
 		} else {
@@ -284,7 +288,7 @@ export default class Vec2 {
 	 * @returns This vector after division
 	 */
 	div(other: Vec2): Vec2 {
-		if(other.x === 0 || other.y === 0) throw "Divide by zero error";
+		if (other.x === 0 || other.y === 0) throw "Divide by zero error";
 		this.x /= other.x;
 		this.y /= other.y;
 		return this;
@@ -307,7 +311,7 @@ export default class Vec2 {
 	 * @returns The squared distance between this vector and the one provided
 	 */
 	distanceSqTo(other: Vec2): number {
-		return (this.x - other.x)*(this.x - other.x) + (this.y - other.y)*(this.y - other.y);
+		return (this.x - other.x) * (this.x - other.x) + (this.y - other.y) * (this.y - other.y);
 	}
 
 	/**
@@ -325,7 +329,7 @@ export default class Vec2 {
 	 * @returns The dot product of this vector and the one provided.
 	 */
 	dot(other: Vec2): number {
-		return this.x*other.x + this.y*other.y;
+		return this.x * other.x + this.y * other.y;
 	}
 
 	/**
@@ -335,11 +339,11 @@ export default class Vec2 {
 	 */
 	angleToCCW(other: Vec2): number {
 		let dot = this.dot(other);
-		let det = this.x*other.y - this.y*other.x;
+		let det = this.x * other.y - this.y * other.x;
 		let angle = -Math.atan2(det, dot);
 
-		if(angle < 0){
-			angle += 2*Math.PI;
+		if (angle < 0) {
+			angle += 2 * Math.PI;
 		}
 
 		return angle;
@@ -406,7 +410,7 @@ export default class Vec2 {
 	isZero(): boolean {
 		return Math.abs(this.x) < 0.0000001 && Math.abs(this.y) < 0.0000001;
 	}
-	
+
 	/**
 	 * Sets the function that is called whenever this vector is changed.
 	 * @param f The function to be called

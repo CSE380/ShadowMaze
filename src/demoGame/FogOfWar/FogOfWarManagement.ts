@@ -1,22 +1,26 @@
 import Vec2 from "../../Wolfie2D/DataTypes/Vec2";
+import Graphic from "../../Wolfie2D/Nodes/Graphic";
+import { GraphicType } from "../../Wolfie2D/Nodes/Graphics/GraphicTypes";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import { UIElementType } from "../../Wolfie2D/Nodes/UIElements/UIElementTypes";
 import FactoryManager from "../../Wolfie2D/Scene/Factories/FactoryManager";
-import Scene from "../../Wolfie2D/Scene/Scene";
 import Color from "../../Wolfie2D/Utils/Color";
 import { GameLayers } from "../GameLayers";
 import AbstractScene from "../Scenes/AbstractScene";
 import Lighting from "./Lighting";
+import Rain, { CENTER, RAIN_SHAPE, RAIN_SIZE, VIEWPORT_SIZE } from "./Rain";
+import RandUtils from "../../Wolfie2D/Utils/RandUtils";
 export enum FogOfWarMode {
     LIGHTING_MODE = "lighting",
-    STANDARD="Standard"
+    STANDARD = "Standard"
 }
 export default class FogOfWarManagement {
     private scene: AbstractScene;
     private add: FactoryManager;
     private wallSize: number;
     private labelSize: number;
-    constructor(scene: AbstractScene, add: FactoryManager,wallSize?:number,labelSize?: number) {
+    private rainDroplets: Array<Graphic>;
+    constructor(scene: AbstractScene, add: FactoryManager, wallSize?: number, labelSize?: number) {
         this.scene = scene;
         this.add = add;
         this.wallSize = wallSize;
@@ -59,4 +63,33 @@ export default class FogOfWarManagement {
         label.borderColor = Color.TRANSPARENT;
         label.backgroundColor = Color.FOG_OF_WAR_BLACK;
     }
+    public createLine() {
+
+    }
+    public initObjectPools(): void {
+        this.rainDroplets = new Array(500);
+        for (let i = 0; i < this.rainDroplets.length; i++) {
+            let start = RandUtils.randOutsideViewportVec(RAIN_SIZE, VIEWPORT_SIZE);
+            this.rainDroplets[i] = this.add.graphic(GraphicType.RECT, GameLayers.UI, {
+                position: start,
+                size: new Vec2(1, RandUtils.randFloat(7,10)),
+            });
+            this.rainDroplets[i].color = Color.RAIN_COLOR;
+            this.rainDroplets[i].visible = true;
+            this.rainDroplets[i].rotation = Vec2.UP.angleToCCW(CENTER.dirTo(start));
+            this.rainDroplets[i].addAI(Rain);
+        }
+    }
+
+
 }
+
+// let start = RandUtils.randOutsideViewportVec(RAIN_SIZE, VIEWPORT_SIZE /2);
+// let dir = start.dirTo(CENTER).scale(0.1);
+// let end = start.clone();
+// end.add(dir)
+// this.rainDroplets[i] = this.add.graphic(GraphicType.LINE, GameLayers.UI, {
+//     start,
+//     end,
+//     color: Color.BLACK,
+// });

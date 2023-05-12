@@ -98,6 +98,7 @@ export default abstract class AbstractScene extends Scene {
     protected levelEndTransitionLabel: Label;
     protected messageBoxLabel: Label;
     protected playerInitPosition = new Vec2(260, 235);
+    
     // protected playerInitPosition = new Vec2(360, 180);
     protected levelEndPosition = new Vec2(260, 490);
     protected levelEndHalfSize = new Vec2(25, 25)
@@ -345,6 +346,7 @@ export default abstract class AbstractScene extends Scene {
         this.navManager.addNavigableEntity("navmesh", navmesh);
 
         this.initInventorySlotsMap();
+
         if (!this.option.isfogOfWarChecked) {
             const Fog = new FogOfWarManagement(this, this.add, this.wallSize, this.labelSize);
             
@@ -359,7 +361,7 @@ export default abstract class AbstractScene extends Scene {
         this.initPauseMenuLayer();
         if (!this.option.isAstarChecked) {
             this.initPlayerStatHUD();
-            this.initNPCs();
+            // this.initNPCs();
             this.initAllGameItems();
 
         }

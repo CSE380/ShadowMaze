@@ -27,7 +27,7 @@ export default class RandUtils {
      * on the seed, _seed.
      */
     static random(): number {
-        if (RandUtils._rand === undefined || RandUtils._rand === null) { 
+        if (RandUtils._rand === undefined || RandUtils._rand === null) {
             RandUtils._rand = RANDOM(RandUtils.seed);
         }
         return RandUtils._rand();
@@ -42,11 +42,11 @@ export default class RandUtils {
      * a seed is generated using RandUtils.randomSeed().
      * @returns the seed
      */
-    static get seed(): string { 
+    static get seed(): string {
         if (RandUtils._seed === undefined || RandUtils._seed === null) {
             RandUtils._seed = RandUtils.randomSeed();
         }
-        return RandUtils._seed; 
+        return RandUtils._seed;
     }
 
     /** 
@@ -54,7 +54,7 @@ export default class RandUtils {
      * by random() to a new function, seeded with the given seed.
      * @param seed the seed used by the random number generator
      */
-    static set seed(seed: string) { 
+    static set seed(seed: string) {
         RandUtils._seed = seed;
         RandUtils._rand = RANDOM(seed);
     }
@@ -65,8 +65,8 @@ export default class RandUtils {
      * @param max The max of the range (exclusive)
      * @returns A random int in the range [min, max)
      */
-	static randInt(min: number, max: number): number {
-        return Math.floor(RandUtils.random()*(max - min) + min);
+    static randInt(min: number, max: number): number {
+        return Math.floor(RandUtils.random() * (max - min) + min);
     }
 
     /**
@@ -75,10 +75,10 @@ export default class RandUtils {
      * @param max The max of the range (exclusive)
      * @returns A random float in the range [min, max)
      */
-	static randFloat(min: number, max: number): number {
-        return RandUtils.random()*(max - min) + min;
+    static randFloat(min: number, max: number): number {
+        return RandUtils.random() * (max - min) + min;
     }
-    
+
     /**
      * Generates a random hexadecimal number in the specified range
      * @param min The min of the range (inclusive)
@@ -93,16 +93,48 @@ export default class RandUtils {
      * Generates a random color
      * @returns A random Color
      */
-	static randColor(): Color {
+    static randColor(): Color {
         let r = RandUtils.randInt(0, 256);
         let g = RandUtils.randInt(0, 256);
         let b = RandUtils.randInt(0, 256);
         return new Color(r, g, b);
     }
-
     static randVec(minX: number, maxX: number, minY: number, maxY: number): Vec2 {
         return new Vec2(this.randFloat(minX, maxX), this.randFloat(minY, maxY));
     }
+    static randOustideViewportX(offset: number, viewportSize: number): number {
+        return RandUtils.random() < 0.5 ?
+            RandUtils.randFloat(-offset, 0) :
+            RandUtils.randFloat(viewportSize, viewportSize + offset);
+    }
+
+    public static randOutsideViewportVec(padding: number, viewportSize: number): Vec2 {
+        const side = RandUtils.randInt(0, 6);
+        let x: number, y: number;
+        switch (side) {
+            case 0: // left
+                x = RandUtils.randFloat(-padding, 0);
+                y = RandUtils.randFloat(-padding, viewportSize + padding);
+                break;
+            case 1: // right
+                x = RandUtils.randFloat(viewportSize, viewportSize + padding);
+                y = RandUtils.randFloat(-padding, viewportSize + padding);
+                break;
+            case 2: // top
+                x = RandUtils.randFloat(0, viewportSize);
+                y = RandUtils.randFloat(-padding, 0);
+                break;
+            case 3: // bottom
+                x = RandUtils.randFloat(0, viewportSize);
+                y = RandUtils.randFloat(viewportSize, viewportSize + padding);
+                break;
+            default:
+                x = RandUtils.randFloat(0, viewportSize);
+                y = RandUtils.randFloat(0, viewportSize);
+        }
+        return new Vec2(x, y);
+    }
+
 
     /** A noise generator */
     static noise: Noise = new Noise();

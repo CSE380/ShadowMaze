@@ -1,3 +1,4 @@
+import Graphic from "../../Wolfie2D/Nodes/Graphic";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import Scene from "../../Wolfie2D/Scene/Scene";
 import Timer from "../../Wolfie2D/Timing/Timer";
@@ -14,6 +15,7 @@ export default class Lighting {
     private colorArray: Color[];
     private numberofFlashback: number;
     private numberofMaxFlashback = 4;
+
     constructor(scene: AbstractScene) {
         this.scene = scene;
 
@@ -27,9 +29,12 @@ export default class Lighting {
             this.timers.push(timer);
             this.createAlpha(i);
         }
+
         this.timerIndex = 0;
         this.timers[0].start();
     }
+  
+
     protected createAlpha(i: number) {
         let { r, g, b, a } = new Color(0, 0, 0, 0);
         const length = this.length;
