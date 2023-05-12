@@ -625,7 +625,10 @@ export default abstract class AbstractScene extends Scene {
         if (Input.isKeyJustPressed("escape")) {
             this.emitter.fireEvent(PauseButtonEvent.PAUSE);
         }
-
+        if (Input.isKeyJustPressed("v")) {
+             this.removeFogOfWar(this.option.isfogOfWarChecked);
+            // this.emitter.fireEvent(PauseButtonEvent.PAUSE);
+        }
         if (this.option.isAstarChecked) {
             this.player.moveOnPath(1, this.path)
             if (this.path.isDone()) {
@@ -652,7 +655,11 @@ export default abstract class AbstractScene extends Scene {
         this.handlePlayerStatChange(PlayerStatKey.CURRENT_SHIELD);
         this.handlePlayerStatChange(PlayerStatKey.CURRENT_HEALTH);
         this.handlePlayerStatChange(PlayerStatKey.CURRENT_ENERGY);
-
+    }
+    protected removeFogOfWar(flag: boolean) {
+        this.getLayer(GameLayers.FOG_OF_WAR).setHidden(flag);
+        this.option.isfogOfWarChecked = !flag;
+        return !flag;
     }
     protected updateVisibleGroup() {
         this.updateTransparentLabels(this.player);
@@ -797,7 +804,7 @@ export default abstract class AbstractScene extends Scene {
                     this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameWAVSound.ULT_KEY, loop: false, holdReference: true });
                 }
             }
-            case  PlayerInput.PARRY:{
+            case PlayerInput.PARRY: {
                 if (!this.ultimateWave.visible) {
                     this.handleFireUltimate();
                     this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameWAVSound.ULT_KEY, loop: false, holdReference: true });
@@ -979,7 +986,7 @@ export default abstract class AbstractScene extends Scene {
         );
     }
     protected showOtherPositionByColor(position: Vec2, color: Color) {
-        const labels =  <Array<Label>>this.getSceneGraph().getNodesAt(position);
+        const labels = <Array<Label>>this.getSceneGraph().getNodesAt(position);
         labels.forEach(label => {
             if (label.backgroundColor) {
                 if (label.backgroundColor.isEqual(Color.FOG_OF_WAR_BLACK)) {
