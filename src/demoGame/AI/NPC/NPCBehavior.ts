@@ -79,7 +79,9 @@ export default abstract class NPCBehavior extends StateMachineGoapAI<NPCAction> 
         if (!this.isInvincible) {
             this.isInvincible = true;
             this.currentHealth -= dmg;
+            console.log('this.currentHealth  :', this.currentHealth );
             this.invincibleTime.start();
+            
             this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameWAVSound.MONSTER_HIT, loop: false, holdReference: true });
             if (this.currentHealth <= 0) {
                 this.owner.animation.play(AnimationType.DYING, false);

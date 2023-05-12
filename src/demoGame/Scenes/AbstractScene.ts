@@ -301,7 +301,7 @@ export default abstract class AbstractScene extends Scene {
     protected initUltimateWave() {
         this.ultimateWave = this.add.sprite(this.ultimateWaveKey, this.GameLayers.BASE);
         this.ultimateWave.visible = false
-        const halfSize = this.player.sizeWithZoom.scale(0.25);
+        const halfSize = this.player.sizeWithZoom.scale(1);
         this.ultimateWave.position.set(this.player.position.x, this.player.position.y);
         this.ultimateWave.setCollisionShape(new AABB(this.player.position, halfSize));
         this.visibleGroup.push(this.ultimateWave);
@@ -347,7 +347,7 @@ export default abstract class AbstractScene extends Scene {
         if (!this.option.isfogOfWarChecked) {
             const Fog = new FogOfWarManagement(this, this.add, this.wallSize, this.labelSize);
 
-            if (this.currentLevel == 5) {
+            if (this.currentLevel == 6) {
                 Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
             }
             else {
@@ -435,6 +435,7 @@ export default abstract class AbstractScene extends Scene {
             ...Object.values(MessageBoxEvents),
         ]);
         this.receiver.subscribe(PlayerInput.ULTIMATE);
+        this.receiver.subscribe(PlayerInput.PARRY);
         this.initGameItemEventSubscribe();
     }
 
@@ -690,7 +691,7 @@ export default abstract class AbstractScene extends Scene {
     protected checkUltimateMonstersCollision() {
         this.battlers.forEach(battler => {
             if (battler.battlerActive && !(battler == this.player)) {
-                if ((this.ultstatus || this.monsterID != battler.id) && battler.position.distanceTo(this.ultimateWave.position) < 30) {
+                if ((this.ultstatus || this.monsterID != battler.id) && battler.position.distanceTo(this.ultimateWave.position) < 100) {
                     this.ultstatus = false;
                     this.monsterID = battler.id;
                     this.emitter.fireEvent(BattlerEvents.MONSTER_HIT, { id: battler.id, dmg: this.player._ai["ultDmg"] });
@@ -776,7 +777,7 @@ export default abstract class AbstractScene extends Scene {
             }
             case BattlerEvents.PRINCE_HIT: {
                 if (!this.player._ai["isInvincible"]) {
-                    this.player._ai[PlayerStatKey.CURRENT_STAT][PlayerStatKey.CURRENT_HEALTH]--;
+                    this.player._ai[PlayerStatKey.CURRENT_STAT][PlayerStatKey.CURRENT_HEALTH] -= 0.5;
                     this.handlePlayerStatChange(PlayerStatKey.CURRENT_HEALTH);
                     this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameWAVSound.PRINCE_HIT, loop: false, holdReference: true });
                 }
@@ -792,6 +793,12 @@ export default abstract class AbstractScene extends Scene {
                 if (!this.ultimateWave.visible
                     && this.player._ai["currentStat"].currentEnergy == this.player._ai["maxStatValue"]) {
                     this.player._ai["currentStat"].currentEnergy = this.player._ai["minStatValue"];
+                    this.handleFireUltimate();
+                    this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameWAVSound.ULT_KEY, loop: false, holdReference: true });
+                }
+            }
+            case  PlayerInput.PARRY:{
+                if (!this.ultimateWave.visible) {
                     this.handleFireUltimate();
                     this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: GameWAVSound.ULT_KEY, loop: false, holdReference: true });
                 }
@@ -815,9 +822,10 @@ export default abstract class AbstractScene extends Scene {
 
         if (battler) {
             this.healthbars.get(id).visible = false;
-            setTimeout(() => {
-                battler.battlerActive = false;
-            }, 1000)
+            battler.battlerActive = false;
+            // setTimeout(() => {
+            //     battler.battlerActive = false;
+            // }, 1000)
 
         }
     }
@@ -867,12 +875,12 @@ export default abstract class AbstractScene extends Scene {
                 break;
             }
             case AllLevelGameItems.ORACLE_ELIXIR: {
-                this.npcGroup.forEach(npc => npc.visible && this.showPositionByColor(npc.position, Color.TRANSPARENT))
+                this.npcGroup.forEach(npc => npc.visible && this.showOtherPositionByColor(npc.position, Color.TRANSPARENT))
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_ORACLE_ELIXIR })
                 break;
             }
             case AllLevelGameItems.SEEING_STONE: {
-                this.gameItemGroup.forEach(gameItem => gameItem.visible && this.showPositionByColor(gameItem.position, Color.TRANSPARENT))
+                this.gameItemGroup.forEach(gameItem => gameItem.visible && this.showOtherPositionByColor(gameItem.position, Color.TRANSPARENT))
                 this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.USE_SEEING_STONE })
                 break;
             }
@@ -970,7 +978,21 @@ export default abstract class AbstractScene extends Scene {
         }
         );
     }
+    protected showOtherPositionByColor(position: Vec2, color: Color) {
+        const labels =  <Array<Label>>this.getSceneGraph().getNodesAt(position);
+        labels.forEach(label => {
+            if (label.backgroundColor) {
+                if (label.backgroundColor.isEqual(Color.FOG_OF_WAR_BLACK)) {
+                    label.backgroundColor = color
+                }
+                else if (label.backgroundColor.isEqual(Color.TRANSPARENT)) {
+                    label.backgroundColor = color
+                }
+            }
 
+        }
+        );
+    }
 
     public initTransparentLabelByPosition(position: Vec2): Array<Label> {
         const labels = this.getLabelsByPosition(position)
@@ -1000,7 +1022,6 @@ export default abstract class AbstractScene extends Scene {
         // let shape = new AABB(position);
         // let labels= <Array<Label>>this.getSceneGraph().getNodesAt(position);
         let labels = this.getLabelsByPosition(position);
-        console.log(labels)
         labels.forEach(label => this.showPositionByColor(label.position, Color.TRANSPARENT));
     }
     public updateTransparentLabelsColor(label: Label) {

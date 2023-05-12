@@ -28,8 +28,8 @@ export default class PlayerAI extends StateMachineAI implements AI {
     public item: Item | null;
 
     // hit 
-    private defendingTime:Timer
-    private isDefending =false;
+    private defendingTime: Timer
+    private isDefending = false;
     private invincibleTime: Timer;
     private isInvincible = false;
     //stats of AI
@@ -40,7 +40,7 @@ export default class PlayerAI extends StateMachineAI implements AI {
     //curse 
     private isCursed: boolean;
     private cursedRatio = -0.2;
-    private cursedThreshHold = 0.3*this.maxStatValue;
+    private cursedThreshHold = 0.3 * this.maxStatValue;
     private dmg = 2;
 
     private ultDmg = 10;
@@ -62,16 +62,16 @@ export default class PlayerAI extends StateMachineAI implements AI {
         this.receiver.subscribe(BattlerEvents.PRINCE_HIT);
         this.receiver.subscribe(BattlerEvents.MONSTER_ATTACK);
         // this.receiver.subscribe(BattlerEvents.MONSTER_HIT);
-        this.invincibleTime = new Timer(1000, ()=>this.isInvincible =this.resetFlag(this.isInvincible), false);
-        this.defendingTime= new Timer(300, ()=>this.isDefending = this.resetFlag(this.isDefending), false);
+        this.invincibleTime = new Timer(1000, () => this.isInvincible = this.resetFlag(this.isInvincible), false);
+        this.defendingTime = new Timer(300, () => this.isDefending = this.resetFlag(this.isDefending), false);
         this.activate(null)
     }
-    
+
     public activate(options: Record<string, any>): void {
         for (const name of this.statNames) {
             this.currentStat[name] = this.currentStatValue; // Set default value for each stat
-            if (name !== 'currentHealth') {
-                this.currentStat[name] = 0;
+            if (name == 'currentHealth') {
+                this.currentStat[name] = this.currentStatValue;
             }
             // this.currentStat[name]=10;
         }
@@ -88,11 +88,11 @@ export default class PlayerAI extends StateMachineAI implements AI {
     }
 
     public destroy(): void { }
-    public updateCurseStat(deltaT: number){
+    public updateCurseStat(deltaT: number) {
         if (this.isCursed) {
-            if(this.currentStat[PlayerStatKey.CURRENT_HEALTH]<=this.cursedThreshHold){
+            if (this.currentStat[PlayerStatKey.CURRENT_HEALTH] <= this.cursedThreshHold) {
                 this.dmg = 2;
-                this.emitter.fireEvent(MessageBoxEvents.SHOW,{message:MessageBoxEvents.UNUSED_CURSED_SWORD})
+                this.emitter.fireEvent(MessageBoxEvents.SHOW, { message: MessageBoxEvents.UNUSED_CURSED_SWORD })
                 this.isCursed = false;
             }
             this.dynamicUpdatePlayerStat(this.cursedRatio * deltaT, PlayerStatKey.CURRENT_HEALTH);
@@ -107,7 +107,7 @@ export default class PlayerAI extends StateMachineAI implements AI {
     }
     public handleEvent(event: GameEvent): void {
         switch (event.type) {
-            case BattlerEvents.MONSTER_ATTACK:{
+            case BattlerEvents.MONSTER_ATTACK: {
                 this.handleMonsterAttack();
                 break;
             }
@@ -118,34 +118,34 @@ export default class PlayerAI extends StateMachineAI implements AI {
             case BattlerEvents.PRINCE_DEAD: {
                 break;
             }
-            case BattlerEvents.MONSTER_HIT:{
+            case BattlerEvents.MONSTER_HIT: {
                 this.handleMonsterHit();
                 break;
             }
         }
     }
     // TO DO play hit animation
-    protected handleMonsterHit(){
-        
-        if(this.currentStat[PlayerStatKey.CURRENT_ENERGY]<this.maxStatValue){
+    protected handleMonsterHit() {
+
+        if (this.currentStat[PlayerStatKey.CURRENT_ENERGY] < this.maxStatValue) {
             this.currentStat[PlayerStatKey.CURRENT_ENERGY]++;
         }
     }
-    protected handleMonsterAttack(){
-        if(this.owner.animation.isPlaying(AnimationType.SHIELDING)){
-            if(!this.isDefending){
+    protected handleMonsterAttack() {
+        if (this.owner.animation.isPlaying(AnimationType.SHIELDING)) {
+            if (!this.isDefending) {
                 this.isDefending = true;
                 this.defendingTime.start();
                 console.log("defending")
             }
         }
-        else{
+        else {
             this.emitter.fireEvent(BattlerEvents.PRINCE_HIT);
-            
+
         }
     }
     protected handlePrinceHit() {
-        
+
         if (!this.isInvincible) {
             this.isInvincible = true;
             this.invincibleTime.start();
@@ -156,7 +156,7 @@ export default class PlayerAI extends StateMachineAI implements AI {
             }
         }
     }
-    protected resetFlag = (flag:boolean) => {
+    protected resetFlag = (flag: boolean) => {
         return !flag;
     };
 }

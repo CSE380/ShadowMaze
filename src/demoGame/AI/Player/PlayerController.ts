@@ -16,7 +16,7 @@ export enum PlayerInput {
     ULTIMATE = "ULTIMATE",
     PICKUP_ITEM = "PICKUP_ITEM",
     DROP_ITEM = "DROP_ITEM",
-   
+    PARRY = "PARRY"
 }
 export enum UseItemInput {
     USE_ITEM1 = "USE_ITEM1",
@@ -24,11 +24,11 @@ export enum UseItemInput {
     USE_ITEM3 = "USE_ITEM3",
     USE_ITEM4 = "USE_ITEM4",
     USE_ITEM5 = "USE_ITEM5",
-  }
+}
 export const PlayerAnimations = {
-    IDLE : "IDLE",
+    IDLE: "IDLE",
     ATTACKING: "ATTACKING",
-    MOVING : "MOVING",
+    MOVING: "MOVING",
     SHIELDING: "SHIELDING",
     DYING: "DYING",
     DEAD: "DEAD",
@@ -48,7 +48,7 @@ export const MonsterAnimations = {
  * The PlayerController class handles processing the input recieved from the user and exposes  
  * a set of methods to make dealing with the user input a bit simpler.
  */
-export default class PlayerController{
+export default class PlayerController {
 
     /** The GameNode that owns the AI */
     protected owner: AnimatedSprite;
@@ -61,10 +61,10 @@ export default class PlayerController{
      * Gets the direction the player should move based on input from the keyboard. 
      * @returns a Vec2 indicating the direction the player should move. 
      */
-    public get moveDir(): Vec2 { 
+    public get moveDir(): Vec2 {
         let dir: Vec2 = Vec2.ZERO;
         dir.y = (Input.isPressed(PlayerInput.MOVE_UP) ? -1 : 0) + (Input.isPressed(PlayerInput.MOVE_DOWN) ? 1 : 0);
-		dir.x = (Input.isPressed(PlayerInput.MOVE_LEFT) ? -1 : 0) + (Input.isPressed(PlayerInput.MOVE_RIGHT) ? 1 : 0);
+        dir.x = (Input.isPressed(PlayerInput.MOVE_LEFT) ? -1 : 0) + (Input.isPressed(PlayerInput.MOVE_RIGHT) ? 1 : 0);
         return dir.normalize();
     }
 

@@ -64,7 +64,7 @@ export enum Level4GameItems {
 }
 
 export enum Level5GameItems {
-    LANTERNS = "lantern",
+    HEALTH_PACK = "healthPacks",
     INVENTORY_SLOT = "inventorySlot",
     IRON_SHIELD = "ironShield",
     IRON_SWORD =  "ironSword",

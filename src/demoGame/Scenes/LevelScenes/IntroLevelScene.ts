@@ -40,7 +40,6 @@ export default class Level3Scene extends AbstractScene {
     protected handleInGameButtonEvent(event:GameEvent){
         let nextScene;
         // console.log(event)
-        console.log(event.type);
         switch (event.type) {
             case MainMenuButtonEvent.Restart: {
                 nextScene = Level3Scene;
