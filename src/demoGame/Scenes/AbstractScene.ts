@@ -344,16 +344,16 @@ export default abstract class AbstractScene extends Scene {
 
         this.initInventorySlotsMap();
 
-        // if (!this.option.isfogOfWarChecked) {
-        //     const Fog = new FogOfWarManagement(this, this.add, this.wallSize, this.labelSize);
+        if (!this.option.isfogOfWarChecked) {
+            const Fog = new FogOfWarManagement(this, this.add, this.wallSize, this.labelSize);
 
-        //     if (this.currentLevel == 5) {
-        //         Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
-        //     }
-        //     else {
-        //         Fog.initFogOfWar(FogOfWarMode.STANDARD);
-        //     }
-        // }
+            if (this.currentLevel == 5) {
+                Fog.initFogOfWar(FogOfWarMode.LIGHTING_MODE);
+            }
+            else {
+                Fog.initFogOfWar(FogOfWarMode.STANDARD);
+            }
+        }
         this.center = this.viewport.getHalfSize();
         this.initPauseMenuLayer();
         if (!this.option.isAstarChecked) {
@@ -1139,7 +1139,6 @@ export default abstract class AbstractScene extends Scene {
         else {
             player.addAI(PlayerAI);
             this.initUltimateWave();
-            console.log(this.player._ai)
         }
         // 
         player.animation.play("IDLE");
