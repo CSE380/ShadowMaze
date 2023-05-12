@@ -19,17 +19,29 @@ import Battler from "../GameSystems/BattleSystem/Battler";
 
 // Welcome to Wolfie2D!
 // This is a simple sample scene so something displays when you run the game.
+export enum MODE_TYPE {
+    AUTO_PILOT = "Auto-Pilot",
+    FOG_OF_WAR = "Remove Fog of War",
+    // INVICINBLE = "Invincible",
+    // UNLIMITED_SPELL = "Unlimited Ult",
+}
 export default class CheatCodeMenuScene extends HW4Scene {
     /* ########## MEMBER DEFINITIONS ##########*/
+
     protected Astar = "Auto-Pilot";
     protected FogOfWar = "Remove Fog of War";
     protected astarCheckLabel: Label;
-    protected isAstarChecked:boolean;
+    protected isAstarChecked: boolean;
     protected fogOfWarCheckLabel: Label;
     protected isfogOfWarChecked: boolean;
+    protected isInvincibleChecked: boolean;
+    protected isUnlimitedChecked: boolean;
+    protected length = 4;
+    protected checkedLables: Label[] = Array.from({ length });
+    protected checkedValues: boolean[] = Array.from({ length }, () => false);
     loadScene(): void {
         // this.load.tilemap("map", "../dist/shadowMaze_assets/tilemaps/test2.json");
-
+        console.log(MODE_TYPE.AUTO_PILOT)
         this.load.image(this.backgroundImageKey, "shadowMaze_assets/images/mazeBackground.jpg");
         // console.log(this.load.getImage("image"));
 
@@ -40,8 +52,7 @@ export default class CheatCodeMenuScene extends HW4Scene {
     // Once again, this occurs strictly after loadScene(), so anything you loaded there will be available
     startScene(): void {
         this.addUILayer(this.GameLayers.BASE)
-        this.isAstarChecked = false;
-        this.isfogOfWarChecked = false;
+
         this.backgroundImage = this.add.sprite(this.backgroundImageKey, this.GameLayers.BASE);
         let center = this.viewport.getCenter();
         this.addBackButton(this.backButtonPosition);
@@ -53,10 +64,15 @@ export default class CheatCodeMenuScene extends HW4Scene {
             fontSize: 50,
         }
         this.addLabel(textOption);
-        this.astarCheckLabel = this.addModeButton(center, this.Astar);
-        center = new Vec2(center.x, center.y + 200);
-        this.fogOfWarCheckLabel = this.addModeButton(center, this.FogOfWar);
-      
+        this.addAllModeButton();
+    }
+    public addAllModeButton() {
+        let center = this.viewport.getCenter();
+        center.y = center.y - 100;
+        Object.values(MODE_TYPE).forEach((key, index) => {
+            this.checkedLables[index] = this.addModeButton(center, key);
+            center = new Vec2(center.x, center.y + 200);
+        })
     }
     public addModeButton(position: Vec2, buttonName: string) {
         let aStarTextOption = {
@@ -104,34 +120,33 @@ export default class CheatCodeMenuScene extends HW4Scene {
         }
         return !flag;
     }
-   
+
     public handleEvent(event: GameEvent): void {
-        // console.log(event.type === this.Astar)
         console.log(event.type)
-        // console.log(event.type === this.FogOfWar)
         switch (event.type) {
             case BackButtonEvent.BACK: {
-                const option={
-                    isAstarChecked:this.isAstarChecked,
-                    isfogOfWarChecked:this.isfogOfWarChecked,
+                const option = {
+                    isAstarChecked: this.checkedValues[0],
+                    isfogOfWarChecked:this.checkedValues[1],
+                    isInvincibleChecked : this.checkedValues[2],
+                    isUnlimitedChecked : this.checkedValues[3],
                 }
-                this.sceneManager.changeToScene(SelectLevelMenuScene,option);
+                this.sceneManager.changeToScene(SelectLevelMenuScene, option);
                 break;
             }
-            case this.Astar: {
-                // this.isAstarChecked= !this.isAstarChecked
-                // this.showCheckLabel(this.astarCheckLabel, this.isAstarChecked);
-                this.isAstarChecked = this.showCheckLabel(this.astarCheckLabel,this.isAstarChecked);
-                break;
+            default :{
+                Object.values(MODE_TYPE).forEach((key, index) => {
+                    if(key == event.type){
+                        this.checkedValues[index] =  this.showCheckLabel(this.checkedLables[index], this.checkedValues[index]);
+                    }
+
+                })
             }
-            case this.FogOfWar: {
-                this.isfogOfWarChecked =this.showCheckLabel(this.fogOfWarCheckLabel, this.isfogOfWarChecked);
-                break;
-            }
+
         }
     }
 
     public getBattlers(): Battler[] { return this.battlers; }
 
-    
+
 }

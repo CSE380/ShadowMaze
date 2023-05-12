@@ -358,7 +358,7 @@ export default abstract class AbstractScene extends Scene {
         this.initPauseMenuLayer();
         if (!this.option.isAstarChecked) {
             this.initPlayerStatHUD();
-            // this.initNPCs();
+            this.initNPCs();
             this.initAllGameItems();
 
         }
@@ -1139,6 +1139,7 @@ export default abstract class AbstractScene extends Scene {
         else {
             player.addAI(PlayerAI);
             this.initUltimateWave();
+            console.log(this.player._ai)
         }
         // 
         player.animation.play("IDLE");
